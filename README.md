@@ -50,14 +50,6 @@ La dirección de red permite probar en teléfonos y escanear el QR de la credenc
 
 ![Estructura del proyecto](docs/estructura.png)
 
-El diagrama se genera desde `docs/estructura.puml` (PlantUML). Para regenerarlo:
-
-~~~bash
-curl -X POST https://kroki.io/plantuml/png \
-  -H "Content-Type: text/plain" \
-  --data-binary @docs/estructura.puml \
-  -o docs/estructura.png
-~~~
 
 ## Rutas principales
 
@@ -107,19 +99,12 @@ pnpm start   # servidor de producción
 pnpm lint    # ESLint
 ~~~
 
-## Próximos pasos (Incremento 1)
-
-- [ ] Backend con BetterAuth (JWT y sesiones)
-- [ ] PostgreSQL con Prisma ORM
-- [ ] Resend para envío de correos
-- [ ] SeaweedFS para almacenamiento de archivos
-- [ ] Dominio de producción para el QR de verificación
-
 Las interfaces de `lib/mock` (Solicitud, Documento, PerfilCatalogo, Conversacion, ContenidoHome) funcionan como contrato de datos entre el front y el futuro backend.
 
 ## Equipo
 
-- Desarrollo: Alberth812
+- Desarrollo:
+- Desarrollo:
 - Validación: directivos de la Asociación de Egresados de Posgrado del TecNM
 
 ---
