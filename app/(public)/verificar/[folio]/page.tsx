@@ -77,7 +77,7 @@ export default function VerificarPage() {
                   </p>
                   <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-red-900">
                     <div><dt className="font-medium">Tipo sanguíneo</dt><dd>{credencial.emergencia.tipoSanguineo}</dd></div>
-                    <div><dt className="font-medium">Alergias</dt><dd>{credencial.emergencia.alergencia ?? credencial.emergencia.alergias}</dd></div>
+                    <div><dt className="font-medium">Alergias</dt><dd>{credencial.emergencia.alergias ?? credencial.emergencia.alergias}</dd></div>
                     <div className="col-span-2">
                       <dt className="font-medium">Contacto</dt>
                       <dd>

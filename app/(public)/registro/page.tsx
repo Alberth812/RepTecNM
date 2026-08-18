@@ -373,7 +373,7 @@ export default function RegistroPage() {
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm font-medium">Género (confidencial)</span>
-                  <Select value={datos.genero} onValueChange={(v) => actualizar({ genero: v })}>
+                  <Select value={datos.genero} onValueChange={(v) => { if (v) actualizar({ genero: v }); }}>
                     <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Femenino">Femenino</SelectItem>
@@ -410,6 +410,7 @@ export default function RegistroPage() {
                     <Select
                       value={p.tipo}
                       onValueChange={(v) => {
+                        if (!v) return;
                         const copia = [...datos.posgrados];
                         copia[i] = { ...copia[i], tipo: v };
                         actualizar({ posgrados: copia });
@@ -424,6 +425,7 @@ export default function RegistroPage() {
                     <Select
                       value={p.instituto}
                       onValueChange={(v) => {
+                        if (!v) return;
                         const copia = [...datos.posgrados];
                         copia[i] = { ...copia[i], instituto: v };
                         actualizar({ posgrados: copia });

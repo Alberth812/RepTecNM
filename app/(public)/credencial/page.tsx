@@ -128,7 +128,7 @@ export default function CredencialPage() {
             </div>
             <div className="grid gap-2 md:col-span-2">
               <span className="text-sm font-medium">Instituto TecNM</span>
-              <Select value={perfil.instituto} onValueChange={(v) => actualizar({ instituto: v })}>
+              <Select value={perfil.instituto} onValueChange={(v) => { if (v) actualizar({ instituto: v }); }}>
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
                   {INSTITUTOS.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}
@@ -151,7 +151,7 @@ export default function CredencialPage() {
           <Seccion titulo="Información de emergencia">
             <div className="grid gap-2">
               <span className="text-sm font-medium">Tipo sanguíneo</span>
-              <Select value={perfil.tipoSanguineo} onValueChange={(v) => actualizar({ tipoSanguineo: v })}>
+              <Select value={perfil.tipoSanguineo} onValueChange={(v) => { if (v) actualizar({ tipoSanguineo: v }); }}>
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
                   {TIPOS_SANGUINEOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}

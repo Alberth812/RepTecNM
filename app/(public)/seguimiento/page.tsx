@@ -81,12 +81,12 @@ function Escala({ valor, onChange }: { valor: number; onChange: (n: number) => v
   );
 }
 
-function Selector({ valor, onValue, placeholder, opciones, className }: {
-  valor: string; onValue: (v: string) => void; placeholder: string; opciones: string[]; className?: string;
+function Selector({ valor, onValue, placeholder, opciones }: {
+  valor: string; onValue: (v: string) => void; placeholder: string; opciones: string[];
 }) {
   return (
-    <Select value={valor || undefined} onValueChange={onValue}>
-      <SelectTrigger className={className ?? "bg-background"}><SelectValue placeholder={placeholder} /></SelectTrigger>
+    <Select value={valor || undefined} onValueChange={(v) => { if (v) onValue(v); }}>
+      <SelectTrigger className="bg-background"><SelectValue placeholder={placeholder} /></SelectTrigger>
       <SelectContent>
         {opciones.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
       </SelectContent>
@@ -251,7 +251,7 @@ export default function SeguimientoPage() {
                 <Pregunta etiqueta="Sector económico primario">
                   <Selector valor={resp.sector} onValue={(v) => actualizar({ sector: v })} placeholder="Selecciona" opciones={SECTOR} />
                 </Pregunta>
-                <Pregunta etiqueta="Tiempo para conseguir el primer empleo tras el egreso" className="md:col-span-2">
+                <Pregunta etiqueta="Tiempo para conseguir el primer empleo tras el egreso">
                   <Selector valor={resp.tiempoEmpleo} onValue={(v) => actualizar({ tiempoEmpleo: v })} placeholder="Selecciona" opciones={TIEMPO_EMPLEO} />
                 </Pregunta>
               </div>

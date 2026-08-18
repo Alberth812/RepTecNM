@@ -426,7 +426,7 @@ export default function RepositorioPage() {
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="grid gap-2">
                   <span className="text-sm font-medium">Tipo de documento</span>
-                  <Select value={form.tipo || undefined} onValueChange={(v) => setForm({ ...form, tipo: v })}>
+                  <Select value={form.tipo || undefined} onValueChange={(v) => { if (v) setForm({ ...form, tipo: v }); }}>
                     <SelectTrigger className="bg-background"><SelectValue placeholder="Selecciona" /></SelectTrigger>
                     <SelectContent>
                       {TIPOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -529,7 +529,7 @@ export default function RepositorioPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
-            <Select value={motivoReporte || undefined} onValueChange={setMotivoReporte}>
+            <Select value={motivoReporte || undefined} onValueChange={(v) => { if (v) setMotivoReporte(v); }}>
               <SelectTrigger><SelectValue placeholder="Motivo del reporte" /></SelectTrigger>
               <SelectContent>
                 {MOTIVOS_REPORTE.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
@@ -552,7 +552,7 @@ export default function RepositorioPage() {
           <DialogHeader>
             <DialogTitle>Eliminar publicación</DialogTitle>
             <DialogDescription>
-              Esta acción es irreversible y retirará el documento del repositorio.
+              {eliminando ? "Esta acción es irreversible y retirará el documento del repositorio." : ""}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -560,6 +560,7 @@ export default function RepositorioPage() {
             <Button
               variant="destructive"
               onClick={() => {
+                if (!eliminando) return;
                 setDocs((prev) => prev.filter((d) => d.id !== eliminando.id));
                 toast.success("Publicación eliminada del repositorio.");
                 setEliminando(null);

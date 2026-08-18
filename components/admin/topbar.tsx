@@ -19,7 +19,7 @@ export function Topbar() {
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
       {/* Menú Móvil */}
       <Sheet>
-        <SheetTrigger asChild>
+        <SheetTrigger>
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background hover:bg-accent hover:text-accent-foreground h-9 w-9 md:hidden"
@@ -55,7 +55,7 @@ export function Topbar() {
 
         {/* Perfil de Administrador */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/avatars/01.png" alt="@admin" />
