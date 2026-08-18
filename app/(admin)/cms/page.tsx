@@ -99,7 +99,23 @@ export default function CmsPage() {
         <div className="grid gap-6">
           {c.slides.map((sl, i) => (
             <div key={i} className="grid gap-3 rounded-xl border bg-background p-4">
-              <p className="text-sm font-medium text-primary">Slide {i + 1}</p>
+                            <p className="text-sm font-medium text-primary">Slide {i + 1}</p>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <span className="text-xs font-medium">Tipo</span>
+                  <Select value={sl.tipo || "normal"} onValueChange={(v) => setSlide(i, { tipo: v as "normal" | "aviso" })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="aviso">Aviso importante</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <span className="text-xs font-medium">Etiqueta</span>
+                  <Input value={sl.etiqueta} onChange={(e) => setSlide(i, { etiqueta: e.target.value })} placeholder="Etiqueta" />
+                </div>
+              </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <Input value={sl.etiqueta} onChange={(e) => setSlide(i, { etiqueta: e.target.value })} placeholder="Etiqueta" />
                 <Input value={sl.ctaLabel} onChange={(e) => setSlide(i, { ctaLabel: e.target.value })} placeholder="Texto del botón" />

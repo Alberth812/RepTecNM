@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  ArrowRight, Search, Users, BookOpen, Building2, MapPin, GraduationCap,
+  AlertCircle, ArrowRight, Search, Users, BookOpen, Building2, MapPin, GraduationCap,
   Star, Quote, QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,10 +57,11 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-24 text-center">
-          <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium tracking-wide backdrop-blur">
+          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur ${s.tipo === "aviso" ? "border-amber-400/60 bg-amber-500/25 text-amber-100" : "border-white/30 bg-white/10"}`}>
+            {s.tipo === "aviso" && <AlertCircle className="h-3 w-3" />}
             {s.etiqueta}
           </span>
-          <h1 className="mt-4 font-serif text-5xl font-bold leading-tight md:text-6xl">
+          <h1 className={`mt-4 font-serif text-5xl font-bold leading-tight md:text-6xl ${s.tipo === "aviso" ? "text-amber-100" : ""}`}>
             {s.titulo}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-sky-100/90">{s.texto}</p>

@@ -1,4 +1,5 @@
 export interface Slide {
+  tipo: "normal" | "aviso";
   etiqueta: string;
   titulo: string;
   texto: string;
@@ -35,6 +36,7 @@ export interface ContenidoHome {
 export const CONTENIDO_DEFAULT: ContenidoHome = {
   slides: [
     {
+      tipo: "normal",
       etiqueta: "Red de Egresados",
       titulo: "Conectamos el talento de posgrado del TecNM",
       texto: "Una comunidad nacional de profesionales que colabora, investiga y transforma al país.",
@@ -43,6 +45,7 @@ export const CONTENIDO_DEFAULT: ContenidoHome = {
       imagen: "",
     },
     {
+      tipo: "normal",
       etiqueta: "Credencial digital",
       titulo: "Tu afiliación, siempre contigo",
       texto: "Credencial con verificación por código QR, disponible en formato digital e imprimible.",
@@ -51,6 +54,7 @@ export const CONTENIDO_DEFAULT: ContenidoHome = {
       imagen: "",
     },
     {
+      tipo: "normal",
       etiqueta: "Vinculación",
       titulo: "Servicios profesionales con respaldo académico",
       texto: "Consultoría, investigación y capacitación para el sector productivo y gubernamental.",
