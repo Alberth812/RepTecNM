@@ -59,11 +59,8 @@ function borrarStorage(clave: string) {
   }
 }
 
-const INSTITUTOS = [
-  "Instituto Tecnológico de Celaya", "Instituto Tecnológico de Mérida",
-  "Instituto Tecnológico de Tijuana", "Instituto Tecnológico de Nuevo León",
-  "Instituto Tecnológico de Oaxaca", "Instituto Tecnológico de Querétaro",
-];
+import { INSTITUTOS_BASE } from "@/lib/mock/institutos";
+const INSTITUTOS = INSTITUTOS_BASE.filter((i) => i.activo).map((i) => i.nombre);
 const SECCIONES = [
   "Datos generales", "Formación académica", "Perfil profesional", "Servicios",
   "Experiencia y proyectos", "Intereses de colaboración", "Visibilidad y documentos",

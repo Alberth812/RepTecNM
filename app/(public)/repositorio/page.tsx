@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Download, Eye, FilePlus2, FileText, Flag, MessageSquareText, PencilLine,
@@ -23,22 +24,11 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { documentosIniciales, type Documento } from "@/lib/mock/repositorio";
+import { COMENTARIOS_INICIALES, type Comentario } from "@/lib/mock/comentarios";
 
 const ANIO_ACTUAL = new Date().getFullYear();
 const TIPOS = ["Artículo", "Tesis", "Libro", "Memoria de congreso", "Presentación", "Ensayo", "Reporte técnico", "Otro"];
 const MOTIVOS_REPORTE = ["Derechos de autor", "Contenido inapropiado", "Información confidencial", "Plagio", "Spam", "Otro"];
-
-interface Comentario { autor: string; texto: string; fecha: string }
-
-const COMENTARIOS_INICIALES: Record<string, Comentario[]> = {
-  "DOC-2026-0001": [
-    { autor: "Jorge Alberto Ramírez Soto", texto: "Excelente trabajo de campo. ¿Compartirán el dataset de lecturas?", fecha: "12 ago 2026" },
-    { autor: "Gabriela Sánchez Moreno", texto: "Muy útil como referencia para mi proyecto de sensores en salud.", fecha: "11 ago 2026" },
-  ],
-  "DOC-2026-0002": [
-    { autor: "Ricardo Pérez Castillo", texto: "¿El modelo está disponible como código abierto?", fecha: "09 ago 2026" },
-  ],
-};
 
 interface FormDoc {
   titulo: string; resumen: string; tipo: string; otroTipo: string; anio: string;
@@ -101,6 +91,12 @@ export default function RepositorioPage() {
   const [foroAbierto, setForoAbierto] = useState<string | null>(null);
   const [comentarios, setComentarios] = useState<Record<string, Comentario[]>>(COMENTARIOS_INICIALES);
   const [textoComentario, setTextoComentario] = useState("");
+  const paramsUrl = useSearchParams();
+  const qUrl = paramsUrl.get("q");
+
+  useEffect(() => {
+    if (qUrl) setBusqueda(qUrl);
+  }, [qUrl]);
 
   const resultados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean);

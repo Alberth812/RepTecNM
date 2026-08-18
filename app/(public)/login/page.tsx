@@ -1,15 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, GraduationCap, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
+
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const [ver, setVer] = useState(false);
+  const [recAbierto, setRecAbierto] = useState(false);
+  const [correoRec, setCorreoRec] = useState("");
+  const [recEnviado, setRecEnviado] = useState(false);
+  const [espera, setEspera] = useState(0);
+
+  useEffect(() => {
+    if (espera <= 0) return;
+    const t = setTimeout(() => setEspera(espera - 1), 1000);
+    return () => clearTimeout(t);
+  }, [espera]);
+
+  const enviarRecuperacion = () => {
+    if (!/^\S+@\S+\.\S+$/.test(correoRec.trim())) {
+      toast.error("Ingresa un correo válido.");
+      return;
+    }
+    setRecEnviado(true);
+    setEspera(120);
+    toast.success("Enlace de recuperación enviado (simulado en el prototipo).");
+  };
 
   return (
     <div className="relative flex min-h-[calc(100dvh-100px)] items-center justify-center overflow-hidden px-4 py-10">
@@ -48,7 +72,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 className="text-xs text-primary hover:underline"
-                onClick={() => toast.info("Recuperación disponible con el backend (RF-AUTH-011).")}
+                onClick={() => { setRecAbierto(true); setRecEnviado(false); setCorreoRec(""); }}
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -91,6 +115,40 @@ export default function LoginPage() {
         <Link href="/registro" className="block">
           <Button variant="outline" className="w-full">Crear cuenta de afiliado</Button>
         </Link>
+
+        <Dialog open={recAbierto} onOpenChange={setRecAbierto}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Recuperar contraseña</DialogTitle>
+              <DialogDescription>
+                Te enviaremos un enlace para restablecerla (RF-AUTH-011).
+              </DialogDescription>
+            </DialogHeader>
+            {recEnviado ? (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-900">
+                Si el correo existe en nuestra base, recibirá el enlace en unos minutos.
+                Revisa también la carpeta de spam.
+              </div>
+            ) : (
+              <Input
+                type="email"
+                value={correoRec}
+                onChange={(e) => setCorreoRec(e.target.value)}
+                placeholder="tucorreo@ejemplo.com"
+              />
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRecAbierto(false)}>Cerrar</Button>
+              {recEnviado ? (
+                <Button disabled={espera > 0} onClick={enviarRecuperacion}>
+                  {espera > 0 ? `Reenviar en ${espera} s` : "Reenviar enlace"}
+                </Button>
+              ) : (
+                <Button onClick={enviarRecuperacion}>Enviar enlace</Button>
+              )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <p className="mt-6 text-center text-[11px] leading-relaxed text-muted-foreground">
           Entorno de demostración. En producción, la autenticación usa tokens JWT

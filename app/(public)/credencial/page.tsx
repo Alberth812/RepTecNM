@@ -16,11 +16,8 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-const INSTITUTOS = [
-  "Instituto Tecnológico de Celaya", "Instituto Tecnológico de Mérida",
-  "Instituto Tecnológico de Tijuana", "Instituto Tecnológico de Nuevo León",
-  "Instituto Tecnológico de Oaxaca", "Instituto Tecnológico de Querétaro",
-];
+import { INSTITUTOS_BASE } from "@/lib/mock/institutos";
+const INSTITUTOS = INSTITUTOS_BASE.filter((i) => i.activo).map((i) => i.nombre);
 const TIPOS_SANGUINEOS = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
 const FOLIO = "A1B2C3D4E5F6";
 const NUMERO = "REP-2026-00001";

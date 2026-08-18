@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, UserCheck, UserMinus, UserX } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,6 +37,12 @@ export default function AfiliadosPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("");
   const [baja, setBaja] = useState<Afiliado | null>(null);
+  const paramsUrl = useSearchParams();
+  const qUrl = paramsUrl.get("q");
+
+  useEffect(() => {
+    if (qUrl) setBusqueda(qUrl);
+  }, [qUrl]);
 
   const resultados = useMemo(() => {
     return afiliados.filter(
