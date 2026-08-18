@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -76,6 +76,14 @@ function SeccionForm({ titulo, children }: { titulo: string; children: ReactNode
 }
 
 export default function RepositorioPage() {
+  return (
+    <Suspense fallback={<div className="flex h-64 items-center justify-center text-muted-foreground">Cargando...</div>}>
+      <RepositorioPageInner />
+    </Suspense>
+  );
+}
+
+function RepositorioPageInner() {
   const [docs, setDocs] = useState(documentosIniciales);
   const [busqueda, setBusqueda] = useState("");
   const [sheetAbierto, setSheetAbierto] = useState(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, UserCheck, UserMinus, UserX } from "lucide-react";
 import { toast } from "sonner";
@@ -33,6 +33,14 @@ const ESTILO_ESTADO: Record<EstadoAfiliado, string> = {
 };
 
 export default function AfiliadosPage() {
+  return (
+    <Suspense fallback={<div className="flex h-64 items-center justify-center text-muted-foreground">Cargando...</div>}>
+      <AfiliadosPageInner />
+    </Suspense>
+  );
+}
+
+function AfiliadosPageInner() {
   const [afiliados, setAfiliados] = useState(afiliadosIniciales);
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("");
