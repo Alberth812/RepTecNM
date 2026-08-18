@@ -119,7 +119,7 @@ export default function MensajeriaPage() {
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card md:grid-cols-[320px_1fr]">
+      <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card max-md:grid-rows-[220px_minmax(0,1fr)] md:grid-cols-[320px_1fr]">
         {/* Lista de conversaciones */}
         <div className="flex min-h-0 flex-col border-r">
           <div className="shrink-0 border-b p-3">
