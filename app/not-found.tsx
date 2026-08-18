@@ -2,16 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GraduationCap, RefreshCw, Search } from "lucide-react";
+import { GraduationCap, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 const MENSAJES = [
-  "Parece que buscabas algo... pero ¿qué será? Esta ruta no existe en nuestro repositorio.",
   "Error 404: esta página se tituló y no nos dejó el certificado.",
+  "Parece que buscabas algo... pero ¿qué será? Esta ruta no existe en nuestro repositorio.",
   "Revisamos todo el catálogo y esta página no aparece ni con búsqueda por relevancia.",
   "Esta página solicitó una sabática y no está registrada en el sistema.",
   "Ni con QR ni con folio: este destino no está verificado en la red.",
+  "Esta página presentó su examen profesional y no volvió por su diploma.",
+  "Buscamos en el acervo bibliográfico y esta ruta no está ni en las referencias.",
+  "El comité dictaminador revisó esta URL y no la encontró en el acta.",
+  "Esta página dejó la tesis en la biblioteca, pero no el código en el servidor.",
+  "La ruta que buscas aplicó para una beca en otro servidor.",
+  "Esta página causó baja por faltas de asistencia al plan de estudios.",
   "Estamos trabajando en ello. Mientras tanto, el catálogo sigue abierto para ti.",
 ];
 
@@ -33,12 +39,6 @@ export default function NotFoundPage() {
 
       <h1 className="mt-2 text-2xl font-semibold tracking-tight">Página no encontrada</h1>
       <p className="mt-3 max-w-md text-sm text-muted-foreground">{MENSAJES[indice]}</p>
-      <button
-        onClick={() => setIndice((i) => (i + 1) % MENSAJES.length)}
-        className="mt-3 flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <RefreshCw className="h-3 w-3" /> Dame otra frase
-      </button>
 
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link href="/">

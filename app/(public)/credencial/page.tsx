@@ -65,7 +65,7 @@ function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) 
 
 export default function CredencialPage() {
   const [perfil, setPerfil] = useState<Perfil>(PERFIL_DEFAULT);
-  const [origen, setOrigen] = useState("http://localhost:3000");
+  const [origen, setOrigen] = useState("");
   const [dialogo, setDialogo] = useState(false);
   const [contrasena, setContrasena] = useState("");
   const [verEmergencia, setVerEmergencia] = useState(false);

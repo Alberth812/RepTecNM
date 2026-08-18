@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, BadgeCheck, CalendarClock, Save } from "lucide-react";
 import { toast } from "sonner";
 
@@ -95,15 +95,16 @@ function Selector({ valor, onValue, placeholder, opciones }: {
 }
 
 export default function SeguimientoPage() {
-  const [resp, setResp] = useState<Resp>(() => {
-    if (typeof window === "undefined") return RESP_INICIAL;
+  const [resp, setResp] = useState<Resp>(RESP_INICIAL);
+  
+  useEffect(() => {
     try {
       const g = localStorage.getItem("rep-seguimiento");
-      return g ? { ...RESP_INICIAL, ...JSON.parse(g) } : RESP_INICIAL;
+      if (g) setResp({ ...RESP_INICIAL, ...JSON.parse(g) });
     } catch {
-      return RESP_INICIAL;
+      /* sin almacenamiento disponible */
     }
-  });
+  }, []);
   const [seccion, setSeccion] = useState(0);
   const [ultima, setUltima] = useState<string>(() => {
     if (typeof window === "undefined") return "2025-05-10";

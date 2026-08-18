@@ -117,16 +117,18 @@ export default function RegistroPage() {
   const [espera, setEspera] = useState(0);
   const [seccion, setSeccion] = useState(0);
   const [tagInput, setTagInput] = useState("");
-  const [datos, setDatos] = useState<Datos>(() => {
-    if (typeof window === "undefined") return DATOS_INICIALES;
+  const [datos, setDatos] = useState<Datos>(DATOS_INICIALES);
+  
+  useEffect(() => {
     const g = leerStorage("rep-registro");
-    if (!g) return DATOS_INICIALES;
-    try {
-      return { ...DATOS_INICIALES, ...JSON.parse(g) };
-    } catch {
-      return DATOS_INICIALES;
+    if (g) {
+      try {
+        setDatos({ ...DATOS_INICIALES, ...JSON.parse(g) });
+      } catch {
+        /* datos corruptos, usar iniciales */
+      }
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (espera <= 0) return;
