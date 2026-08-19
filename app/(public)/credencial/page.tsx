@@ -193,7 +193,7 @@ export default function CredencialPage() {
                 <div className="flex items-center gap-2 font-semibold">
                   <GraduationCap className="h-6 w-6" /> REP TecNM
                 </div>
-                <Badge className="border-white/30 bg-white/15 text-white">ACTIVO</Badge>
+                <Badge className="border-white/30 bg-card/15 text-white">ACTIVO</Badge>
               </div>
               <p className="mt-1 text-xs text-sky-100/80">Credencial digital de afiliado</p>
             </div>
@@ -211,7 +211,7 @@ export default function CredencialPage() {
                     <p className="text-xs text-muted-foreground">{perfil.instituto}</p>
                   </div>
                 </div>
-                <div className="rounded-xl border bg-white p-2">
+                <div className="rounded-xl border bg-card p-2">
                   <QRCodeSVG value={`${origen}/verificar/${FOLIO}`} size={88} />
                 </div>
               </div>

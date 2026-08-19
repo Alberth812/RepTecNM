@@ -1,5 +1,6 @@
 export interface Slide {
   tipo: "normal" | "aviso";
+  prioridad?: "alta" | "normal";
   etiqueta: string;
   titulo: string;
   texto: string;

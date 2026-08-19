@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState , useMemo } from "react";
 import Link from "next/link";
 import {
   AlertCircle, ArrowRight, Search, Users, BookOpen, Building2, MapPin, GraduationCap,
@@ -27,12 +27,19 @@ export default function HomePage() {
 
   useEffect(() => setContenido(cargarContenido()), []);
 
-  useEffect(() => {
-    const t = setInterval(() => setSlide((s) => (s + 1) % 3), 7000);
-    return () => clearInterval(t);
-  }, []);
+  const slidesOrden = useMemo(
+    () => [...contenido.slides].sort((a, b) => Number(b.prioridad === "alta") - Number(a.prioridad === "alta")),
+    [contenido.slides]
+  );
 
-  const s = contenido.slides[slide];
+  useEffect(() => {
+    const actual = slidesOrden[slide];
+    const dur = actual?.prioridad === "alta" || actual?.tipo === "aviso" ? 8000 : 5000;
+    const t = setTimeout(() => setSlide((x) => (x + 1) % slidesOrden.length), dur);
+    return () => clearTimeout(t);
+  }, [slide, slidesOrden]);
+
+  const s = slidesOrden[slide] || slidesOrden[0];
 
   const redes = [
     { url: contenido.redes.facebook, label: "FB", nombre: "Facebook" },
@@ -57,7 +64,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-24 text-center">
-          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur ${s.tipo === "aviso" ? "border-amber-400/60 bg-amber-500/25 text-amber-100" : "border-white/30 bg-white/10"}`}>
+          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur ${s.tipo === "aviso" ? "border-amber-400/60 bg-amber-500/25 text-amber-100" : "border-white/30 bg-card/10"}`}>
             {s.tipo === "aviso" && <AlertCircle className="h-3 w-3" />}
             {s.etiqueta}
           </span>
@@ -74,7 +81,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/catalogo">
-              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-white/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-white/20">
+              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-card/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-card/20">
                 <Search className="mr-2 h-4 w-4" />
                 Buscar profesionales
               </Button>
@@ -82,15 +89,15 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10 flex justify-center gap-2">
-            {contenido.slides.map((_, i) => (
+            {slidesOrden.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setSlide(i)}
                 aria-label={`Ir al slide ${i + 1}`}
                 className={
                   i === slide
-                    ? "h-2 w-8 rounded-full bg-white transition-all"
-                    : "h-2 w-4 rounded-full bg-white/40 transition-all hover:bg-white/60"
+                    ? "h-2 w-8 rounded-full bg-amber-400 shadow-[0_1px_4px_rgba(0,0,0,0.6)] transition-all"
+                    : "h-2 w-4 rounded-full bg-amber-400/50 shadow-[0_1px_4px_rgba(0,0,0,0.6)] transition-all hover:bg-amber-300"
                 }
               />
             ))}
@@ -103,7 +110,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 md:grid-cols-4">
           {STATS.map((st) => (
             <div key={st.etiqueta} className="flex items-center gap-3">
-              <div className="rounded-xl bg-white/10 p-2.5">
+              <div className="rounded-xl bg-card/10 p-2.5">
                 <st.icon className="h-5 w-5" />
               </div>
               <div>
@@ -141,14 +148,17 @@ export default function HomePage() {
           )}
         </div>
       </section>
-
-      {/* Qué hacemos */}
-      <section id="que-hacemos" className="bg-gradient-to-b from-sky-50 to-background py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="font-serif text-3xl font-bold tracking-tight">Qué hacemos</h2>
-          <p className="mt-6 leading-relaxed text-muted-foreground">{contenido.queHacemosTexto}</p>
+      <section className="bg-background py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <h2 className="font-serif text-3xl font-bold text-foreground">Qué hacemos</h2>
+          <p className="mt-4 leading-relaxed text-foreground/80">
+            Impulsamos la investigación aplicada, la publicación académica y la vinculación del
+            talento de posgrado con los sectores productivo, social y gubernamental, para que el
+            conocimiento generado en las aulas del TecNM se traduzca en desarrollo para México.
+          </p>
         </div>
       </section>
+
 
       {/* Testimonios */}
       <section id="testimonios" className="mx-auto max-w-6xl px-4 py-20">
@@ -196,7 +206,7 @@ export default function HomePage() {
           {redes.length > 0 && (
             <div className="glass-dark mx-auto mt-8 flex w-fit items-center gap-4 rounded-2xl px-6 py-4">
               {redes.map((r) => (
-                <a key={r.nombre} href={r.url} target="_blank" rel="noopener noreferrer" aria-label={r.nombre} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/10 text-xs font-bold transition-colors hover:bg-white/20">
+                <a key={r.nombre} href={r.url} target="_blank" rel="noopener noreferrer" aria-label={r.nombre} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-card/10 text-xs font-bold transition-colors hover:bg-card/20">
                   {r.label}
                 </a>
               ))}
@@ -204,12 +214,12 @@ export default function HomePage() {
           )}
           <div className="mt-8 flex justify-center gap-3">
             <Link href="/catalogo">
-              <Button size="lg" className="rounded-sm bg-white text-xs uppercase tracking-widest text-[#004B87] hover:bg-sky-100">
+              <Button size="lg" className="rounded-sm bg-card text-xs uppercase tracking-widest text-[#004B87] hover:bg-sky-100">
                 Explorar catálogo
               </Button>
             </Link>
             <Link href="/verificar">
-              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-white/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-white/20">
+              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-card/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-card/20">
                 <QrCode className="mr-2 h-4 w-4" />
                 Verificar credencial
               </Button>

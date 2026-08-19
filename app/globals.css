@@ -231,3 +231,14 @@
   --border: oklch(0.88 0.03 85);
   --input: oklch(0.88 0.03 85);
 }
+
+/* Ajustes de superficies personalizadas por tema */
+.dark .glass {
+  background: rgba(12, 14, 18, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sepia .glass {
+  background: rgba(240, 232, 216, 0.7);
+  border-color: rgba(120, 100, 60, 0.25);
+}

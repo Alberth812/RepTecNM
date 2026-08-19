@@ -40,7 +40,7 @@ export default function LoginPage() {
       <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#004B87]/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-sky-300/20 blur-3xl" />
 
-      <div className="relative w-full max-w-md rounded-3xl border border-white/60 bg-white/80 p-8 shadow-2xl shadow-[#004B87]/10 backdrop-blur-xl md:p-10">
+      <div className="relative w-full max-w-md rounded-3xl border border-white/60 bg-background/80 p-8 shadow-2xl shadow-[#004B87]/10 backdrop-blur-xl md:p-10">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#004B87] to-[#0070C0] shadow-lg shadow-[#004B87]/30">
             <GraduationCap className="h-7 w-7 text-white" />

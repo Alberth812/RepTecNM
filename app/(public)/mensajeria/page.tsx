@@ -214,7 +214,7 @@ export default function MensajeriaPage() {
                         {m.contenido && <p className="text-sm leading-snug">{m.contenido}</p>}
                         {m.adjunto && (
                           <div className={`mt-1 flex items-center gap-2 rounded-lg border p-2 text-xs ${
-                            m.remitente === "yo" ? "border-white/30 bg-white/10" : "border-border bg-background"
+                            m.remitente === "yo" ? "border-white/30 bg-card/10" : "border-border bg-background"
                           }`}>
                             {(() => {
                               const Icon = iconoAdjunto(m.adjunto.tipo);

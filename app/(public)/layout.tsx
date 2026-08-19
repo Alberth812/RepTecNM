@@ -23,7 +23,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         </div>
       </div>
 
-      <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 text-primary">
             <GraduationCap className="h-7 w-7" />
