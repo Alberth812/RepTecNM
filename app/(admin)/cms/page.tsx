@@ -66,6 +66,19 @@ export default function CmsPage() {
   const eliminarSlide = (i: number) =>
     setC((prev) => ({ ...prev, slides: prev.slides.filter((_, x) => x !== i) }));
 
+  const MAX_ALTAS = 3;
+
+  const setPrioridad = (i: number, p: "normal" | "alta") => {
+    if (p === "alta") {
+      const altas = c.slides.filter((s, x) => x !== i && s.prioridad === "alta").length;
+      if (altas >= MAX_ALTAS) {
+        toast.error(`Máximo ${MAX_ALTAS} slides de alta prioridad. Baja alguno antes de subir otro.`);
+        return;
+      }
+    }
+    setSlide(i, { prioridad: p });
+  };
+
   const setTest = (i: number, cambios: Partial<Testimonio>) =>
     setC((prev) => ({ ...prev, testimonios: prev.testimonios.map((t, x) => (x === i ? { ...t, ...cambios } : t)) }));
 
@@ -138,7 +151,12 @@ export default function CmsPage() {
 
       {/* Slider */}
       <section className="rounded-2xl border bg-card p-6">
-        <h2 className="mb-4 font-semibold">Slider principal (slides dinámicos con prioridad)</h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-semibold">Slider principal (slides dinámicos con prioridad)</h2>
+          <span className={`rounded-full px-3 py-1 text-xs font-medium ${c.slides.filter((s) => s.prioridad === "alta").length >= MAX_ALTAS ? "bg-amber-500/15 text-amber-700" : "bg-muted text-muted-foreground"}`}>
+            Alta prioridad: {c.slides.filter((s) => s.prioridad === "alta").length} / {MAX_ALTAS}
+          </span>
+        </div>
         <Button variant="outline" size="sm" className="mb-4" onClick={agregarSlide}>
           <Plus className="mr-2 h-4 w-4" /> Agregar slide
         </Button>
@@ -181,7 +199,7 @@ export default function CmsPage() {
                       <button
                         key={p}
                         type="button"
-                        onClick={() => setSlide(i, { prioridad: p })}
+                        onClick={() => setPrioridad(i, p)}
                         className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${(sl.prioridad || "normal") === p ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                       >
                         {p === "normal" ? "Normal · 5 s" : "Alta · primero y 8 s"}
