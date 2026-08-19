@@ -7,7 +7,6 @@ import {
   Star, Quote, QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EstadisticasPublicas } from "@/components/public/estadisticas-publicas";
 import { CONTENIDO_DEFAULT, cargarContenido, type ContenidoHome } from "@/lib/mock/cms";
 
 const STATS = [
@@ -106,6 +105,7 @@ export default function HomePage() {
       </section>
 
       {/* Franja azul institucional con estadísticas (RF-DASH-007) */}
+      
       <section className="bg-[#27518F] py-10 text-white">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 md:grid-cols-4">
           {STATS.map((st) => (
@@ -121,9 +121,6 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* La red en números (RF-DASH-007) */}
-      <EstadisticasPublicas />
 
       {/* Nosotros */}
       <section id="nosotros" className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2">
@@ -148,6 +145,7 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
       <section className="bg-background py-20">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <h2 className="font-serif text-3xl font-bold text-foreground">Qué hacemos</h2>
