@@ -56,6 +56,7 @@ export default function Step5ServiciosProfesionales() {
         label="Descripción detallada de servicios"
         required
         maxWords={300}
+        maxChars={500}
         currentValue={descripcionServicios}
         rows={5}
         {...register("descripcion_servicios")}

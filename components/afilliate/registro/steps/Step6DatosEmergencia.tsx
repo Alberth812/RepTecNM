@@ -2,7 +2,11 @@
 
 import { Controller, useFormContext } from "react-hook-form";
 import { ShieldAlert } from "lucide-react";
-import { PARENTESCO_OPTIONS, RegistroFormValues, TIPO_SANGUINEO_OPTIONS } from "@/lib/registro/types";
+import {
+  PARENTESCO_OPTIONS,
+  RegistroFormValues,
+  TIPO_SANGUINEO_OPTIONS,
+} from "@/lib/registro/types";
 import TextInput from "../ui/TextInput";
 import TextArea from "../ui/TextArea";
 import SelectInput from "../ui/SelectInput";
@@ -27,8 +31,8 @@ export default function Step6DatosEmergencia() {
       <div className="flex gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-3 text-sm text-amber-800">
         <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
         <p>
-          Esta información es de carácter privado. No se mostrará en el catálogo público de
-          egresados; solo estará disponible en tu credencial.
+          Esta información es de carácter privado. No se mostrará en el catálogo
+          público de egresados; solo estará disponible en tu credencial.
         </p>
       </div>
 
@@ -94,6 +98,7 @@ export default function Step6DatosEmergencia() {
         label="Alergias o condiciones médicas relevantes"
         description="Indica únicamente lo que deba conocerse en caso de emergencia. Si no aplica, deja este campo vacío."
         maxWords={500}
+        maxChars={500}
         currentValue={alergias}
         rows={4}
         {...register("alergias_condiciones_medicas")}

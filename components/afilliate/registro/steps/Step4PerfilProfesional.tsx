@@ -1,7 +1,10 @@
 "use client";
 
 import { Controller, useFormContext } from "react-hook-form";
-import { AREA_CONOCIMIENTO_OPTIONS, RegistroFormValues } from "@/lib/registro/types";
+import {
+  AREA_CONOCIMIENTO_OPTIONS,
+  RegistroFormValues,
+} from "@/lib/registro/types";
 import TextInput from "../ui/TextInput";
 import TextArea from "../ui/TextArea";
 import CheckboxGroup from "../ui/CheckboxGroup";
@@ -51,6 +54,7 @@ export default function Step4PerfilProfesional() {
         label="Descripción breve del perfil profesional"
         required
         maxWords={200}
+        maxChars={500}
         currentValue={perfilProfesional}
         rows={5}
         placeholder="Resume tu trayectoria, especialidad y lo que te distingue profesionalmente."

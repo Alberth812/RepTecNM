@@ -55,9 +55,15 @@ const optionalPhoneSchema = z
   .optional()
   .or(z.literal(""));
 
-const maxWordsText = (label: string, maxWords: number, required: boolean) => {
+const maxWordsText = (
+  label: string,
+  maxWords: number,
+  required: boolean,
+  maxChars = 500,
+) => {
   const base = z.string().trim();
-  const withMax = base.refine(
+
+  const withMaxWords = base.refine(
     (val) => {
       if (val === "") return true;
       const words = val.split(/\s+/).filter(Boolean);
@@ -65,11 +71,16 @@ const maxWordsText = (label: string, maxWords: number, required: boolean) => {
     },
     { message: `${label} no debe exceder ${maxWords} palabras.` },
   );
+
+  const withMaxChars = withMaxWords.refine((val) => val.length <= maxChars, {
+    message: `${label} no debe exceder ${maxChars} caracteres.`,
+  });
+
   return required
-    ? withMax.refine((val) => val.length > 0, {
+    ? withMaxChars.refine((val) => val.length > 0, {
         message: `${label} es obligatorio.`,
       })
-    : withMax;
+    : withMaxChars;
 };
 
 type ImageDimensionChecker = (
@@ -256,7 +267,7 @@ export function buildRegistroSchema(options?: {
       sitio_web: z
         .string()
         .trim()
-        .url("Ingresa una URL válida (incluye https://).")
+        .check(z.email("Ingresa una URL válida (incluye https://)."))
         .optional()
         .or(z.literal("")),
 
@@ -378,6 +389,13 @@ export function buildRegistroSchema(options?: {
           ctx.addIssue({
             code: "custom",
             message: 'Especifica la opción "Otro".',
+            path: [path],
+          });
+        }
+        if (hasOtro && otroValue.length > 150) {
+          ctx.addIssue({
+            code: "custom",
+            message: 'La opción "Otro" no puede superar los 150 caracteres.',
             path: [path],
           });
         }
