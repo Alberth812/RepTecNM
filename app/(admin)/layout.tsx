@@ -19,8 +19,10 @@ export default function AdminLayout({
       <div className="flex flex-col">
         <Topbar />
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <div className="mx-auto w-full max-w-[1600px]">
           {children}
-        </main>
+        </div>
+      </main>
       </div>
     </div>
   );

@@ -12,11 +12,18 @@ skinparam backgroundColor transparent
 **** seguimiento
 **** registro
 **** login
+**** aviso-de-privacidad
 *** (admin)
 **** dashboard
 **** aprobaciones
 **** cms
 **** reportes
+**** afiliados
+**** moderacion
+**** institutos
+*** not-found.tsx - 404
+*** error.tsx
+*** global-error.tsx
 *** layout.tsx
 *** globals.css
 ** components
@@ -25,6 +32,7 @@ skinparam backgroundColor transparent
 *** ui
 ** lib
 *** mock
+*** validaciones.ts
 *** utils.ts
 ** public
 *** docs
