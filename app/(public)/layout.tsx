@@ -26,7 +26,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 text-primary">
-            <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 object-cover object-[center_15%]" />
+            <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 rounded-lg object-cover object-[center_15%] ring-1 ring-border" />
             <span className="text-xl font-bold tracking-tight">
               REP-<span className="font-light">TecNM</span>
             </span>

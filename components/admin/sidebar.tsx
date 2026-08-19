@@ -30,7 +30,7 @@ export function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     <div className={cn("flex h-full flex-col bg-background border-r", isMobile && "border-none")}>
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-          <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 object-cover object-[center_15%]" />
+          <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 rounded-lg object-cover object-[center_15%] ring-1 ring-border" />
           <span className="text-lg">REP TecNM</span>
         </Link>
       </div>
