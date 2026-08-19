@@ -1,7 +1,7 @@
 "use client";
 
-import { Bell, Menu, Search, Sun, Moon, Glasses } from "lucide-react";
-import { useTheme } from "@/lib/use-theme";
+import { Bell, Menu, Search } from "lucide-react";
+import { ThemeSwitcher } from "@/components/public/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,6 +16,7 @@ import {
 import { Sidebar } from "./sidebar";
 
 export function Topbar() {
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
       <div className="mx-auto flex h-full w-full max-w-[1920px] items-center gap-4">
@@ -41,36 +42,7 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        {/* Selector de tema */}
-        <div className="flex items-center rounded-lg border bg-muted p-1">
-          <button
-            onClick={() => setTheme("light")}
-            className={`rounded-md p-1.5 transition-colors ${theme === "light" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
-            title="Modo claro"
-          >
-            <Sun className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setTheme("sepia")}
-            className={`rounded-md p-1.5 transition-colors ${theme === "sepia" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
-            title="Descanso visual"
-          >
-            <Glasses className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setTheme("dark")}
-            className={`rounded-md p-1.5 transition-colors ${theme === "dark" ? "bg-background shadow-sm" : "hover:bg-background/50"}`}
-            title="Modo oscuro"
-          >
-            <Moon className="h-4 w-4" />
-          </button>
-        </div>
-
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-destructive" />
-          <span className="sr-only">Notificaciones</span>
-        </Button>
+        <ThemeSwitcher />
 
         <DropdownMenu>
           <DropdownMenuTrigger className="relative h-8 w-8 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">

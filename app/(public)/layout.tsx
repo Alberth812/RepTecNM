@@ -2,6 +2,8 @@ import Link from "next/link";
 import { GraduationCap, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { ThemeSwitcher } from "@/components/public/theme-switcher";
+
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
@@ -45,6 +47,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <Search className="h-4 w-4" />
               </Button>
             </Link>
+            <ThemeSwitcher />
             <Link href="/dashboard" className="hidden sm:block">
               <Button variant="outline" size="sm">Volver al panel</Button>
             </Link>
