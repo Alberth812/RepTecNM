@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { registroSchema } from "@/lib/registro/schema";
-import { parseRegistroFormData } from "@/lib/registro/formData";
-import { uploadFile } from "@/lib/storage";
 import { createAfiliado } from "@/lib/db/afiliados/queries";
+import { parseRegistroFormData } from "@/lib/registro/formData";
+import { registroServerSchema } from "@/lib/registro/schema";
+import { uploadFile } from "@/lib/storage";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 // El driver de Neon usado en `lib/db/index.ts` necesita WebSockets (`ws`),
@@ -26,15 +26,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Se reutiliza el MISMO esquema de Zod que usa el cliente: nunca hay que
-  // confiar en la validación del navegador. `registroSchema` (sin
-  // `checkImageDimensions`) no vuelve a validar la relación de
-  // aspecto/resolución de la fotografía en el servidor, ya que eso
-  // requeriría decodificar la imagen (p. ej. con `sharp` o `image-size`).
-  // El recortador del cliente ya garantiza una salida 3:4 de al menos
-  // 354x472px; para blindar el servidor en producción, decodifica la
-  // imagen aquí y pasa un `checkImageDimensions` a `buildRegistroSchema`.
-  const result = await registroSchema.safeParseAsync(raw);
+  const result = await registroServerSchema.safeParseAsync(raw);
 
   if (!result.success) {
     // Usamos la nueva función recomendada por Zod

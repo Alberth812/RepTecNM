@@ -31,7 +31,12 @@ export const MAX_COMPROBANTE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export const PHOTO_MIN_WIDTH = 354;
 export const PHOTO_MIN_HEIGHT = 472;
+
+export const PHOTO_MAX_WIDTH = 2400;
+export const PHOTO_MAX_HEIGHT = 3200;
+
 export const PHOTO_ASPECT_RATIO = 3 / 4;
+export const PHOTO_ASPECT_TOLERANCE = 0.02;
 
 /**
  * Lee las dimensiones de un archivo de imagen en el navegador.

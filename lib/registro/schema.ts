@@ -20,11 +20,15 @@ import {
   ORCID_REGEX,
   PHONE_REGEX,
   PHOTO_ASPECT_RATIO,
+  PHOTO_ASPECT_TOLERANCE,
+  PHOTO_MAX_HEIGHT,
+  PHOTO_MAX_WIDTH,
   PHOTO_MIME_TYPES,
   PHOTO_MIN_HEIGHT,
   PHOTO_MIN_WIDTH,
   formatBytes,
 } from "./validators";
+import { checkImageDimensionsServer } from "./photo-validator";
 
 const OTRO_ESPECIFIQUE = "Otro (especifique)";
 
@@ -121,13 +125,16 @@ function fotografiaSchema(checkImageDimensions?: ImageDimensionChecker) {
           message: "Formato inválido. Solo se aceptan JPG o PNG.",
         });
       }
+
       if (file.size > MAX_PHOTO_SIZE_BYTES) {
         ctx.addIssue({
           code: "custom",
-          message: `La fotografía no debe superar ${formatBytes(MAX_PHOTO_SIZE_BYTES)}.`,
+          message: `La fotografía no debe superar ${formatBytes(
+            MAX_PHOTO_SIZE_BYTES,
+          )}.`,
         });
       }
-      if (checkImageDimensions) {
+      if (checkImageDimensions && file.size <= MAX_PHOTO_SIZE_BYTES) {
         try {
           const { width, height } = await checkImageDimensions(file);
           if (width < PHOTO_MIN_WIDTH || height < PHOTO_MIN_HEIGHT) {
@@ -135,9 +142,15 @@ function fotografiaSchema(checkImageDimensions?: ImageDimensionChecker) {
               code: "custom",
               message: `La imagen debe medir al menos ${PHOTO_MIN_WIDTH}x${PHOTO_MIN_HEIGHT}px.`,
             });
+          } else if (width > PHOTO_MAX_WIDTH || height > PHOTO_MAX_HEIGHT) {
+            ctx.addIssue({
+              code: "custom",
+              message: `La imagen no debe superar ${PHOTO_MAX_WIDTH}x${PHOTO_MAX_HEIGHT}px.`,
+            });
           } else {
             const ratio = width / height;
-            if (Math.abs(ratio - PHOTO_ASPECT_RATIO) > 0.02) {
+
+            if (Math.abs(ratio - PHOTO_ASPECT_RATIO) > PHOTO_ASPECT_TOLERANCE) {
               ctx.addIssue({
                 code: "custom",
                 message:
@@ -425,13 +438,15 @@ export function buildRegistroSchema(options?: {
     });
 }
 
-/** Esquema por defecto (sin verificación de dimensiones) — útil en el servidor. */
-export const registroSchema = buildRegistroSchema();
+/** Esquema por defecto (sin verificación de dimensiones) */
+export const registroClientSchema = buildRegistroSchema();
 
-export type RegistroFormSchema = typeof registroSchema;
-export type RegistroFormInput = z.input<RegistroFormSchema>;
-export type RegistroFormOutput = z.output<RegistroFormSchema>;
-export type RegistroApiPayload = RegistroFormOutput;
+export const registroServerSchema = buildRegistroSchema({
+  checkImageDimensions: checkImageDimensionsServer,
+});
+
+export type RegistroFormInput = z.input<typeof registroClientSchema>;
+export type RegistroFormOutput = z.output<typeof registroServerSchema>;
 
 export const registroDefaultValues = {
   apellido_paterno: "",
