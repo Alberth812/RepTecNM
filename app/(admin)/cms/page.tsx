@@ -270,6 +270,17 @@ export default function CmsPage() {
                     onChange={(e) => { const f = e.target.files?.[0]; if (f) subirImagen(i, f); }}
                   />
                 </label>
+                {sl.imagen && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setSlide(i, { imagen: "" })}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" /> Quitar imagen
+                  </Button>
+                )}
                 {sl.imagen?.startsWith("data:") && (
                   <span className="text-xs text-muted-foreground">Imagen local cargada</span>
                 )}
@@ -298,6 +309,15 @@ export default function CmsPage() {
                   {c.nosotrosImagen1?.startsWith("data:") && (
                     <span className="text-xs text-muted-foreground">Imagen local cargada</span>
                   )}
+                  {c.nosotrosImagen1 && (
+                    <button
+                      type="button"
+                      className="text-xs font-medium text-destructive hover:underline"
+                      onClick={() => setC((prev) => ({ ...prev, nosotrosImagen1: "" }))}
+                    >
+                      Quitar imagen
+                    </button>
+                  )}
                 </div>
           <Input value={c.nosotrosImagen2} onChange={(e) => setC({ ...c, nosotrosImagen2: e.target.value })} placeholder="URL imagen 2 (opcional)" />
                 <div className="flex items-center gap-2">
@@ -312,6 +332,15 @@ export default function CmsPage() {
                   </label>
                   {c.nosotrosImagen2?.startsWith("data:") && (
                     <span className="text-xs text-muted-foreground">Imagen local cargada</span>
+                  )}
+                  {c.nosotrosImagen2 && (
+                    <button
+                      type="button"
+                      className="text-xs font-medium text-destructive hover:underline"
+                      onClick={() => setC((prev) => ({ ...prev, nosotrosImagen2: "" }))}
+                    >
+                      Quitar imagen
+                    </button>
                   )}
                 </div>
         </div>
