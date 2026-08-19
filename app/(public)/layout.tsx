@@ -36,8 +36,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <Link href="/" className="hover:text-primary">Inicio</Link>
             <Link href="/#nosotros" className="hover:text-primary">Nosotros</Link>
             <Link href="/#que-hacemos" className="hover:text-primary">Servicios</Link>
-            <Link href="/registro" className="hover:text-primary">Afiliación</Link>
-            <Link href="/repositorio" className="hover:text-primary">Vinculación</Link>
+            <Link href="/#afiliacion" className="hover:text-primary">Afiliación</Link>
+            
             <Link href="/#contacto" className="hover:text-primary">Contacto</Link>
           </nav>
 
@@ -51,7 +51,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <Link href="/dashboard" className="hidden sm:block">
               <Button variant="outline" size="sm">Volver al panel</Button>
             </Link>
-            <Link href="/login">
+            <Link href="/registro">
+            <Button className="bg-amber-400 text-amber-950 hover:bg-amber-300">¿Eres nuevo? Afíliate</Button>
+          </Link>
+          <Link href="/login">
               <Button size="sm">Iniciar sesión</Button>
             </Link>
           </div>

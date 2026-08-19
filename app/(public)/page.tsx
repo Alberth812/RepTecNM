@@ -146,6 +146,46 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section id="afiliacion" className="mx-auto max-w-6xl px-4 py-20">
+        <div className="text-center">
+          <h2 className="font-serif text-3xl font-bold tracking-tight">Afiliación</h2>
+          <p className="mt-3 text-muted-foreground">Conoce los beneficios, requisitos y el proceso para unirte a la red.</p>
+        </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-semibold">Beneficios</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>Credencial digital con verificación por QR.</li>
+              <li>Perfil en el catálogo nacional de profesionales.</li>
+              <li>Mensajería con la comunidad de posgrado.</li>
+              <li>Publicación en el repositorio académico.</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-semibold">Requisitos</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>Grado de posgrado en un instituto TecNM.</li>
+              <li>Comprobante de pago de membresía.</li>
+              <li>Fotografía 3:4 reciente.</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-semibold">Proceso</h3>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+              <li>Crea tu cuenta y verifica tu correo.</li>
+              <li>Completa tu expediente y documentación.</li>
+              <li>La directiva revisa y aprueba tu solicitud.</li>
+              <li>Recibe tu credencial digital activa.</li>
+            </ol>
+          </div>
+        </div>
+        <div className="mt-8 text-center">
+          <Link href="/registro">
+            <Button className="bg-amber-400 text-amber-950 hover:bg-amber-300">¿Eres nuevo? Afíliate</Button>
+          </Link>
+        </div>
+      </section>
+
       <section className="bg-background py-20">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <h2 className="font-serif text-3xl font-bold text-foreground">Qué hacemos</h2>
