@@ -10,6 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  icons: [{ url: "/logo.png" }],
   title: "REP TecNM - Red de Egresados de Posgrado",
   description: "Plataforma de la Red de Egresados de Posgrado del Tecnológico Nacional de México",
 };

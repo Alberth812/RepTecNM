@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
+import { GraduationCap, 
   LayoutDashboard, 
   UserCheck, 
   BookOpen, 
   FileText, 
   Settings, 
-  GraduationCap, 
   Paintbrush
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,7 +30,7 @@ export function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     <div className={cn("flex h-full flex-col bg-background border-r", isMobile && "border-none")}>
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-          <GraduationCap className="h-6 w-6" />
+          <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 object-cover object-[center_15%]" />
           <span className="text-lg">REP TecNM</span>
         </Link>
       </div>

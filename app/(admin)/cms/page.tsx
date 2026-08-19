@@ -66,6 +66,20 @@ export default function CmsPage() {
   const eliminarSlide = (i: number) =>
     setC((prev) => ({ ...prev, slides: prev.slides.filter((_, x) => x !== i) }));
 
+  const subirImagenCampo = (campo: string, f: File) => {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(f.type)) {
+      toast.error("Formato no permitido. Usa JPG, PNG o WebP.");
+      return;
+    }
+    if (f.size > 1500000) {
+      toast.error("Imagen demasiado pesada para el prototipo (máx. 1.5 MB).");
+      return;
+    }
+    const r = new FileReader();
+    r.onload = () => setC((prev) => ({ ...prev, [campo]: String(r.result) }));
+    r.readAsDataURL(f);
+  };
+
   const MAX_ALTAS = 3;
 
   const setPrioridad = (i: number, p: "normal" | "alta") => {
@@ -271,7 +285,35 @@ export default function CmsPage() {
         <Contador len={c.nosotrosTexto.trim().length} min={150} max={1500} />
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <Input value={c.nosotrosImagen1} onChange={(e) => setC({ ...c, nosotrosImagen1: e.target.value })} placeholder="URL imagen 1 (opcional)" />
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer rounded-lg border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted">
+                    Subir desde archivo
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) subirImagenCampo("nosotrosImagen1", f); }}
+                    />
+                  </label>
+                  {c.nosotrosImagen1?.startsWith("data:") && (
+                    <span className="text-xs text-muted-foreground">Imagen local cargada</span>
+                  )}
+                </div>
           <Input value={c.nosotrosImagen2} onChange={(e) => setC({ ...c, nosotrosImagen2: e.target.value })} placeholder="URL imagen 2 (opcional)" />
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer rounded-lg border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted">
+                    Subir desde archivo
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) subirImagenCampo("nosotrosImagen2", f); }}
+                    />
+                  </label>
+                  {c.nosotrosImagen2?.startsWith("data:") && (
+                    <span className="text-xs text-muted-foreground">Imagen local cargada</span>
+                  )}
+                </div>
         </div>
       </section>
 

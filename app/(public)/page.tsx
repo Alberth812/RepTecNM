@@ -64,7 +64,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-24 text-center">
-          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur ${s.tipo === "aviso" ? "border-amber-400/60 bg-amber-500/25 text-amber-100" : "border-white/30 bg-card/10"}`}>
+          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur ${s.tipo === "aviso" || s.prioridad === "alta" ? "border-amber-300 bg-amber-400 text-amber-950 shadow-md" : "border-white/30 bg-card/10"}`}>
             {s.tipo === "aviso" && <AlertCircle className="h-3 w-3" />}
             {s.etiqueta}
           </span>
