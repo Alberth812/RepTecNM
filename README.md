@@ -1,4 +1,3 @@
-cat << 'EOF' > README.md
 # REP TecNM · Red de Egresados de Posgrado
 
 Plataforma web para la Asociación de Egresados de Posgrado del Tecnológico Nacional de México. Prototipo de alta fidelidad validado con directivos.
@@ -94,7 +93,7 @@ curl -X POST https://kroki.io/plantuml/png \
 
 | Archivo | Función |
 |---------|---------|
-| `app/not-found.tsx` | 404 con mensajes aleatorios de humor académico y salidas útiles |
+| `app/not-found.tsx` | 404 con mensajes aleatorios de humor y salidas útiles |
 | `app/error.tsx` | Falla en cualquier página con reintento |
 | `app/global-error.tsx` | Última línea de defensa ante caída total del servicio |
 
@@ -138,13 +137,6 @@ git push
 
 División sugerida por módulos (no por capas) para evitar conflictos en los mismos archivos.
 
-## Próximos pasos (Incremento 1)
-
-- [ ] Backend con BetterAuth (JWT y sesiones)
-- [ ] PostgreSQL con Prisma ORM
-- [ ] Resend para envío de correos
-- [ ] SeaweedFS para almacenamiento y búsqueda de documentos
-- [ ] Dominio de producción para el QR de verificación
 
 ## Equipo
 
@@ -155,4 +147,3 @@ División sugerida por módulos (no por capas) para evitar conflictos en los mis
 ---
 
 Última actualización: 2026-08-19
-EOF
