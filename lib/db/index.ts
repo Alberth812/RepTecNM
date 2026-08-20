@@ -2,6 +2,7 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import ws from "ws";
 import { relations } from "./relations";
+import { authRelations } from "@/auth-schema";
 
 neonConfig.webSocketConstructor = ws;
 
@@ -28,5 +29,5 @@ if (process.env.NODE_ENV !== "production") {
 
 export const db = drizzle({
   client: pool,
-  relations,
+  relations: { ...relations, ...authRelations },
 });

@@ -1,4 +1,4 @@
-Tengo los siguientes requisitos funcionales para implementar una REST API de autenticación en Next.js (usando API Routes)
+Tengo los siguientes requisitos funcionales para implementar una REST API de autenticación en Next.js usando API Routes y la la librería better-auth. Los requisitos son los siguientes.
 
 ## 3. Autenticación y Gestión de Cuentas (RF-AUTH)
 
@@ -36,7 +36,7 @@ El sistema reconoce dos roles de cuenta: AFILIADO y ADMINISTRADOR. El rol ADMINI
 
   Independientemente de si el correo existe, de si la cuenta existe o de su estado, el sistema siempre muestra: _"Si existe una cuenta asociada a este correo, se enviará un correo electrónico para recuperar la contraseña."_ Esta respuesta uniforme evita revelar la existencia o el estado de una cuenta **a través de este flujo en particular**; no es una garantía general anti-enumeración, ya que el flujo de registro (RF-AUTH-005) sí puede revelar si un correo está en uso.
 
-- **RF-AUTH-012 — Cambio de correo de inicio de sesión.** Un afiliado puede cambiar su correo de inicio de sesión. El proceso es autogestionado: requiere introducir la contraseña actual y confirmar un código de seis dígitos enviado al nuevo correo. Una vez confirmado, el nuevo correo sustituye al anterior para el inicio de sesión. Además, se notifica al correo _anterior_ que hubo un cambio.
+- **RF-AUTH-012 — Cambio de correo de inicio de sesión.** Un afiliado puede cambiar su correo de inicio de sesión. El proceso es autogestionado: requiere introducir la contraseña actual y confirmar un código de seis dígitos enviado al nuevo correo. Una vez confirmado, el nuevo correo sustituye al anterior para el inicio de sesión.
 
 ### 3.4 Cuentas administrativas
 
@@ -50,60 +50,7 @@ Cuando un administrador inicia sesión se muestra que "Bienvenido <correo>. Eres
 
 ## 3.5 Protección contra abuso, rate limiting y códigos de verificación
 
-Con el propósito de evitar abuso de los mecanismos de autenticación, generación de códigos, recuperación de contraseña y envío de correos electrónicos, el sistema deberá aplicar límites de frecuencia tanto por dirección IP como por cuenta, correo electrónico u otro identificador disponible.
-
-- **RF-AUTH-016 — Rate limiting de solicitudes de autenticación.**
-  Los endpoints relacionados con registro, inicio de sesión, reenvío de desafíos, verificación de correo, recuperación de contraseña, cambio de correo y cualquier otra operación sensible de autenticación deberán estar protegidos mediante mecanismos de rate limiting. El límite deberá considerar como mínimo la dirección IP de origen y, cuando sea posible, la cuenta o correo electrónico involucrado.
-
-- **RF-AUTH-017 — Límite de solicitudes de registro por IP.**
-  El endpoint de registro deberá limitar la cantidad de cuentas que pueden intentarse crear desde una misma dirección IP dentro de una ventana de tiempo determinada. Al superar el límite, el sistema deberá rechazar temporalmente nuevas solicitudes y responder con HTTP `429 Too Many Requests`.
-
-- **RF-AUTH-018 — Límite de generación y reenvío de desafíos de verificación.**
-  Una cuenta con `email_verified = FALSE` deberá respetar un intervalo mínimo de 120 segundos entre solicitudes de reenvío, conforme a RF-AUTH-003. Adicionalmente, el sistema deberá establecer un límite máximo de desafíos de verificación que pueden generarse para una misma cuenta dentro de una ventana de tiempo determinada.
-
-  Este límite deberá existir incluso cuando se respete correctamente el intervalo de 120 segundos, con el objetivo de impedir el abuso sistemático del servicio de correo. Más adelante, definiré una política de depuración de cuentas; si el correo no ha sido verificado 7 días después del registro, la cuenta se elimina automáticamente y el correo queda disponible para un nuevo registro.
-
-- **RF-AUTH-019 — Límite de generación de desafíos por dirección IP.**
-  Independientemente del límite asociado a una cuenta, el sistema deberá limitar la cantidad total de desafíos de verificación que pueden solicitarse desde una misma dirección IP dentro de una ventana de tiempo determinada. Esto evita utilizar una misma IP para generar grandes cantidades de correos dirigidos a diferentes cuentas.
-
-- **RF-AUTH-020 — Límite de intentos de validación de código de verificación.**
-  El código de verificación de seis dígitos deberá contar con un número máximo de intentos de validación fallidos. Cuando se alcance dicho límite, el desafío deberá invalidarse inmediatamente, aun cuando no haya transcurrido su vigencia de 15 minutos, y el usuario deberá solicitar un nuevo desafío.
-
-- **RF-AUTH-021 — Uso único del código de verificación.**
-  Un código de verificación solo podrá utilizarse una vez. Una vez validado correctamente, deberá quedar invalidado permanentemente y no podrá reutilizarse para verificar nuevamente el mismo correo.
-
-- **RF-AUTH-022 — Invalidez de desafíos anteriores.**
-  Cuando se genere un nuevo desafío de verificación, deberán invalidarse inmediatamente todos los desafíos anteriores asociados a la misma cuenta. En consecuencia, únicamente el desafío más reciente podrá utilizarse para completar la verificación.
-
-- **RF-AUTH-023 — Límite de solicitudes de recuperación de contraseña.**
-  Además de la restricción funcional definida en RF-AUTH-011 de un máximo de 5 solicitudes dentro de un período de 7 días, el endpoint de recuperación de contraseña deberá contar con rate limiting adicional por dirección IP. El límite por IP deberá aplicarse independientemente de que el correo proporcionado exista o no en el sistema.
-
-- **RF-AUTH-024 — Límite de intentos de uso del enlace de recuperación.**
-  El enlace de recuperación de contraseña deberá ser de un solo uso. Una vez utilizado correctamente, deberá invalidarse inmediatamente. Los intentos inválidos, manipulados, expirados o ya utilizados deberán ser rechazados y no deberán permitir reutilizar el mismo enlace.
-
-- **RF-AUTH-025 — Límite de intentos de inicio de sesión.**
-  El endpoint de inicio de sesión deberá limitar los intentos fallidos de autenticación. El límite deberá considerar como mínimo la cuenta y la dirección IP, aplicando un mecanismo progresivo de bloqueo o backoff cuando se detecten múltiples intentos fallidos consecutivos.
-
-- **RF-AUTH-026 — Protección contra abuso distribuido.**
-  Los límites no deberán depender exclusivamente de la dirección IP, ya que un atacante puede distribuir solicitudes entre múltiples direcciones. Para operaciones sensibles, el sistema deberá combinar al menos dos dimensiones de control, por ejemplo:
-  - dirección IP;
-  - correo electrónico o identificador de cuenta;
-  - dispositivo o identificador de cliente, cuando sea viable.
-
-- **RF-AUTH-027 — Respuesta ante superación de límites.**
-  Cuando una solicitud sea rechazada por exceder un rate limit, el sistema deberá responder con HTTP `429 Too Many Requests`. Cuando corresponda, deberá incluir información que permita al cliente conocer el tiempo mínimo antes de intentar nuevamente, por ejemplo mediante el encabezado `Retry-After`.
-
-- **RF-AUTH-028 — Protección del servicio de correo.**
-  El sistema deberá limitar globalmente la cantidad de correos electrónicos relacionados con autenticación que pueden enviarse durante un período determinado. Este límite deberá aplicarse además de los límites por cuenta e IP, con el objetivo de evitar que la plataforma sea utilizada como mecanismo de envío masivo de correos no solicitados.
-
-- **RF-AUTH-029 — No almacenamiento de OTP en texto plano.**
-  Los códigos de verificación y demás secretos temporales utilizados para autenticación no deberán almacenarse en texto plano en la base de datos. El sistema deberá almacenar únicamente una representación segura que permita verificar el código introducido sin revelar el valor original en caso de acceso no autorizado a la base de datos.
-
-- **RF-AUTH-030 — Invalidación por expiración.**
-  Todo desafío de verificación o recuperación deberá quedar invalidado automáticamente al alcanzar su tiempo de vigencia. Un desafío expirado no podrá utilizarse aunque no haya alcanzado su máximo de intentos.
-
-- **RF-AUTH-031 — Rate limiting independiente por endpoint.**
-  Los límites deberán definirse de forma independiente según el riesgo y costo de la operación. No deberá existir necesariamente un único límite global para todos los endpoints de autenticación. Las operaciones de mayor impacto, especialmente aquellas que generan correos o permiten validar secretos, deberán contar con restricciones más estrictas.
+Aprovecha los mecanismos de rate limites disponibles en Better Auth y su plugin Email OTP. También puedes implementar cuestiones de rate limit propias para cosas específicas.
 
 ## 3.6 Sobre las relaciones entre cuentas (accounts), afiliados y administradores.
 
@@ -256,101 +203,155 @@ export const relations = defineRelations(
 );
 ```
 
+Sin embargo, better auth ya tiene su propia tabla `account`, entonces puedes descartar/eliminar la que te proporcioné, solo recuerda definir bien las relaciones. En particular, el esquema generado por better auth al instalarlo es
+
+```ts
+import { defineRelationsPart } from "drizzle-orm";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (table) => [index("sessions_userId_idx").on(table.userId)],
+);
+
+export const accounts = pgTable(
+  "accounts",
+  {
+    id: text("id").primaryKey(),
+    issuer: text("issuer").notNull(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("accounts_issuer_accountId_uidx").on(
+      table.issuer,
+      table.accountId,
+    ),
+    index("accounts_userId_idx").on(table.userId),
+  ],
+);
+
+export const verifications = pgTable(
+  "verifications",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index("verifications_identifier_idx").on(table.identifier)],
+);
+
+export const authRelations = defineRelationsPart(
+  { users, sessions, accounts, verifications },
+  (r) => ({
+    users: {
+      sessions: r.many.sessions({
+        from: r.users.id,
+        to: r.sessions.userId,
+      }),
+      accounts: r.many.accounts({
+        from: r.users.id,
+        to: r.accounts.userId,
+      }),
+    },
+    sessions: {
+      user: r.one.users({
+        from: r.sessions.userId,
+        to: r.users.id,
+      }),
+    },
+    accounts: {
+      user: r.one.users({
+        from: r.accounts.userId,
+        to: r.users.id,
+      }),
+    },
+  }),
+);
+```
+
 ## Lo que quiero
 
 Lo que necesito es que implementes este mecanismo de autenticación en una REST API en Next.js así como los componentes React necesarios para realizar las acciones descritas.
 
-De todas formas te doy una separación o catalogo de acciones como recordatorio. Puedes agregar más según necesites o consideres.
-
-### Usuario no autenticado
-
-Acciones públicas:
-
-| Acción                               | Componente/pantalla   | API                                  |
-| ------------------------------------ | --------------------- | ------------------------------------ |
-| Registrarse como afiliado            | `/signup`             | `POST /api/auth/register`            |
-| Verificar correo mediante código     | `/verificar-email`    | `POST /api/auth/verify-email`        |
-| Solicitar reenvío de código          | `/verificar-email`    | `POST /api/auth/resend-verification` |
-| Iniciar sesión                       | `/login`              | `POST /api/auth/login`               |
-| Solicitar recuperación de contraseña | `/recuperar-password` | `POST /api/auth/forgot-password`     |
-
-### Usuarios autenticados
-
-Una vez autenticado, aparecen varias acciones distintas.
-
-#### Cuenta / autenticación
-
-| Acción                 | Componente                 | API                           |
-| ---------------------- | -------------------------- | ----------------------------- |
-| Ver sesión actual      | provider/context de sesión | `GET /api/auth/session`       |
-| Cerrar sesión          | botón/logout               | `POST /api/auth/logout`       |
-| Cambiar contraseña     | `/perfil/seguridad`        | `POST/PATCH /api/me/password` |
-| Cambiar correo         | `/perfil/seguridad`        | `POST /api/me/email/change`   |
-| Confirmar nuevo correo | Va junto con el anterior   | `POST /api/me/email/confirm`  |
-
-#### Perfil y registro. Solo afiliados
-
-| Acción                         | Componente | API                      |
-| ------------------------------ | ---------- | ------------------------ |
-| Consultar mi perfil            | `/perfil`  | `GET /api/me`            |
-| Consultar estado de afiliación | dashboard  | `GET /api/me/membership` |
-
-### Administrador
-
-### Administrador general
-
-### Gestión de afiliados
-
-| Acción                   | Componente              | API                             |
-| ------------------------ | ----------------------- | ------------------------------- |
-| Listar afiliados         | `/admin/afiliados`      | `GET /api/admin/affiliates`     |
-| Buscar/filtrar afiliados | misma pantalla          | `GET /api/admin/affiliates?...` |
-| Ver afiliado             | `/admin/afiliados/[id]` | `GET /api/admin/affiliates/:id` |
-
----
-
-### Gestión de administradores
-
-| Acción                         | Componente                     | API                            |
-| ------------------------------ | ------------------------------ | ------------------------------ |
-| Listar administradores         | `/admin/administradores`       | `GET /api/admin/admins`        |
-| Ver administrador              | `/admin/administradores/[id]`  | `GET /api/admin/admins/:id`    |
-| Crear administrador            | `/admin/administradores/nuevo` | `POST /api/admin/admins`       |
-| Eliminar administrador         | detalle                        | `DELETE /api/admin/admins/:id` |
-| Cambiar datos de administrador | detalle                        | `PATCH /api/admin/admins/:id`  |
-
-La autorización debe estar en el backend:
-
-- `GENERAL` puede crear administradores.
-- `GENERAL` puede eliminar `CONTENIDO`.
-- `ROOT` puede eliminar `GENERAL`.
-- nadie puede eliminarse a sí mismo.
-- nadie puede asignarse `is_root`.
-
-### Administrador de contenido
-
-Solo ve página de bienvenida
-
-Ambos administradores (general y contenido) pueden hacer acciones de Cuenta / autenticación.
-
-### Acciones automáticas del sistema
-
-Hay procesos que debe ejecutar el sistema:
-
-| Acción                                      | Ejecución           |
-| ------------------------------------------- | ------------------- |
-| Expirar desafío de verificación             | automática          |
-| Invalidar OTP anterior                      | automática          |
-| Expirar tokens de recuperación              | automática          |
-| Expirar sesión por inactividad              | middleware/servicio |
-| Enviar correo de verificación               | servicio            |
-| Enviar correo de recuperación de contraseña | servicio            |
-| Notificar cambio de correo                  | servicio            |
-
 ## Tecnologías
 
-Puedes ocupar cualquier librería para cualquier cosa. Por ejemplo, puedes usar better auth con su integración de jwt (cookies), OTP y sus demás cosas que tiene. Puedes usar lo que quieras.
+Debes usar better usando su plugin de Email OTP, pero puedes usar más plugins que tiene. Puedes usar cualquier otro libería para lo que quieras. Prácticamente better auth ya tiene mucho para la mayoría de las cosas que queremos
 
-Asume un método sencillo (to, from, text) para enviar emails (usaré Mailtrap). Recuerda que estamos usando Drizzle ORM v1.0 (usando Postgres en Neon).
+- Sign Up
+- Sign In
+- Sign Out
+- Email Verification
+- Request Password Reset
+- Update password
+
+Y su plugin "Email OTP" tiene varias cosas útiles como:
+
+- Send an OTP
+- Check an OTP
+- Sign In with OTP
+- Verify Email with OTP
+- Change Email with OTP
+- Override Default Email Verification
+
+Debes usar tailwind css para el frontend.
+
+Asume un método sencillo para enviar emails (usaré Mailtrap).
+
+Recuerda que estamos usando Drizzle ORM v1.0 usando Postgres.
 
 Recuerda seguir buenas prácticas y favorecer el desacoplamiento.
