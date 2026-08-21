@@ -146,4 +146,4 @@ División sugerida por módulos (no por capas) para evitar conflictos en los mis
 
 ---
 
-Última actualización: 2026-08-19
+Última actualización: 2026-08-21
