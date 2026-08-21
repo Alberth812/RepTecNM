@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   BadgeCheck, BarChart3, Bell, Building2, CalendarCheck, FileText, Flag,
-  LayoutDashboard, LogOut, MessageSquareText, PencilLine, Search, Users, UserCheck, Settings,
+  LayoutDashboard, LogOut, MessageSquareText, PencilLine, Search, Users, UserCheck, Settings, CreditCard,
 } from "lucide-react";
 
 import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
@@ -26,6 +26,7 @@ const MENU_ADMIN = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/aprobaciones", label: "Aprobaciones", icon: UserCheck },
   { href: "/afiliados", label: "Afiliados", icon: Users },
+  { href: "/credenciales", label: "Credenciales", icon: CreditCard },
   { href: "/institutos", label: "Institutos", icon: Building2 },
   { href: "/moderacion", label: "Moderación", icon: Flag },
   { href: "/reportes", label: "Reportes de docs", icon: Flag },

@@ -9,7 +9,7 @@ import { GraduationCap,
   FileText, 
   Settings, 
   Paintbrush
-, BadgeCheck, MessageSquareText , Flag, Users, Building2, BarChart3, LogOut } from "lucide-react";
+, BadgeCheck, MessageSquareText , Flag, Users, Building2, BarChart3, CreditCard, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -18,6 +18,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/aprobaciones", label: "Aprobaciones", icon: UserCheck },
   { href: "/afiliados", label: "Afiliados", icon: Users },
+  { href: "/credenciales", label: "Credenciales", icon: CreditCard },
   { href: "/institutos", label: "Institutos", icon: Building2 },
   { href: "/moderacion", label: "Moderación", icon: Flag },
   { href: "/reportes", label: "Reportes de docs", icon: Flag },
