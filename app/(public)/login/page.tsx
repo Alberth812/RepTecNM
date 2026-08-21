@@ -1,7 +1,6 @@
 "use client";
 
-import { USUARIOS_DEMO } from "@/lib/mock/usuarios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, GraduationCap, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
@@ -12,21 +11,26 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { USUARIOS_DEMO } from "@/lib/mock/usuarios";
 
 export default function LoginPage() {
   const [ver, setVer] = useState(false);
-  const [correoLogin, setCorreoLogin] = useState("");
-  const [claveLogin, setClaveLogin] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [clave, setClave] = useState("");
   const [recAbierto, setRecAbierto] = useState(false);
   const [correoRec, setCorreoRec] = useState("");
   const [recEnviado, setRecEnviado] = useState(false);
-  const [espera, setEspera] = useState(0);
 
-  useEffect(() => {
-    if (espera <= 0) return;
-    const t = setTimeout(() => setEspera(espera - 1), 1000);
-    return () => clearTimeout(t);
-  }, [espera]);
+  const iniciar = () => {
+    const u = USUARIOS_DEMO.find((x) => x.correo === correo.trim().toLowerCase());
+    if (!u || u.contrasena !== clave) {
+      toast.error("Credenciales inválidas. Usa las cuentas de demostración.");
+      return;
+    }
+    localStorage.setItem("rep-rol", u.rol);
+    localStorage.setItem("rep-usuario", u.nombre);
+    window.location.href = u.rol === "admin" ? "/dashboard" : "/";
+  };
 
   const enviarRecuperacion = () => {
     if (!/^\S+@\S+\.\S+$/.test(correoRec.trim())) {
@@ -34,7 +38,6 @@ export default function LoginPage() {
       return;
     }
     setRecEnviado(true);
-    setEspera(120);
     toast.success("Enlace de recuperación enviado (simulado en el prototipo).");
   };
 
@@ -56,23 +59,21 @@ export default function LoginPage() {
 
         <form
           className="grid gap-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const u = USUARIOS_DEMO.find((x) => x.correo === correoLogin.trim().toLowerCase());
-            if (!u || u.contrasena !== claveLogin) {
-              toast.error("Credenciales inválidas. Usa las cuentas de demostración.");
-              return;
-            }
-            localStorage.setItem("rep-rol", u.rol);
-            localStorage.setItem("rep-usuario", u.nombre);
-            window.location.href = u.rol === "admin" ? "/dashboard" : "/credencial";
-          }}
+          onSubmit={(e) => { e.preventDefault(); iniciar(); }}
         >
           <div className="grid gap-2">
             <label htmlFor="correo" className="text-sm font-medium">Correo electrónico</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="correo" type="email" required placeholder="tucorreo@ejemplo.com" className="bg-background pl-9" value={correoLogin} onChange={(e) => setCorreoLogin(e.target.value)} />
+              <Input
+                id="correo"
+                type="email"
+                required
+                placeholder="tucorreo@ejemplo.com"
+                className="bg-background pl-9"
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
+              />
             </div>
           </div>
 
@@ -95,8 +96,8 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
                 className="bg-background pl-9 pr-10"
-                value={claveLogin}
-                onChange={(e) => setClaveLogin(e.target.value)}
+                value={clave}
+                onChange={(e) => setClave(e.target.value)}
               />
               <button
                 type="button"
@@ -117,6 +118,27 @@ export default function LoginPage() {
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </form>
+
+        <div className="mt-6 rounded-xl border border-dashed p-4 text-sm">
+          <p className="font-medium">Cuentas de demostración</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Afiliada: mf.lopez@ejemplo.com · Egresada2026! — Administración: admin@reptecnm.mx · Directiva2026!
+          </p>
+          <div className="mt-3 grid gap-2">
+            <Link
+              href="/"
+              onClick={() => { localStorage.setItem("rep-rol", "afiliado"); localStorage.setItem("rep-usuario", "María Fernanda López Herrera"); }}
+            >
+              <Button variant="outline" className="w-full">Entrar como afiliada activa</Button>
+            </Link>
+            <Link
+              href="/dashboard"
+              onClick={() => { localStorage.setItem("rep-rol", "admin"); localStorage.setItem("rep-usuario", "Administración RepTecNM"); }}
+            >
+              <Button variant="outline" className="w-full">Entrar como administración</Button>
+            </Link>
+          </div>
+        </div>
 
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
@@ -151,13 +173,7 @@ export default function LoginPage() {
             )}
             <DialogFooter>
               <Button variant="outline" onClick={() => setRecAbierto(false)}>Cerrar</Button>
-              {recEnviado ? (
-                <Button disabled={espera > 0} onClick={enviarRecuperacion}>
-                  {espera > 0 ? `Reenviar en ${espera} s` : "Reenviar enlace"}
-                </Button>
-              ) : (
-                <Button onClick={enviarRecuperacion}>Enviar enlace</Button>
-              )}
+              <Button onClick={enviarRecuperacion}>Enviar enlace</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
