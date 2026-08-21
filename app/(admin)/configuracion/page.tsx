@@ -1,12 +1,13 @@
 "use client";
 
-import { SelectorTema } from "@/components/public/selector-tema";
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CambiarContrasena } from "@/components/public/cambiar-contrasena";
+import { SelectorTema } from "@/components/public/selector-tema";
+import { TitularAsociacion } from "@/components/admin/titular-asociacion";
 
 export default function ConfiguracionPage() {
   const [nombre, setNombre] = useState("Administración RepTecNM");
@@ -39,15 +40,14 @@ export default function ConfiguracionPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Configuración</h1>
         <p className="text-sm text-muted-foreground">Preferencias de la cuenta de administración.</p>
+      </div>
 
       <div className="grid gap-4 rounded-2xl border bg-card p-6">
         <h2 className="font-semibold">Tema de la plataforma</h2>
         <p className="text-sm text-muted-foreground">
-          Elige el esquema de color global; se aplica en toda la aplicación y se recuerda en este dispositivo.
+          Elige el esquema de color global de tu área de trabajo; se recuerda en este dispositivo.
         </p>
         <SelectorTema />
-      </div>
-
       </div>
 
       <div className="grid gap-4 rounded-2xl border bg-card p-6">
@@ -98,20 +98,17 @@ export default function ConfiguracionPage() {
           Correo
           <Input value={correo} onChange={(e) => setCorreo(e.target.value)} />
         </label>
-        <Button className="justify-self-start" onClick={() => toast.success("Cambios guardados (simulado en el prototipo).")}>
+        <Button
+          className="justify-self-start"
+          onClick={() => toast.success("Cambios guardados (simulado en el prototipo).")}
+        >
           Guardar cambios
         </Button>
       </div>
 
-      <div className="grid gap-2 rounded-2xl border bg-card p-6">
-        <h2 className="font-semibold">Seguridad</h2>
-        <p className="text-sm text-muted-foreground">
-          En producción: cambio de contraseña, sesiones activas y verificación en dos pasos (RF-AUTH).
-        </p>
-        <Button variant="outline" className="justify-self-start" onClick={() => toast.info("Disponible al conectar el backend.")}>
-          Cambiar contraseña
-        </Button>
-      </div>
+      <CambiarContrasena />
+
+      <TitularAsociacion />
     </div>
   );
 }
