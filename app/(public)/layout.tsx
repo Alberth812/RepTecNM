@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GraduationCap, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { ThemeSwitcher } from "@/components/public/theme-switcher";
+import { BarraSesion } from "@/components/public/barra-sesion";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -47,16 +47,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <Search className="h-4 w-4" />
               </Button>
             </Link>
-            <ThemeSwitcher />
-            <Link href="/dashboard" className="hidden sm:block">
-              <Button variant="outline" size="sm">Volver al panel</Button>
-            </Link>
-            <Link href="/registro">
-            <Button className="bg-amber-400 text-amber-950 hover:bg-amber-300">¿Eres nuevo? Afíliate</Button>
-          </Link>
-          <Link href="/login">
-              <Button size="sm">Iniciar sesión</Button>
-            </Link>
+            <BarraSesion />
           </div>
         </div>
       </header>
