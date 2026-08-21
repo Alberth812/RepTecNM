@@ -110,6 +110,7 @@ export default function CmsPage() {
     if (!t.nombre.trim()) errores.push(`Testimonio ${i + 1}: el nombre es obligatorio.`);
   });
   if (!c.redes.facebook.trim()) errores.push("El enlace de Facebook es obligatorio.");
+  if (!c.mision?.trim() || !c.vision?.trim()) errores.push("Misión y visión son obligatorias.");
 
   const guardar = () => {
     if (errores.length > 0) { toast.error(errores[0]); return; }
@@ -294,6 +295,14 @@ export default function CmsPage() {
         <h2 className="mb-4 font-semibold">Sección Nosotros</h2>
         <Textarea rows={5} value={c.nosotrosTexto} onChange={(e) => setC({ ...c, nosotrosTexto: e.target.value })} />
         <Contador len={c.nosotrosTexto.trim().length} min={150} max={1500} />
+              <div className="grid gap-2">
+                <span className="text-xs font-medium">Misión</span>
+                <Textarea rows={4} value={c.mision} onChange={(e) => setC({ ...c, mision: e.target.value })} placeholder="Misión de la red" />
+              </div>
+              <div className="grid gap-2">
+                <span className="text-xs font-medium">Visión</span>
+                <Textarea rows={4} value={c.vision} onChange={(e) => setC({ ...c, vision: e.target.value })} placeholder="Visión de la red" />
+              </div>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <Input value={c.nosotrosImagen1} onChange={(e) => setC({ ...c, nosotrosImagen1: e.target.value })} placeholder="URL imagen 1 (opcional)" />
                 <div className="flex items-center gap-2">

@@ -3,11 +3,16 @@ import { GraduationCap, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { BarraSesion } from "@/components/public/barra-sesion";
+import { GuardiaPublica } from "@/components/public/guardia-publica";
+import { SoloNoAdmin } from "@/components/public/solo-no-admin";
+import { FranjaSuperior } from "@/components/public/franja-superior";
+import { EstructuraSesion } from "@/components/public/estructura-sesion";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="bg-zinc-900 text-zinc-300">
+      <FranjaSuperior>
+<div className="bg-zinc-900 text-zinc-300">
         <div className="mx-auto flex h-9 max-w-6xl items-center justify-between px-4 text-[11px]">
           <p className="truncate italic">Investigación con propósito, conocimiento con impacto.</p>
           <nav className="flex shrink-0 items-center gap-4">
@@ -22,7 +27,9 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </nav>
         </div>
       </div>
+</FranjaSuperior>
 
+      <SoloNoAdmin>
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2 text-primary">
@@ -51,12 +58,19 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </div>
         </div>
       </header>
+      </SoloNoAdmin>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <GuardiaPublica>
+          <EstructuraSesion>{children}</EstructuraSesion>
+          </GuardiaPublica>
+      </main>
 
+      <SoloNoAdmin>
       <footer className="border-t py-6 text-center text-sm text-muted-foreground">
         Red de Egresados de Posgrado del TecNM © 2026
       </footer>
+      </SoloNoAdmin>
     </div>
   );
 }

@@ -1,4 +1,6 @@
 "use client";
+import { AvisoDemo } from "@/components/public/aviso-demo";
+import { useRol } from "@/lib/use-rol";
 
 import { useRef, useState, useEffect } from "react";
 import {
@@ -31,6 +33,7 @@ export default function MensajeriaPage() {
   const [nuevoMsj, setNuevoMsj] = useState("");
   const [adjunto, setAdjunto] = useState<{ nombre: string; tipo: string; tamano: string } | null>(null);
   const [bloqueando, setBloqueando] = useState<Conversacion | null>(null);
+  const { rol } = useRol();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activa = convs.find((c) => c.id === activaId) ?? null;
@@ -103,10 +106,8 @@ export default function MensajeriaPage() {
   const totalNoLeidos = convs.reduce((acc, c) => acc + c.noLeidos, 0);
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-100px)] w-full max-w-6xl flex-col px-4 py-4">
-      <div className="mb-4 shrink-0 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-        Entorno de demostración: vista como afiliado ACTIVO. En producción requiere autenticación (RF-MSG-001).
-      </div>
+    <div className={`mx-auto flex w-full max-w-6xl flex-col px-4 py-4 ${rol === "visitante" ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-170px)]"}`}>
+      <AvisoDemo />
 
       <div className="flex shrink-0 items-center justify-between pb-4">
         <div className="flex items-center gap-3">
@@ -119,7 +120,11 @@ export default function MensajeriaPage() {
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card max-md:grid-rows-[220px_minmax(0,1fr)] md:grid-cols-[320px_1fr]">
+      <p className="pb-4 text-sm text-muted-foreground">
+        Mensajería interna entre profesionales afiliados de la red.
+      </p>
+
+      <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card shadow-sm max-md:grid-rows-[220px_minmax(0,1fr)] md:grid-cols-[320px_1fr]">
         {/* Lista de conversaciones */}
         <div className="flex min-h-0 flex-col border-r">
           <div className="shrink-0 border-b p-3">

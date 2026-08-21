@@ -1,4 +1,6 @@
 "use client";
+import { AvisoDemo } from "@/components/public/aviso-demo";
+import { useRol } from "@/lib/use-rol";
 
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
@@ -28,6 +30,15 @@ import { COMENTARIOS_INICIALES, type Comentario } from "@/lib/mock/comentarios";
 
 const ANIO_ACTUAL = new Date().getFullYear();
 const TIPOS = ["Artículo", "Tesis", "Libro", "Memoria de congreso", "Presentación", "Ensayo", "Reporte técnico", "Otro"];
+const MOTIVOS_RETIRO = [
+  "Autoría no verificada",
+  "Incongruencias en los datos",
+  "Contenido duplicado",
+  "Incumplimiento del aviso de privacidad",
+  "Derechos de autor / plagio",
+  "Otro",
+];
+
 const MOTIVOS_REPORTE = ["Derechos de autor", "Contenido inapropiado", "Información confidencial", "Plagio", "Spam", "Otro"];
 
 interface FormDoc {
@@ -95,6 +106,10 @@ function RepositorioPageInner() {
   const [detalleReporte, setDetalleReporte] = useState("");
   const [reportados, setReportados] = useState<string[]>([]);
   const [eliminando, setEliminando] = useState<Documento | null>(null);
+  const [retirando, setRetirando] = useState<Documento | null>(null);
+  const [motivoRetiro, setMotivoRetiro] = useState("");
+  const [detalleRetiro, setDetalleRetiro] = useState("");
+  const { rol } = useRol();
   const [viendo, setViendo] = useState<Documento | null>(null);
   const [foroAbierto, setForoAbierto] = useState<string | null>(null);
   const [comentarios, setComentarios] = useState<Record<string, Comentario[]>>(COMENTARIOS_INICIALES);
@@ -177,6 +192,40 @@ function RepositorioPageInner() {
     setSheetAbierto(false);
   };
 
+
+  const confirmarRetiro = () => {
+    if (!retirando || !motivoRetiro) { toast.error("Selecciona un motivo."); return; }
+    if (motivoRetiro === "Otro") {
+      const len = detalleRetiro.trim().length;
+      if (len < 10 || len > 300) { toast.error("Describe el motivo (10 a 300 caracteres)."); return; }
+    }
+    const motivoFinal = motivoRetiro === "Otro" ? detalleRetiro.trim() : motivoRetiro;
+    setDocs((prev) => prev.filter((d) => d.id !== retirando.id));
+    const reportes = JSON.parse(localStorage.getItem("rep-reportes-admin") ?? "[]");
+    reportes.unshift({
+      id: `RET-${Date.now()}`,
+      tipo: "Retiro de publicación",
+      documento: retirando.titulo,
+      afiliado: retirando.afiliado,
+      motivo: motivoFinal,
+      fecha: new Date().toISOString().slice(0, 10),
+    });
+    localStorage.setItem("rep-reportes-admin", JSON.stringify(reportes));
+    const notis = JSON.parse(localStorage.getItem("rep-notificaciones") ?? "[]");
+    notis.unshift({
+      id: `NOT-${Date.now()}`,
+      destinatario: retirando.afiliado,
+      documento: retirando.titulo,
+      motivo: motivoFinal,
+      fecha: new Date().toISOString().slice(0, 10),
+    });
+    localStorage.setItem("rep-notificaciones", JSON.stringify(notis));
+    toast.success(`Publicación retirada y ${retirando.afiliado} notificado del motivo.`);
+    setRetirando(null);
+    setMotivoRetiro("");
+    setDetalleRetiro("");
+  };
+
   const confirmarReporte = () => {
     if (!reportando || !motivoReporte) { toast.error("Selecciona un motivo."); return; }
     if (motivoReporte === "Otro") {
@@ -210,10 +259,7 @@ function RepositorioPageInner() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-        Entorno de demostración: vista como afiliado ACTIVO. En producción, el acceso
-        requiere autenticación (RF-DOC-008).
-      </div>
+      <AvisoDemo />
 
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
@@ -290,6 +336,17 @@ function RepositorioPageInner() {
                 <Flag className="mr-2 h-4 w-4" />
                 {reportados.includes(d.id) ? "Reportado" : "Reportar"}
               </Button>
+              {rol === "admin" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => setRetirando(d)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> Retirar publicación
+                </Button>
+              )}
+
               {d.propio && (
                 <>
                   <Button variant="ghost" size="sm" onClick={() => abrirEdicion(d)}>
@@ -546,6 +603,55 @@ function RepositorioPageInner() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setReportando(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={confirmarReporte}>Enviar reporte</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
+      {/* Retiro por administracion */}
+      <Dialog open={!!retirando} onOpenChange={(open) => { if (!open) { setRetirando(null); setMotivoRetiro(""); setDetalleRetiro(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Retirar publicación</DialogTitle>
+            <DialogDescription>
+              La publicación se elimina del repositorio y el afiliado autor recibe una notificación con el motivo. Esta acción queda registrada en el historial de administración (RF-DOC-010).
+            </DialogDescription>
+          </DialogHeader>
+          {retirando && (
+            <div className="rounded-lg border bg-muted/30 p-3 text-sm">
+              <p className="font-medium">{retirando.titulo}</p>
+              <p className="text-xs text-muted-foreground">{retirando.afiliado} · {retirando.tipo} · {retirando.anio}</p>
+            </div>
+          )}
+          <div className="grid gap-3">
+            <label className="grid gap-1.5 text-sm">
+              <span className="font-medium">Motivo del retiro</span>
+              <select
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                value={motivoRetiro}
+                onChange={(e) => setMotivoRetiro(e.target.value)}
+              >
+                <option value="">Selecciona un motivo</option>
+                {MOTIVOS_RETIRO.map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </label>
+            {motivoRetiro === "Otro" && (
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-medium">Describe el motivo</span>
+                <Textarea
+                  rows={3}
+                  maxLength={300}
+                  value={detalleRetiro}
+                  onChange={(e) => setDetalleRetiro(e.target.value)}
+                  placeholder="Mínimo 10 caracteres"
+                />
+                <span className="text-xs text-muted-foreground">{detalleRetiro.length} / 300</span>
+              </label>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setRetirando(null); setMotivoRetiro(""); setDetalleRetiro(""); }}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmarRetiro}>Retirar y notificar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,5 +1,6 @@
 "use client";
 
+import { USUARIOS_DEMO } from "@/lib/mock/usuarios";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, GraduationCap, Lock, Mail } from "lucide-react";
@@ -14,6 +15,8 @@ import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const [ver, setVer] = useState(false);
+  const [correoLogin, setCorreoLogin] = useState("");
+  const [claveLogin, setClaveLogin] = useState("");
   const [recAbierto, setRecAbierto] = useState(false);
   const [correoRec, setCorreoRec] = useState("");
   const [recEnviado, setRecEnviado] = useState(false);
@@ -55,14 +58,21 @@ export default function LoginPage() {
           className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            toast.info("Disponible al conectar el backend (Incremento 1, RF-AUTH).");
+            const u = USUARIOS_DEMO.find((x) => x.correo === correoLogin.trim().toLowerCase());
+            if (!u || u.contrasena !== claveLogin) {
+              toast.error("Credenciales inválidas. Usa las cuentas de demostración.");
+              return;
+            }
+            localStorage.setItem("rep-rol", u.rol);
+            localStorage.setItem("rep-usuario", u.nombre);
+            window.location.href = u.rol === "admin" ? "/dashboard" : "/credencial";
           }}
         >
           <div className="grid gap-2">
             <label htmlFor="correo" className="text-sm font-medium">Correo electrónico</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="correo" type="email" required placeholder="tucorreo@ejemplo.com" className="bg-background pl-9" />
+              <Input id="correo" type="email" required placeholder="tucorreo@ejemplo.com" className="bg-background pl-9" value={correoLogin} onChange={(e) => setCorreoLogin(e.target.value)} />
             </div>
           </div>
 
@@ -85,6 +95,8 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
                 className="bg-background pl-9 pr-10"
+                value={claveLogin}
+                onChange={(e) => setClaveLogin(e.target.value)}
               />
               <button
                 type="button"

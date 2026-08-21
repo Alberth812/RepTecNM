@@ -21,8 +21,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: "(function(){try{var t=localStorage.getItem('rep-tema')||'light';var r=document.documentElement;r.classList.remove('light','sepia','dark');r.classList.add(t);}catch(e){}})();"
+        }}
+      />
         {children}
         <Toaster richColors />
       </body>

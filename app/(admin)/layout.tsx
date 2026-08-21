@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+import { GuardiaAdmin } from "@/components/admin/guardia-admin";
 import { Topbar } from "@/components/admin/topbar";
 import { Sidebar } from "@/components/admin/sidebar";
 
-export default function AdminLayout({
+function AdminLayoutInterno({
   children,
 }: {
   children: React.ReactNode;
@@ -25,5 +27,12 @@ export default function AdminLayout({
       </main>
       </div>
     </div>
+  );
+}
+export default function AdminLayout(props: { children: ReactNode }) {
+  return (
+    <GuardiaAdmin>
+      <AdminLayoutInterno {...props} />
+    </GuardiaAdmin>
   );
 }

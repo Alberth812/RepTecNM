@@ -4,7 +4,7 @@ import { useEffect, useState , useMemo } from "react";
 import Link from "next/link";
 import {
   AlertCircle, ArrowRight, Search, Users, BookOpen, Building2, MapPin, GraduationCap,
-  Star, Quote, QrCode,
+  Star, Quote, QrCode, Target, Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CONTENIDO_DEFAULT, cargarContenido, type ContenidoHome } from "@/lib/mock/cms";
@@ -143,6 +143,36 @@ export default function HomePage() {
               <Users className="h-14 w-14 text-[#004B87]/60" />
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Misión y visión */}
+      <section className="bg-gradient-to-br from-[#003366] via-[#004B87] to-[#0077c8] py-20 text-white">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center">
+            <h2 className="font-serif text-3xl font-bold tracking-tight">Nuestro rumbo</h2>
+            <p className="mt-3 text-sky-100/80">Misión y visión de la Red de Egresados de Posgrado del TecNM.</p>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-8 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-amber-400 p-2.5 text-amber-950">
+                  <Target className="h-6 w-6" />
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Misión</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-sky-50/90">{contenido.mision}</p>
+            </div>
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-8 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-amber-400 p-2.5 text-amber-950">
+                  <Eye className="h-6 w-6" />
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Visión</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-sky-50/90">{contenido.vision}</p>
+            </div>
+          </div>
         </div>
       </section>
 

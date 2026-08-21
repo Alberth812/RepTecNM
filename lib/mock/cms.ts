@@ -19,6 +19,8 @@ export interface Testimonio {
 export interface ContenidoHome {
   slides: Slide[];
   nosotrosTexto: string;
+  mision: string;
+  vision: string;
   nosotrosImagen1: string;
   nosotrosImagen2: string;
   queHacemosTexto: string;
@@ -35,6 +37,8 @@ export interface ContenidoHome {
 }
 
 export const CONTENIDO_DEFAULT: ContenidoHome = {
+  mision: "Consolidar una comunidad de egresados de posgrado del TecNM que promueva la colaboración académica, científica y social, contribuyendo al desarrollo sustentable, la innovación tecnológica y el fortalecimiento institucional, con impacto en los ámbitos local, regional, nacional e internacional.",
+  vision: "Ser una red de referencia nacional e internacional que articule conocimientos, proyectos y liderazgos de los egresados del TecNM, posicionando su incidencia en la transformación productiva, la innovación social, el desarrollo territorial y la consolidación de una sociedad más justa, equitativa y sostenible.",
   slides: [
     {
       tipo: "normal",

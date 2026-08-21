@@ -1,4 +1,5 @@
 "use client";
+import { AvisoDemo } from "@/components/public/aviso-demo";
 
 import { useEffect, useState } from "react";
 import {
@@ -318,10 +319,7 @@ export default function RegistroPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Ingresa el código de 6 dígitos enviado a <span className="font-medium text-foreground">{correo}</span>.
           </p>
-          <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-            Entorno de demostración: se acepta cualquier código de 6 dígitos.
-            En producción el código se enviará por correo (RNF-009).
-          </div>
+          <AvisoDemo />
           <div className="mt-6 grid gap-4">
             <Input
               value={claveIngresada}
