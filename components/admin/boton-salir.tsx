@@ -9,6 +9,7 @@ export function BotonSalir() {
   const salir = () => {
     localStorage.removeItem("rep-rol");
     localStorage.removeItem("rep-usuario");
+    localStorage.removeItem("rep-tema");
     window.location.href = "/";
   };
 

@@ -18,12 +18,13 @@ export function BarraSesion() {
 
   const salir = () => {
     cambiar("visitante");
+    localStorage.removeItem("rep-tema");
     window.location.href = "/";
   };
 
   return (
     <div className="flex items-center gap-3">
-      {rol === "visitante" && <ThemeSwitcher />}
+      <ThemeSwitcher />
 
       {rol !== "visitante" && (
         <span className="flex items-center gap-2">

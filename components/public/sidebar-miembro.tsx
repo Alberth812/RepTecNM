@@ -66,6 +66,7 @@ export function SidebarMiembro({ rol }: { rol: Rol }) {
   const salir = () => {
     localStorage.removeItem("rep-rol");
     localStorage.removeItem("rep-usuario");
+    localStorage.removeItem("rep-tema");
     window.location.href = "/";
   };
 

@@ -119,27 +119,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 rounded-xl border border-dashed p-4 text-sm">
-          <p className="font-medium">Cuentas de demostración</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Afiliada: mf.lopez@ejemplo.com · Egresada2026! — Administración: admin@reptecnm.mx · Directiva2026!
-          </p>
-          <div className="mt-3 grid gap-2">
-            <Link
-              href="/"
-              onClick={() => { localStorage.setItem("rep-rol", "afiliado"); localStorage.setItem("rep-usuario", "María Fernanda López Herrera"); }}
-            >
-              <Button variant="outline" className="w-full">Entrar como afiliada activa</Button>
-            </Link>
-            <Link
-              href="/dashboard"
-              onClick={() => { localStorage.setItem("rep-rol", "admin"); localStorage.setItem("rep-usuario", "Administración RepTecNM"); }}
-            >
-              <Button variant="outline" className="w-full">Entrar como administración</Button>
-            </Link>
-          </div>
-        </div>
-
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
           <span className="text-xs text-muted-foreground">¿Primera vez aquí?</span>
