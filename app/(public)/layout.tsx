@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BarraSesion } from "@/components/public/barra-sesion";
 import { GuardiaPublica } from "@/components/public/guardia-publica";
 import { SoloNoAdmin } from "@/components/public/solo-no-admin";
+import { SoloVisitante } from "@/components/public/solo-visitante";
 import { FranjaSuperior } from "@/components/public/franja-superior";
 import { EstructuraSesion } from "@/components/public/estructura-sesion";
 
@@ -39,14 +40,14 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-5 text-sm font-medium text-zinc-700 lg:flex">
+          <SoloVisitante><nav className="hidden items-center gap-5 text-sm font-medium text-zinc-700 lg:flex">
             <Link href="/" className="hover:text-primary">Inicio</Link>
             <Link href="/#nosotros" className="hover:text-primary">Nosotros</Link>
             <Link href="/#que-hacemos" className="hover:text-primary">Servicios</Link>
             <Link href="/#afiliacion" className="hover:text-primary">Afiliación</Link>
             
             <Link href="/#contacto" className="hover:text-primary">Contacto</Link>
-          </nav>
+          </nav></SoloVisitante>
 
           <div className="flex items-center gap-2">
             <Link href="/catalogo" aria-label="Buscar en el catálogo">

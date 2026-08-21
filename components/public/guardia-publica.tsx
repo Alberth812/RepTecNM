@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { useRol } from "@/lib/use-rol";
 
-const RUTAS_MIEMBRO = ["/credencial", "/mensajeria", "/seguimiento", "/repositorio"];
+const RUTAS_MIEMBRO = ["/credencial", "/mensajeria", "/seguimiento", "/repositorio", "/notificaciones", "/ajustes"];
 
 export function GuardiaPublica({ children }: { children: ReactNode }) {
   const { rol, listo } = useRol();

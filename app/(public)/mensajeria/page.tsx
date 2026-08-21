@@ -34,6 +34,9 @@ export default function MensajeriaPage() {
   const [adjunto, setAdjunto] = useState<{ nombre: string; tipo: string; tamano: string } | null>(null);
   const [bloqueando, setBloqueando] = useState<Conversacion | null>(null);
   const { rol } = useRol();
+  const [fondoChat, setFondoChat] = useState("");
+
+  useEffect(() => setFondoChat(localStorage.getItem("rep-fondo-chat") ?? ""), []);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activa = convs.find((c) => c.id === activaId) ?? null;
@@ -207,7 +210,7 @@ export default function MensajeriaPage() {
                 </Button>
               </div>
 
-              <div className="scroll-glass flex-1 min-h-0 overflow-y-auto" ref={scrollRef}>
+              <div className="scroll-glass flex-1 min-h-0 overflow-y-auto" ref={scrollRef} style={{ backgroundImage: fondoChat || undefined, backgroundSize: "cover", backgroundPosition: "center" }}>
                 <div className="space-y-3 p-5">
                   {activa.mensajes.map((m) => (
                     <div key={m.id} className={`flex ${m.remitente === "yo" ? "justify-end" : "justify-start"}`}>

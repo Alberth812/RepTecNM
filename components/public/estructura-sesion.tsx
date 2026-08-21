@@ -7,7 +7,7 @@ import { CascoAdmin } from "@/components/admin/casco-admin";
 import { SidebarMiembro } from "./sidebar-miembro";
 import { useRol } from "@/lib/use-rol";
 
-const RUTAS_CON_MENU = ["/credencial", "/catalogo", "/repositorio", "/mensajeria", "/seguimiento"];
+const RUTAS_CON_MENU = ["/credencial", "/catalogo", "/repositorio", "/mensajeria", "/seguimiento", "/notificaciones", "/ajustes"];
 
 export function EstructuraSesion({ children }: { children: ReactNode }) {
   const { rol } = useRol();
@@ -19,7 +19,7 @@ export function EstructuraSesion({ children }: { children: ReactNode }) {
   if (!conMenu) return <>{children}</>;
 
   return (
-    <div className="mx-auto grid w-full max-w-[1600px] items-start gap-6 px-4 py-6 lg:grid-cols-[230px_1fr]">
+    <div className="mx-auto grid w-full max-w-[1600px] items-start gap-6 px-4 py-6 lg:grid-cols-[260px_minmax(0,1fr)]">
       <SidebarMiembro rol={rol} />
       <div className="min-w-0">{children}</div>
     </div>
