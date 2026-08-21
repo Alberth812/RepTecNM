@@ -12,7 +12,11 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeSwitcher } from "@/components/public/theme-switcher";
+<<<<<<< HEAD
 import { useRol } from "@/lib/use-rol";
+=======
+import { useRol, type Rol } from "@/lib/use-rol";
+>>>>>>> 832baa9 (feat: menus por rol con barra de sesion demo (visitante/afiliado/admin))
 
 export function BarraSesion() {
   const { rol, cambiar } = useRol();
@@ -56,7 +60,11 @@ export function BarraSesion() {
       {rol === "afiliado" && (
         <>
           <DropdownMenu>
+<<<<<<< HEAD
             <DropdownMenuTrigger asChild>
+=======
+            <DropdownMenuTrigger>
+>>>>>>> 832baa9 (feat: menus por rol con barra de sesion demo (visitante/afiliado/admin))
               <Button variant="outline">
                 <UserRound className="mr-2 h-4 w-4" /> Mi espacio
               </Button>
