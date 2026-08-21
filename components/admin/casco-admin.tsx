@@ -5,7 +5,6 @@ import { Search } from "lucide-react";
 
 import { Sidebar } from "@/components/admin/sidebar";
 import { AvatarSesion } from "@/components/admin/avatar-sesion";
-import { ThemeSwitcher } from "@/components/public/theme-switcher";
 
 export function CascoAdmin({ children }: { children: ReactNode }) {
   return (
@@ -21,7 +20,6 @@ export function CascoAdmin({ children }: { children: ReactNode }) {
             <Search className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <ThemeSwitcher />
             <AvatarSesion />
           </div>
         </header>

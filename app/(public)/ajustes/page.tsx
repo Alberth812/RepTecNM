@@ -1,5 +1,7 @@
 "use client";
 
+import { SelectorTema } from "@/components/public/selector-tema";
+
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -59,6 +61,15 @@ export default function AjustesPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Configuración</h1>
         <p className="mt-2 text-muted-foreground">Preferencias personales de tu cuenta.</p>
+
+      <div className="grid gap-4 rounded-2xl border bg-card p-6">
+        <h2 className="font-semibold">Tema de la plataforma</h2>
+        <p className="text-sm text-muted-foreground">
+          Elige el esquema de color global; se aplica en toda la aplicación y se recuerda en este dispositivo.
+        </p>
+        <SelectorTema />
+      </div>
+
       </div>
 
       <div className="grid gap-4 rounded-2xl border bg-card p-6">

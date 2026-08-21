@@ -1,7 +1,6 @@
 "use client";
 
 import { Bell, Menu, Search } from "lucide-react";
-import { ThemeSwitcher } from "@/components/public/theme-switcher";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -42,7 +41,6 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <ThemeSwitcher />
 
         <DropdownMenu>
           <DropdownMenuTrigger className="relative h-8 w-8 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">

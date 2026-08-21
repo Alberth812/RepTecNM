@@ -23,6 +23,8 @@ export function BarraSesion() {
 
   return (
     <div className="flex items-center gap-3">
+      {rol === "visitante" && <ThemeSwitcher />}
+
       {rol !== "visitante" && (
         <span className="flex items-center gap-2">
           <AvatarSesion />
@@ -31,8 +33,6 @@ export function BarraSesion() {
           </span>
         </span>
       )}
-
-      <ThemeSwitcher />
 
       {rol === "visitante" && (
         <>

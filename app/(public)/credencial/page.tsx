@@ -6,6 +6,7 @@ import { Download, GraduationCap, HeartPulse, Lock, Save } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
+import { BadgeEstado } from "@/components/public/badge-estado";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -108,7 +109,7 @@ export default function CredencialPage() {
             Administra tu información y genera tu credencial digital (RF-CRED-001).
           </p>
         </div>
-        <Badge variant="secondary">ACTIVO</Badge>
+        <BadgeEstado estado="ACTIVO" />
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_420px]">
@@ -193,7 +194,7 @@ export default function CredencialPage() {
                 <div className="flex items-center gap-2 font-semibold">
                   <GraduationCap className="h-6 w-6" /> REP TecNM
                 </div>
-                <Badge className="border-white/30 bg-card/15 text-white">ACTIVO</Badge>
+                <BadgeEstado estado="ACTIVO" />
               </div>
               <p className="mt-1 text-xs text-sky-100/80">Credencial digital de afiliado</p>
             </div>
