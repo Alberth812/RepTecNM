@@ -1,6 +1,6 @@
 "use client";
 
-import { Circle, Coffee, Moon, Sun, TreePine } from "lucide-react";
+import { Circle, Coffee, Flower2, Moon, Sun, TreePine } from "lucide-react";
 
 import { useTheme, type Theme } from "@/lib/use-theme";
 
@@ -10,6 +10,7 @@ const TEMAS: { id: Theme; nombre: string; icon: typeof Sun }[] = [
   { id: "dark", nombre: "Oscuro", icon: Moon },
   { id: "azul", nombre: "Azul institucional", icon: Circle },
   { id: "verde", nombre: "Verde bosque", icon: TreePine },
+  { id: "rosa", nombre: "Rosa", icon: Flower2 },
 ];
 
 export function SelectorTema() {

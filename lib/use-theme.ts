@@ -2,10 +2,11 @@
 
 import { useCallback, useState } from "react";
 
-export type Theme = "light" | "sepia" | "dark" | "azul" | "verde";
+export type Theme = "light" | "sepia" | "dark" | "azul" | "verde" | "rosa";
 
 const CLAVE = "rep-tema";
-const TEMAS_VALIDOS: Theme[] = ["light", "sepia", "dark", "azul", "verde"];
+const TEMAS_VALIDOS: Theme[] = ["light", "sepia", "dark", "azul", "verde", "rosa"];
+const CLASES = "light sepia dark azul verde rosa";
 
 function leer(): Theme {
   if (typeof window === "undefined") return "light";
@@ -20,7 +21,7 @@ export function useTheme() {
     setThemeState(t);
     window.localStorage.setItem(CLAVE, t);
     const r = document.documentElement;
-    r.classList.remove("light", "sepia", "dark", "azul", "verde");
+    r.classList.remove(...CLASES.split(" "));
     r.classList.add(t);
   }, []);
 

@@ -1,12 +1,10 @@
 "use client";
 
-import { SelectorTema } from "@/components/public/selector-tema";
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { CambiarContrasena } from "@/components/public/cambiar-contrasena";
+import { SelectorTema } from "@/components/public/selector-tema";
 
 const FONDOS = [
   { nombre: "Sin fondo", valor: "" },
@@ -17,8 +15,6 @@ const FONDOS = [
 
 export default function AjustesPage() {
   const [fondo, setFondo] = useState("");
-  const [clave1, setClave1] = useState("");
-  const [clave2, setClave2] = useState("");
 
   useEffect(() => setFondo(localStorage.getItem("rep-fondo-chat") ?? ""), []);
 
@@ -42,25 +38,12 @@ export default function AjustesPage() {
     r.readAsDataURL(f);
   };
 
-  const cambiarClave = () => {
-    if (clave1.length < 8 || !/[A-Z]/.test(clave1) || !/\d/.test(clave1)) {
-      toast.error("Mínimo 8 caracteres, una mayúscula y un número.");
-      return;
-    }
-    if (clave1 !== clave2) {
-      toast.error("Las contraseñas no coinciden.");
-      return;
-    }
-    setClave1("");
-    setClave2("");
-    toast.success("Contraseña actualizada (simulado; en producción RF-AUTH-010).");
-  };
-
   return (
     <div className="mx-auto grid max-w-2xl gap-6 px-4 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Configuración</h1>
         <p className="mt-2 text-muted-foreground">Preferencias personales de tu cuenta.</p>
+      </div>
 
       <div className="grid gap-4 rounded-2xl border bg-card p-6">
         <h2 className="font-semibold">Tema de la plataforma</h2>
@@ -68,8 +51,6 @@ export default function AjustesPage() {
           Elige el esquema de color global; se aplica en toda la aplicación y se recuerda en este dispositivo.
         </p>
         <SelectorTema />
-      </div>
-
       </div>
 
       <div className="grid gap-4 rounded-2xl border bg-card p-6">
@@ -108,18 +89,7 @@ export default function AjustesPage() {
         />
       </div>
 
-      <div className="grid gap-4 rounded-2xl border bg-card p-6">
-        <h2 className="font-semibold">Cambiar contraseña</h2>
-        <label className="grid gap-1 text-sm">
-          Nueva contraseña
-          <Input type="password" value={clave1} onChange={(e) => setClave1(e.target.value)} />
-        </label>
-        <label className="grid gap-1 text-sm">
-          Confirmar contraseña
-          <Input type="password" value={clave2} onChange={(e) => setClave2(e.target.value)} />
-        </label>
-        <Button className="justify-self-start" onClick={cambiarClave}>Actualizar contraseña</Button>
-      </div>
+      <CambiarContrasena />
     </div>
   );
 }
