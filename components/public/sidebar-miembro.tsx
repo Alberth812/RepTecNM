@@ -20,7 +20,7 @@ export function contarMensajesNoLeidos(): number {
   return conversacionesIniciales.reduce((acc, cv) => acc + cv.noLeidos, 0);
 }
 
-const MENU_AFILIADO = [
+export const MENU_AFILIADO = [
   { href: "/credencial", label: "Mi credencial", icon: BadgeCheck },
   { href: "/notificaciones", label: "Notificaciones", icon: Bell },
   { href: "/catalogo", label: "Catálogo", icon: Search },
