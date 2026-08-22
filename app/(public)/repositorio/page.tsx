@@ -283,9 +283,38 @@ function RepositorioPageInner() {
 
       <div className="grid gap-4">
         {resultados.map((d) => (
-          <div key={d.id} className="rounded-2xl border bg-card p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
+          <div key={d.id} className="rounded-2xl border bg-card p-5 transition-shadow hover:shadow-lg">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setViendo(d)}
+                className="group/thumb relative hidden shrink-0 sm:block"
+                aria-label={`Vista previa de ${d.titulo}`}
+              >
+                <div className="relative h-36 w-28 overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm">
+                  <div className="h-2 bg-[#004B87]" />
+                  <div className="p-2">
+                    <p className="line-clamp-3 text-[7px] font-bold leading-snug text-slate-800">{d.titulo}</p>
+                    <p className="mt-1 truncate text-[6px] text-slate-500">{d.autores[0]}</p>
+                    <div className="mt-2 space-y-1">
+                      <div className="h-1 w-11/12 rounded bg-slate-200" />
+                      <div className="h-1 w-full rounded bg-slate-200" />
+                      <div className="h-1 w-10/12 rounded bg-slate-200" />
+                      <div className="h-1 w-full rounded bg-slate-200" />
+                      <div className="h-1 w-9/12 rounded bg-slate-200" />
+                      <div className="h-1 w-11/12 rounded bg-slate-200" />
+                      <div className="h-1 w-7/12 rounded bg-slate-200" />
+                    </div>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 bg-[#004B87] py-0.5 text-center text-[6px] font-semibold text-white">
+                    {d.tipo} · {d.anio}
+                  </div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center rounded-md bg-[#003366]/40 opacity-0 transition-opacity group-hover/thumb:opacity-100">
+                  <Eye className="h-5 w-5 text-white" />
+                </div>
+              </button>
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{d.tipo}</Badge>
                   <span className="text-xs text-muted-foreground">{d.anio}</span>
@@ -299,9 +328,6 @@ function RepositorioPageInner() {
                     <Badge key={c} variant="outline" className="text-[11px]">{c}</Badge>
                   ))}
                 </div>
-              </div>
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#004B87]/10">
-                <FileText className="h-5 w-5 text-[#004B87]" />
               </div>
             </div>
 
