@@ -1,34 +1,88 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { type NextRequest } from "next/server";
+import { eq } from "drizzle-orm";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/db/client";
+import { users } from "@/db/schema/auth-schema";
+import { afiliados } from "@/db/schema/afiliados-schema";
+import { forgotPasswordSchema } from "@/lib/validation/schemas";
+import { getClientIp } from "@/lib/http/client-ip";
+import { ok, toErrorResponse } from "@/lib/http/responses";
+import { AUTH_RULES, MESSAGES, ROLES } from "@/lib/constants";
+import { countAuthEvents, enforceRollingLimit, recordAuthEvent } from "@/lib/rate-limit/limiter";
 
-const UNIFORM_MESSAGE =
-  "Si existe una cuenta asociada a este correo, se enviará un correo electrónico para recuperar la contraseña.";
+const BLOCKED_MEMBERSHIP_STATUSES = new Set(["RECHAZADO", "SUSPENDIDO"]);
 
 /**
- * POST /api/password/forgot
+ * RF-AUTH-011: recuperación de contraseña por enlace de un solo uso.
+ * Siempre responde el mismo mensaje uniforme, exista o no la cuenta, para no
+ * revelar su existencia/estado A TRAVÉS DE ESTE FLUJO (el propio spec aclara
+ * que esto no es una garantía anti-enumeración general: RF-AUTH-005 sí puede
+ * revelar correos en uso desde el registro).
  *
- * RF-AUTH-011. Toda la lógica de elegibilidad (¿existe la cuenta?, ¿está
- * verificada?, ¿está RECHAZADO/SUSPENDIDO?) y de límite de 5 solicitudes
- * cada 7 días vive centralizada en el hook `before` sobre
- * "/email-otp/request-password-reset" en src/lib/auth.ts, para que se
- * cumpla sin importar quién invoque el endpoint interno.
- *
- * Esta ruta solo hace una cosa más: sin importar el resultado (éxito,
- * cuenta inexistente, cuenta no elegible, límite excedido), siempre
- * responde exactamente el mismo mensaje con el mismo código 200, tal como
- * exige la RF, para no filtrar la existencia o el estado de la cuenta a
- * través de este flujo.
+ * RF-AUTH-023: el límite por IP se aplica siempre, exista o no el correo; el
+ * límite de 5 solicitudes/7 días por cuenta, en cambio, se mantiene oculto
+ * detrás del mensaje uniforme (revelarlo con un 429 distinto filtraría que
+ * la cuenta existe).
  */
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : null;
+export async function POST(request: NextRequest) {
+  try {
+    const { email } = forgotPasswordSchema.parse(await request.json());
+    const ip = getClientIp(request);
 
-  if (email) {
-    await auth.api.requestPasswordResetEmailOTP({ body: { email } }).catch(() => {
-      // Se ignora deliberadamente: el hook `before` ya decidió si debía
-      // enviarse o no, y la respuesta al cliente es siempre la misma.
+    // IP: aplica siempre, independientemente de si el correo existe.
+    await enforceRollingLimit({
+      type: "PASSWORD_RESET_REQUESTED",
+      dimension: { column: "ipAddress", value: ip },
+      windowMs: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP_WINDOW_MS,
+      max: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP,
+      message: "Demasiadas solicitudes desde esta red. Intenta de nuevo más tarde.",
     });
-  }
 
-  return NextResponse.json({ message: UNIFORM_MESSAGE }, { status: 200 });
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+    let eligible = false;
+    if (user && user.emailVerified) {
+      if (user.role === ROLES.AFILIADO) {
+        const [afiliado] = await db
+          .select({ membershipStatus: afiliados.membershipStatus })
+          .from(afiliados)
+          .where(eq(afiliados.userId, user.id))
+          .limit(1);
+        eligible = !afiliado || !BLOCKED_MEMBERSHIP_STATUSES.has(afiliado.membershipStatus);
+      } else {
+        // Administradores no tienen membership_status; solo se exige correo
+        // verificado, lo cual ya es siempre cierto para ellos (RF-AUTH-013).
+        eligible = true;
+      }
+    }
+
+    if (eligible && user) {
+      const attemptsInWindow = await countAuthEvents(
+        "PASSWORD_RESET_REQUESTED",
+        { column: "userId", value: user.id },
+        AUTH_RULES.PASSWORD_RESET_MAX_PER_ACCOUNT_WINDOW_MS,
+      );
+
+      if (attemptsInWindow < AUTH_RULES.PASSWORD_RESET_MAX_PER_ACCOUNT) {
+        await auth.api.requestPasswordReset({ body: { email } });
+        await recordAuthEvent({
+          type: "PASSWORD_RESET_REQUESTED",
+          userId: user.id,
+          email,
+          ipAddress: ip,
+        });
+      }
+      // Si ya alcanzó el tope de 5/7 días, no se envía correo ni se registra
+      // un nuevo evento (para no extender artificialmente la ventana), pero
+      // igual respondemos el mensaje uniforme más abajo.
+    } else {
+      // Cuenta inexistente / no verificada / RECHAZADO / SUSPENDIDO: no se
+      // envía nada, pero sí dejamos rastro para el límite por IP.
+      await recordAuthEvent({ type: "PASSWORD_RESET_REQUESTED", email, ipAddress: ip });
+    }
+
+    return ok({ message: MESSAGES.PASSWORD_RESET_UNIFORM });
+  } catch (error) {
+    return toErrorResponse(error);
+  }
 }

@@ -1,59 +1,51 @@
 import { defineRelations } from "drizzle-orm";
-import { user, session, account, verification } from "./auth-schema";
-import { afiliados } from "./afiliados";
+import { users, sessions, accounts, verifications } from "./auth-schema";
 import { administradores } from "./administradores";
+import { afiliados } from "./afiliados";
 
-/**
- * Relaciones con la API v1 (RQBv2) de Drizzle ORM.
- *
- * Esto habilita `db.query.user.findFirst({ with: { afiliado: true } })`
- * en el resto de la app. NO se le pasa este objeto al adaptador de Better
- * Auth (`drizzleAdapter`) -- a ese se le pasan las tablas planas (ver
- * `src/lib/auth.ts`), tal como indica su documentación.
- */
 export const relations = defineRelations(
-  { user, session, account, verification, afiliados, administradores },
+  { users, sessions, accounts, verifications, administradores, afiliados },
   (r) => ({
-    user: {
-      sessions: r.many.session({
-        from: r.user.id,
-        to: r.session.userId,
+    users: {
+      sessions: r.many.sessions({
+        from: r.users.id,
+        to: r.sessions.userId,
       }),
-      accounts: r.many.account({
-        from: r.user.id,
-        to: r.account.userId,
-      }),
-      afiliado: r.one.afiliados({
-        from: r.user.id,
-        to: r.afiliados.accountId,
+      accounts: r.many.accounts({
+        from: r.users.id,
+        to: r.accounts.userId,
       }),
       administrador: r.one.administradores({
-        from: r.user.id,
-        to: r.administradores.accountId,
+        from: r.users.id,
+        to: r.administradores.userId,
+      }),
+      afiliado: r.one.afiliados({
+        from: r.users.id,
+        to: r.afiliados.userId,
       }),
     },
-    session: {
-      user: r.one.user({
-        from: r.session.userId,
-        to: r.user.id,
+    sessions: {
+      user: r.one.users({
+        from: r.sessions.userId,
+        to: r.users.id,
       }),
     },
-    account: {
-      user: r.one.user({
-        from: r.account.userId,
-        to: r.user.id,
-      }),
-    },
-    afiliados: {
-      user: r.one.user({
-        from: r.afiliados.accountId,
-        to: r.user.id,
+    accounts: {
+      user: r.one.users({
+        from: r.accounts.userId,
+        to: r.users.id,
       }),
     },
     administradores: {
-      user: r.one.user({
-        from: r.administradores.accountId,
-        to: r.user.id,
+      user: r.one.users({
+        from: r.administradores.userId,
+        to: r.users.id,
+      }),
+    },
+    afiliados: {
+      user: r.one.users({
+        from: r.afiliados.userId,
+        to: r.users.id,
       }),
     },
   }),

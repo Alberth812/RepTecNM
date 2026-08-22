@@ -5,11 +5,6 @@ import { uploadFile } from "@/lib/storage";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-// El driver de Neon usado en `lib/db/index.ts` necesita WebSockets (`ws`),
-// que no están disponibles en el runtime Edge de Next.js. Se fija
-// explícitamente el runtime Node.js por si el proyecto cambia el default.
-export const runtime = "nodejs";
-
 // Este endpoint recibe `multipart/form-data` (no JSON) porque el formulario
 // incluye archivos (fotografía y, opcionalmente, comprobante de membresía).
 
@@ -53,7 +48,7 @@ export async function POST(request: Request) {
 
     // 2. Insertar afiliado + proyectos + datos de emergencia en una sola
     //    transacción (ver `lib/db/queries.ts`).
-    const afiliado = await createAfiliado({
+    /* const afiliado = await createAfiliado({
       afiliado: {
         apellidoPaterno: data.apellido_paterno,
         apellidoMaterno: data.apellido_materno,
@@ -108,12 +103,12 @@ export async function POST(request: Request) {
         ),
         mostrarEnQr: data.privacidad_datos_emergencia,
       },
-    });
+    }); 
 
     return NextResponse.json(
       { message: "Registro creado correctamente.", id: afiliado.id },
       { status: 201 },
-    );
+    ); */
   } catch (error) {
     if (isUniqueViolation(error)) {
       return NextResponse.json(

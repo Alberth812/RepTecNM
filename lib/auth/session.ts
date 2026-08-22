@@ -1,0 +1,62 @@
+import { headers } from "next/headers";
+import { eq } from "drizzle-orm";
+import { auth } from "./auth";
+import { db } from "@/lib/db/client";
+import { administradores } from "@/lib/db/schema/administradores";
+import { ApiError } from "@/lib/errors";
+import { ROLES, ADMIN_SUBTYPES } from "@/lib/constants";
+
+export async function getCurrentSession() {
+  return auth.api.getSession({ headers: await headers() });
+}
+
+/** Exige una sesión activa; lanza 401 si no hay ninguna. */
+export async function requireSession() {
+  const session = await getCurrentSession();
+  if (!session) throw ApiError.unauthorized();
+  return session;
+}
+
+/** Exige sesión de un AFILIADO. */
+export async function requireAfiliado() {
+  const session = await requireSession();
+  if (session.user.role !== ROLES.AFILIADO) {
+    throw ApiError.forbidden(
+      "Esta operación es solo para cuentas de afiliado.",
+    );
+  }
+  return session;
+}
+
+/** Exige sesión de un ADMINISTRADOR y devuelve también su perfil (subtype/isRoot). */
+export async function requireAdministrador() {
+  const session = await requireSession();
+  if (session.user.role !== ROLES.ADMINISTRADOR) {
+    throw ApiError.forbidden("Esta operación es solo para administradores.");
+  }
+
+  const [profile] = await db
+    .select()
+    .from(administradores)
+    .where(eq(administradores.userId, session.user.id))
+    .limit(1);
+
+  if (!profile) {
+    // No debería pasar nunca (invariante de datos), pero si pasa es mejor
+    // fallar explícito que dejar pasar una cuenta administradora sin perfil.
+    throw ApiError.forbidden("Perfil de administrador no encontrado.");
+  }
+
+  return { session, profile };
+}
+
+/** RF-AUTH-013/014: exige específicamente subtipo GENERAL. */
+export async function requireAdminGeneral() {
+  const { session, profile } = await requireAdministrador();
+  if (profile.subtype !== ADMIN_SUBTYPES.GENERAL) {
+    throw ApiError.forbidden(
+      "Esta operación requiere un administrador de tipo GENERAL.",
+    );
+  }
+  return { session, profile };
+}

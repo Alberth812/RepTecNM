@@ -1,4 +1,4 @@
-import { db } from "../index";
+import { db } from "../client";
 import {
   afiliados,
   datosEmergencia,
@@ -34,14 +34,14 @@ export async function createAfiliado(input: CreateAfiliadoInput) {
       await tx.insert(proyectosRelevantes).values(
         input.proyectos.map((proyecto) => ({
           ...proyecto,
-          afiliadoId: afiliado.accountId,
+          afiliadoId: afiliado.userId,
         })),
       );
     }
 
     await tx.insert(datosEmergencia).values({
       ...input.datosEmergencia,
-      afiliadoId: afiliado.accountId,
+      afiliadoId: afiliado.userId,
     });
 
     return afiliado;
