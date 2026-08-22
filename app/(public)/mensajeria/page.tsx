@@ -132,8 +132,11 @@ export default function MensajeriaPage() {
 
       <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card shadow-sm max-md:grid-rows-[220px_minmax(0,1fr)] md:grid-cols-[320px_1fr]">
         {/* Lista de conversaciones */}
-        <div className="flex min-h-0 flex-col border-r">
+        <div className="flex min-h-0 flex-col border-r bg-muted/20">
           <div className="shrink-0 border-b p-3">
+            <p className="px-1 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Conversaciones
+            </p>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -157,7 +160,7 @@ export default function MensajeriaPage() {
                   key={c.id}
                   onClick={() => abrirConversacion(c)}
                   className={`flex w-full items-start gap-3 rounded-xl p-3 text-left transition-colors ${
-                    c.id === activaId ? "bg-primary/10" : "hover:bg-muted"
+                    c.id === activaId ? "bg-[#004B87]/10 ring-1 ring-[#004B87]/30" : "hover:bg-muted"
                   }`}
                 >
                   <Avatar className="h-10 w-10 shrink-0 border">
@@ -191,7 +194,7 @@ export default function MensajeriaPage() {
         <div className="flex min-h-0 flex-col">
           {activa ? (
             <>
-              <div className="flex shrink-0 items-center justify-between border-b px-5 py-3">
+              <div className="flex shrink-0 items-center justify-between border-b bg-card px-5 py-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-9 w-9 border">
                     <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
@@ -219,7 +222,7 @@ export default function MensajeriaPage() {
                     <div key={m.id} className={`flex ${m.remitente === "yo" ? "justify-end" : "justify-start"}`}>
                       <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                         m.remitente === "yo"
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-primary text-primary-foreground shadow-sm"
                           : "bg-muted text-foreground"
                       }`}>
                         {m.contenido && <p className="text-sm leading-snug">{m.contenido}</p>}
@@ -274,7 +277,7 @@ export default function MensajeriaPage() {
                       onChange={(e) => setNuevoMsj(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviarMensaje(); } }}
                       placeholder="Escribe un mensaje..."
-                      className="h-9"
+                      className="h-9 rounded-full"
                     />
                     <Button size="icon" className="h-9 w-9 shrink-0" disabled={!nuevoMsj.trim() && !adjunto} onClick={enviarMensaje}>
                       <Send className="h-4 w-4" />
