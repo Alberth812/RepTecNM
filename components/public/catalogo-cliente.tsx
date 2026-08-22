@@ -76,7 +76,7 @@ export function CatalogoCliente() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="sticky top-16 z-20 -mx-4 bg-background px-4 pb-4 pt-2">
+      <div className="static -mx-4 bg-background px-4 pb-4 pt-2 lg:sticky lg:top-16 lg:z-20">
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold tracking-tight">Catálogo de Profesionales</h1>
           <p className="mt-2 text-muted-foreground">

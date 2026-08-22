@@ -3,6 +3,7 @@ import { GraduationCap, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { BarraSesion } from "@/components/public/barra-sesion";
+import { MenuMovilMiembro } from "@/components/public/menu-movil-miembro";
 import { GuardiaPublica } from "@/components/public/guardia-publica";
 import { SoloNoAdmin } from "@/components/public/solo-no-admin";
 import { SoloVisitante } from "@/components/public/solo-visitante";
@@ -50,6 +51,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           </nav></SoloVisitante>
 
           <div className="flex items-center gap-2">
+            <MenuMovilMiembro />
             <Link href="/catalogo" aria-label="Buscar en el catálogo">
               <Button variant="ghost" size="icon">
                 <Search className="h-4 w-4" />

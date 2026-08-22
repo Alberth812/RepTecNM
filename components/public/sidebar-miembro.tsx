@@ -12,7 +12,7 @@ import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
 import { BadgeEstado } from "@/components/public/badge-estado";
 import { useRol, type Rol } from "@/lib/use-rol";
 
-const MENU_AFILIADO = [
+export const MENU_AFILIADO = [
   { href: "/credencial", label: "Mi credencial", icon: BadgeCheck },
   { href: "/notificaciones", label: "Notificaciones", icon: Bell },
   { href: "/catalogo", label: "Catálogo", icon: Search },
@@ -22,7 +22,7 @@ const MENU_AFILIADO = [
   { href: "/ajustes", label: "Configuración", icon: Settings },
 ];
 
-const MENU_ADMIN = [
+export const MENU_ADMIN = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/aprobaciones", label: "Aprobaciones", icon: UserCheck },
   { href: "/afiliados", label: "Afiliados", icon: Users },
