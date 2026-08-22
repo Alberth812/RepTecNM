@@ -113,7 +113,7 @@ export default function MensajeriaPage() {
   }, [convs]);
 
   return (
-    <div className={`mx-auto flex w-full max-w-6xl flex-col px-4 py-4 ${rol === "visitante" ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-170px)]"}`}>
+    <div className={`mx-auto flex w-full max-w-7xl flex-col px-4 py-4 ${rol === "visitante" ? "h-[calc(100dvh-96px)]" : "h-[calc(100dvh-150px)]"}`}>
       <AvisoDemo />
 
       <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card shadow-sm max-md:grid-rows-[220px_minmax(0,1fr)] md:grid-cols-[320px_1fr]">
