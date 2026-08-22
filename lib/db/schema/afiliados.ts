@@ -1,3 +1,5 @@
+import { user } from "./auth-schema";
+import { membershipStatusEnum, tipoSanguineoEnum } from "./enums";
 import {
   boolean,
   integer,
@@ -8,45 +10,15 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { accounts } from "../accounts/schema";
-
-// Único enum de Postgres que usamos: el catálogo de tipos sanguíneos es
-// cerrado y estable (8 valores). El resto de los catálogos (área de
-// conocimiento, sectores, géneros, etc.) se guardan como texto/arreglos de
-// texto porque son más propensos a evolucionar y el formulario ya valida
-// las opciones permitidas con Zod antes de llegar aquí.
-export const tipoSanguineoEnum = pgEnum("tipo_sanguineo", [
-  "A+",
-  "A-",
-  "B+",
-  "B-",
-  "AB+",
-  "AB-",
-  "O+",
-  "O-",
-]);
-
-export const membershipStatusEnum = pgEnum("membership_status", [
-  "NO_INICIADA",
-  "PENDIENTE_APROBACION",
-  "REQUIERE_CORRECCION",
-  "RECHAZADO",
-  "ACTIVO",
-  "INACTIVO",
-  "SUSPENDIDO",
-  "BAJA",
-]);
 
 /**
  * Datos "públicos" del afiliado: lo que puede mostrarse en el catálogo de
  * egresados (sujeto a `autoriza_publicacion` / `datos_publicos`).
  */
 export const afiliados = pgTable("afiliados", {
-  accountId: uuid("account_id")
+  accountId: text("account_id")
     .primaryKey()
-    .references(() => accounts.id, {
-      onDelete: "cascade",
-    }),
+    .references(() => user.id, { onDelete: "cascade" }),
   // Datos generales
   apellidoPaterno: text("apellido_paterno").notNull(),
   apellidoMaterno: text("apellido_materno").notNull(),

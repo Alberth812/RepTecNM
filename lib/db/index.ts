@@ -1,33 +1,23 @@
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
-import ws from "ws";
-import { relations } from "./relations";
-import { authRelations } from "@/auth-schema";
-
-neonConfig.webSocketConstructor = ws;
-
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "Falta la variable de entorno DATABASE_URL (cadena de conexión de Neon).",
-  );
-}
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import { relations } from "./schema/relations";
 
 declare global {
   // eslint-disable-next-line no-var
-  var __registroDbPool: Pool | undefined;
+  var __pgPool: Pool | undefined;
 }
 
+// Reutiliza el pool entre recargas en desarrollo (evita agotar conexiones
+// por el hot-reload de Next.js).
 const pool =
-  global.__registroDbPool ??
+  global.__pgPool ??
   new Pool({
     connectionString: process.env.DATABASE_URL,
   });
 
 if (process.env.NODE_ENV !== "production") {
-  global.__registroDbPool = pool;
+  global.__pgPool = pool;
 }
 
-export const db = drizzle({
-  client: pool,
-  relations: { ...relations, ...authRelations },
-});
+// `relations` habilita la API relacional v1 (RQBv2) de Drizzle: db.query.*
+export const db = drizzle({ client: pool, relations });

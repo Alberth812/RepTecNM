@@ -6,7 +6,7 @@ import {
   type NewAfiliado,
   type NewDatosEmergencia,
   type NewProyectoRelevante,
-} from "./schema";
+} from "../schema/afiliados";
 
 export interface CreateAfiliadoInput {
   afiliado: Omit<NewAfiliado, "id" | "createdAt" | "updatedAt">;
