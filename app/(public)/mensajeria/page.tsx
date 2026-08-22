@@ -10,7 +10,6 @@ import {
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -109,26 +108,13 @@ export default function MensajeriaPage() {
     setBloqueando(null);
   };
 
-  const totalNoLeidos = convs.reduce((acc, c) => acc + c.noLeidos, 0);
+  useEffect(() => {
+    localStorage.setItem("rep-msg-no-leidos", String(convs.reduce((acc, cv) => acc + cv.noLeidos, 0)));
+  }, [convs]);
 
   return (
     <div className={`mx-auto flex w-full max-w-6xl flex-col px-4 py-4 ${rol === "visitante" ? "h-[calc(100dvh-100px)]" : "h-[calc(100dvh-170px)]"}`}>
       <AvisoDemo />
-
-      <div className="flex shrink-0 items-center justify-between pb-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold tracking-tight">Mensajería</h1>
-          {totalNoLeidos > 0 && (
-            <Badge variant="secondary" className="bg-primary text-primary-foreground">
-              {totalNoLeidos} sin leer
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      <p className="pb-4 text-sm text-muted-foreground">
-        Mensajería interna entre profesionales afiliados de la red.
-      </p>
 
       <div className="grid min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card shadow-sm max-md:grid-rows-[220px_minmax(0,1fr)] md:grid-cols-[320px_1fr]">
         {/* Lista de conversaciones */}

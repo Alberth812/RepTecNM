@@ -8,11 +8,19 @@ import {
   LayoutDashboard, LogOut, MessageSquareText, PencilLine, Search, Users, UserCheck, Settings, CreditCard,
 } from "lucide-react";
 
+import { conversacionesIniciales } from "@/lib/mock/mensajeria";
 import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
 import { BadgeEstado } from "@/components/public/badge-estado";
 import { useRol, type Rol } from "@/lib/use-rol";
 
-export const MENU_AFILIADO = [
+export export function contarMensajesNoLeidos(): number {
+  if (typeof window === "undefined") return 0;
+  const g = localStorage.getItem("rep-msg-no-leidos");
+  if (g !== null) return Number(g) || 0;
+  return conversacionesIniciales.reduce((acc, cv) => acc + cv.noLeidos, 0);
+}
+
+const MENU_AFILIADO = [
   { href: "/credencial", label: "Mi credencial", icon: BadgeCheck },
   { href: "/notificaciones", label: "Notificaciones", icon: Bell },
   { href: "/catalogo", label: "Catálogo", icon: Search },
@@ -45,12 +53,15 @@ export function SidebarMiembro({ rol }: { rol: Rol }) {
   const pathname = usePathname();
   const { nombre } = useRol();
   const [noLeidas, setNoLeidas] = useState(0);
+  const [msgNoLeidas, setMsgNoLeidas] = useState(0);
 
   useEffect(() => {
+    if (rol === "visitante") return;
     if (rol === "afiliado") {
       const leidas = leerLeidas();
       setNoLeidas(cargarNotificaciones().filter((n) => !leidas.includes(n.id)).length);
     }
+    setMsgNoLeidas(contarMensajesNoLeidos());
   }, [rol, pathname]);
 
   const nombreReal = nombre || (rol === "admin" ? "Administración RepTecNM" : "María Fernanda López Herrera");
@@ -100,6 +111,11 @@ export function SidebarMiembro({ rol }: { rol: Rol }) {
                 {it.label === "Notificaciones" && noLeidas > 0 && (
                   <span className="ml-auto rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
                     {noLeidas}
+                  </span>
+                )}
+                {it.label === "Mensajería" && msgNoLeidas > 0 && (
+                  <span className="ml-auto rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {msgNoLeidas}
                   </span>
                 )}
               </Link>

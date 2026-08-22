@@ -1,19 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MENU_ADMIN, MENU_AFILIADO } from "@/components/public/sidebar-miembro";
+import { MENU_ADMIN, MENU_AFILIADO, contarMensajesNoLeidos } from "@/components/public/sidebar-miembro";
 import { useRol } from "@/lib/use-rol";
 
 export function MenuMovilMiembro() {
   const { rol, nombre } = useRol();
   const pathname = usePathname();
   const [abierto, setAbierto] = useState(false);
+  const [msgNoLeidas, setMsgNoLeidas] = useState(0);
+
+  useEffect(() => {
+    if (rol !== "visitante") setMsgNoLeidas(contarMensajesNoLeidos());
+  }, [rol, abierto, pathname]);
 
   if (rol === "visitante") return null;
 
@@ -60,6 +65,11 @@ export function MenuMovilMiembro() {
                 }`}
               >
                 <it.icon className="h-4 w-4 shrink-0" /> {it.label}
+                {it.label === "Mensajería" && msgNoLeidas > 0 && (
+                  <span className="ml-auto rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {msgNoLeidas}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
