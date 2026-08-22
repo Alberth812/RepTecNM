@@ -2,20 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-export type Theme = "light" | "sepia" | "dark" | "azul" | "verde" | "rosa";
+export type Theme = "light" | "dark";
 
 const CLAVE = "rep-tema";
-const TEMAS_VALIDOS: Theme[] = ["light", "sepia", "dark", "azul", "verde", "rosa"];
-const CLASES = "light sepia dark azul verde rosa";
 
 function leer(): Theme {
   const g = window.localStorage.getItem(CLAVE);
-  return TEMAS_VALIDOS.includes(g as Theme) ? (g as Theme) : "light";
+  return g === "dark" ? "dark" : "light";
 }
 
 export function useTheme() {
-  // Siempre arranca en "light" para que servidor y cliente pinten igual;
-  // el script del <body> ya aplico el tema guardado antes del primer paint.
   const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
@@ -26,7 +22,7 @@ export function useTheme() {
     setThemeState(t);
     window.localStorage.setItem(CLAVE, t);
     const r = document.documentElement;
-    r.classList.remove(...CLASES.split(" "));
+    r.classList.remove("light", "sepia", "dark", "azul", "verde", "rosa");
     r.classList.add(t);
   }, []);
 

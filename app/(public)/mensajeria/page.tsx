@@ -36,7 +36,10 @@ export default function MensajeriaPage() {
   const { rol } = useRol();
   const [fondoChat, setFondoChat] = useState("");
 
-  useEffect(() => setFondoChat(localStorage.getItem("rep-fondo-chat") ?? ""), []);
+  useEffect(() => {
+    const v = localStorage.getItem("rep-fondo-chat") ?? "";
+    setFondoChat(v.startsWith("url(") ? "" : v);
+  }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activa = convs.find((c) => c.id === activaId) ?? null;
