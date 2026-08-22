@@ -13,7 +13,7 @@ import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
 import { BadgeEstado } from "@/components/public/badge-estado";
 import { useRol, type Rol } from "@/lib/use-rol";
 
-export export function contarMensajesNoLeidos(): number {
+export function contarMensajesNoLeidos(): number {
   if (typeof window === "undefined") return 0;
   const g = localStorage.getItem("rep-msg-no-leidos");
   if (g !== null) return Number(g) || 0;
