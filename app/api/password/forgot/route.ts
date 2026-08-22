@@ -1,14 +1,18 @@
 import { type NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/auth";
-import { db } from "@/db/client";
-import { users } from "@/db/schema/auth-schema";
-import { afiliados } from "@/db/schema/afiliados-schema";
+import { db } from "@/lib/db/client";
+import { users } from "@/lib/db/schema/auth-schema";
+import { afiliados } from "@/lib/db/schema/afiliados";
 import { forgotPasswordSchema } from "@/lib/validation/schemas";
 import { getClientIp } from "@/lib/http/client-ip";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 import { AUTH_RULES, MESSAGES, ROLES } from "@/lib/constants";
-import { countAuthEvents, enforceRollingLimit, recordAuthEvent } from "@/lib/rate-limit/limiter";
+import {
+  countAuthEvents,
+  enforceRollingLimit,
+  recordAuthEvent,
+} from "@/lib/rate-limit/limiter";
 
 const BLOCKED_MEMBERSHIP_STATUSES = new Set(["RECHAZADO", "SUSPENDIDO"]);
 
@@ -35,10 +39,15 @@ export async function POST(request: NextRequest) {
       dimension: { column: "ipAddress", value: ip },
       windowMs: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP_WINDOW_MS,
       max: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP,
-      message: "Demasiadas solicitudes desde esta red. Intenta de nuevo más tarde.",
+      message:
+        "Demasiadas solicitudes desde esta red. Intenta de nuevo más tarde.",
     });
 
-    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
     let eligible = false;
     if (user && user.emailVerified) {
@@ -48,7 +57,9 @@ export async function POST(request: NextRequest) {
           .from(afiliados)
           .where(eq(afiliados.userId, user.id))
           .limit(1);
-        eligible = !afiliado || !BLOCKED_MEMBERSHIP_STATUSES.has(afiliado.membershipStatus);
+        eligible =
+          !afiliado ||
+          !BLOCKED_MEMBERSHIP_STATUSES.has(afiliado.membershipStatus);
       } else {
         // Administradores no tienen membership_status; solo se exige correo
         // verificado, lo cual ya es siempre cierto para ellos (RF-AUTH-013).
@@ -78,7 +89,11 @@ export async function POST(request: NextRequest) {
     } else {
       // Cuenta inexistente / no verificada / RECHAZADO / SUSPENDIDO: no se
       // envía nada, pero sí dejamos rastro para el límite por IP.
-      await recordAuthEvent({ type: "PASSWORD_RESET_REQUESTED", email, ipAddress: ip });
+      await recordAuthEvent({
+        type: "PASSWORD_RESET_REQUESTED",
+        email,
+        ipAddress: ip,
+      });
     }
 
     return ok({ message: MESSAGES.PASSWORD_RESET_UNIFORM });

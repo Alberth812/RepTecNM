@@ -1,8 +1,8 @@
 import { type NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/auth";
-import { db } from "@/db/client";
-import { users } from "@/db/schema/auth-schema";
+import { db } from "@/lib/db/client";
+import { users } from "@/lib/db/schema/auth-schema";
 import { resetPasswordSchema } from "@/lib/validation/schemas";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 import { ApiError } from "@/lib/errors";
@@ -24,7 +24,11 @@ export async function POST(request: NextRequest) {
   try {
     const body = resetPasswordSchema.parse(await request.json());
 
-    const [user] = await db.select().from(users).where(eq(users.email, body.email)).limit(1);
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, body.email))
+      .limit(1);
 
     if (user) {
       const completedInWindow = await countAuthEvents(
@@ -35,7 +39,9 @@ export async function POST(request: NextRequest) {
       if (completedInWindow >= AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT) {
         throw ApiError.rateLimited(
           "Alcanzaste el máximo de cambios de contraseña permitidos esta semana. Intenta de nuevo más tarde.",
-          Math.ceil(AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT_WINDOW_MS / 1000),
+          Math.ceil(
+            AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT_WINDOW_MS / 1000,
+          ),
           "PASSWORD_CHANGE_LIMIT",
         );
       }
@@ -43,10 +49,16 @@ export async function POST(request: NextRequest) {
 
     // RF-AUTH-010 (mayúscula+número+símbolo) ya lo valida resetPasswordSchema
     // (usa el mismo passwordSchema del registro).
-    await auth.api.resetPassword({ body: { token: body.token, newPassword: body.newPassword } });
+    await auth.api.resetPassword({
+      body: { token: body.token, newPassword: body.newPassword },
+    });
 
     if (user) {
-      await recordAuthEvent({ type: "PASSWORD_RESET_COMPLETED", userId: user.id, email: body.email });
+      await recordAuthEvent({
+        type: "PASSWORD_RESET_COMPLETED",
+        userId: user.id,
+        email: body.email,
+      });
     }
 
     return ok({ message: "Tu contraseña se actualizó correctamente." });

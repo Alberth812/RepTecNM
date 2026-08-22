@@ -28,7 +28,7 @@ export const afiliados = pgTable("afiliados", {
 
   //Estado de membresía
   membershipStatus: membershipStatusEnum("membership_status")
-    /* .notNull() */
+    .notNull()
     .default("NO_INICIADA"),
 
   // RF-AUTH-012: fecha del último cambio de correo exitoso, para aplicar el
