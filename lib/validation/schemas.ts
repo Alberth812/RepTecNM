@@ -4,9 +4,10 @@ import { ADMIN_SUBTYPES } from "@/lib/constants";
 
 export const emailSchema = z
   .string()
+  .min(1, "El correo es obligatorio")
   .trim()
   .toLowerCase()
-  .email("Correo inválido");
+  .pipe(z.email("Correo inválido"));
 
 export const otpSchema = z
   .string()

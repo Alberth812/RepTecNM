@@ -140,6 +140,7 @@ export const auth = betterAuth({
       },
       async sendVerificationOTP({ email, otp, type }) {
         if (type === "email-verification") {
+          //
           const { subject, text, html } = verificationOtpEmail(
             otp,
             Math.round(AUTH_RULES.EMAIL_OTP_EXPIRES_IN_SECONDS / 60),

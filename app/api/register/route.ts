@@ -18,6 +18,7 @@ import { enforceRollingLimit, recordAuthEvent } from "@/lib/rate-limit/limiter";
  * está verificada o no.
  * RF-AUTH-017: límite de intentos de registro por IP.
  */
+
 export async function POST(request: NextRequest) {
   try {
     const body = registerSchema.parse(await request.json());
