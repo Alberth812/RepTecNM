@@ -42,6 +42,11 @@ export const auth = betterAuth({
       // un proxy/balanceador confiable.
       ipAddressHeaders: [process.env.TRUSTED_IP_HEADER ?? "x-forwarded-for"],
     },
+    advanced: {
+      database: {
+        joins: true,
+      },
+    },
   },
 
   // ---------------------------------------------------------------------

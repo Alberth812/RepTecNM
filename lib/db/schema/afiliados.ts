@@ -84,7 +84,7 @@ export const afiliados = pgTable("afiliados", {
 /** Proyectos relevantes del afiliado (0 a 5, capturados en el paso 4). */
 export const proyectosRelevantes = pgTable("proyectos_relevantes", {
   id: uuid("id").primaryKey().defaultRandom(),
-  afiliadoId: uuid("afiliado_id")
+  afiliadoId: text("afiliado_id")
     .notNull()
     .references(() => afiliados.userId, { onDelete: "cascade" }),
   nombre: text("nombre").notNull(),
@@ -102,10 +102,12 @@ export const proyectosRelevantes = pgTable("proyectos_relevantes", {
  */
 export const datosEmergencia = pgTable("datos_emergencia", {
   id: uuid("id").primaryKey().defaultRandom(),
-  afiliadoId: uuid("afiliado_id")
+
+  afiliadoId: text("afiliado_id")
     .notNull()
     .unique()
     .references(() => afiliados.userId, { onDelete: "cascade" }),
+
   nombreContacto: text("nombre_contacto").notNull(),
   parentesco: text("parentesco").notNull(),
   parentescoOtro: text("parentesco_otro"),
@@ -113,9 +115,11 @@ export const datosEmergencia = pgTable("datos_emergencia", {
   tipoSanguineo: tipoSanguineoEnum("tipo_sanguineo").notNull(),
   alergiasCondicionesMedicas: text("alergias_condiciones_medicas"),
   mostrarEnQr: boolean("mostrar_en_qr").notNull().default(false),
+
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
@@ -17,13 +17,11 @@ import { AuthShell } from "./auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Field,
+  FieldContent,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import {
   InputOTP,
   InputOTPGroup,
@@ -31,12 +29,11 @@ import {
 } from "@/components/ui/input-otp";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Reutilizamos las mismas reglas de @/lib/validation/schemas para no
-// duplicar el "correo inválido" / "6 dígitos" en dos lugares.
 const verifyEmailFormSchema = z.object({
   email: emailSchema,
   otp: otpSchema,
 });
+
 type VerifyEmailValues = z.infer<typeof verifyEmailFormSchema>;
 
 export function VerifyEmailForm() {
@@ -53,16 +50,17 @@ export function VerifyEmailForm() {
 
   const form = useForm<VerifyEmailValues>({
     resolver: zodResolver(verifyEmailFormSchema),
-    defaultValues: { email: emailFromQuery, otp: "" },
+    defaultValues: {
+      email: emailFromQuery,
+      otp: "",
+    },
   });
 
   async function onSubmit(values: VerifyEmailValues) {
     setFormError(null);
     setIsVerifying(true);
+
     try {
-      // Este endpoint SÍ se llama directo desde el cliente vía better-auth:
-      // los intentos máximos, el uso único, la invalidación de códigos
-      // anteriores y la expiración ya los maneja el plugin emailOTP.
       const { error } = await authClient.emailOtp.verifyEmail({
         email: values.email,
         otp: values.otp,
@@ -87,21 +85,32 @@ export function VerifyEmailForm() {
 
     const emailValue = form.getValues("email");
     const parsedEmail = emailSchema.safeParse(emailValue);
+
     if (!parsedEmail.success) {
-      form.setError("email", { message: "Ingresa un correo válido para reenviar el código." });
+      form.setError("email", {
+        message: "Ingresa un correo válido para reenviar el código.",
+      });
       return;
     }
 
     try {
-      const result = await resendMutation.mutateAsync({ email: parsedEmail.data });
+      const result = await resendMutation.mutateAsync({
+        email: parsedEmail.data,
+      });
+
       setResendMessage(result.message);
-      startCooldown(120); // RF-AUTH-003/004: intervalo mínimo entre envíos.
+      startCooldown(120);
     } catch (error) {
       if (error instanceof ApiRequestError) {
         setFormError(error.message);
-        if (error.retryAfterSeconds) startCooldown(error.retryAfterSeconds);
+
+        if (error.retryAfterSeconds) {
+          startCooldown(error.retryAfterSeconds);
+        }
+
         return;
       }
+
       setFormError("No se pudo reenviar el código. Intenta de nuevo.");
     }
   }
@@ -111,86 +120,111 @@ export function VerifyEmailForm() {
       title="Verifica tu correo"
       description="Ingresa el código de 6 dígitos que enviamos a tu correo"
       footer={
-        <Link href="/login" className="font-medium text-[#004B87] hover:underline">
+        <Link
+          href="/login"
+          className="font-medium text-[#004B87] hover:underline"
+        >
           Volver a iniciar sesión
         </Link>
       }
     >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
-          {formError ? (
-            <Alert variant="destructive">
-              <TriangleAlert className="h-4 w-4" />
-              <AlertTitle>No se pudo verificar</AlertTitle>
-              <AlertDescription>{formError}</AlertDescription>
-            </Alert>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+        noValidate
+      >
+        {formError ? (
+          <Alert variant="destructive">
+            <TriangleAlert className="h-4 w-4" />
+            <AlertTitle>No se pudo verificar</AlertTitle>
+            <AlertDescription>{formError}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        {resendMessage ? (
+          <Alert>
+            <CheckCircle2 className="h-4 w-4" />
+            <AlertDescription>{resendMessage}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <Field
+          data-invalid={!!form.formState.errors.email}
+          orientation="vertical"
+        >
+          <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
+
+          <FieldContent>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              aria-invalid={!!form.formState.errors.email}
+              {...form.register("email")}
+            />
+
+            {form.formState.errors.email && (
+              <FieldError>{form.formState.errors.email.message}</FieldError>
+            )}
+          </FieldContent>
+        </Field>
+
+        <Controller
+          control={form.control}
+          name="otp"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid} orientation="vertical">
+              <FieldLabel htmlFor="otp">Código de verificación</FieldLabel>
+
+              <FieldContent>
+                <InputOTP
+                  id="otp"
+                  maxLength={6}
+                  value={field.value}
+                  onChange={field.onChange}
+                  aria-invalid={fieldState.invalid}
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
+              </FieldContent>
+            </Field>
+          )}
+        />
+
+        <Button
+          type="submit"
+          className="w-full bg-[#004B87] hover:bg-[#003a68]"
+          disabled={isVerifying}
+        >
+          {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+          Verificar correo
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleResend}
+          disabled={!canResend || resendMutation.isPending}
+        >
+          {resendMutation.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : null}
 
-          {resendMessage ? (
-            <Alert>
-              <CheckCircle2 className="h-4 w-4" />
-              <AlertDescription>{resendMessage}</AlertDescription>
-            </Alert>
-          ) : null}
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Correo electrónico</FormLabel>
-                <FormControl>
-                  <Input type="email" autoComplete="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="otp"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Código de verificación</FormLabel>
-                <FormControl>
-                  <InputOTP maxLength={6} value={field.value} onChange={field.onChange}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="w-full bg-[#004B87] hover:bg-[#003a68]"
-            disabled={isVerifying}
-          >
-            {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Verificar correo
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleResend}
-            disabled={!canResend || resendMutation.isPending}
-          >
-            {resendMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {canResend ? "Reenviar código" : `Reenviar en ${secondsLeft}s`}
-          </Button>
-        </form>
-      </Form>
+          {canResend ? "Reenviar código" : `Reenviar en ${secondsLeft}s`}
+        </Button>
+      </form>
     </AuthShell>
   );
 }

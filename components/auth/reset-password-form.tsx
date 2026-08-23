@@ -15,14 +15,7 @@ import { applyServerValidationErrors } from "@/lib/forms/apply-server-errors";
 import { AuthShell } from "./auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // `newPassword` reutiliza las mismas reglas de RF-AUTH-010 que ya aplica el
@@ -43,43 +36,59 @@ type ResetPasswordFormValues = z.infer<typeof resetPasswordFormSchema>;
 export function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   // El enlace enviado por correo incluye ambos como query params (ver
-  // lib/auth/auth.ts -> sendResetPassword), así el backend puede aplicar el
-  // tope de 2 cambios/7 días antes de consumir el token.
+  // lib/auth/auth.ts -> sendResetPassword), así el backend puede aplicar
+  // el tope de 2 cambios/7 días antes de consumir el token.
   const token = searchParams.get("token") ?? "";
   const email = searchParams.get("email") ?? "";
   const linkIsIncomplete = !token || !email;
 
   const [formError, setFormError] = useState<string | null>(null);
   const [isDone, setIsDone] = useState(false);
+
   const resetPasswordMutation = useResetPasswordMutation();
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordFormSchema),
-    defaultValues: { newPassword: "", confirmPassword: "" },
+    defaultValues: {
+      newPassword: "",
+      confirmPassword: "",
+    },
   });
 
   async function onSubmit(values: ResetPasswordFormValues) {
     setFormError(null);
+
     try {
       await resetPasswordMutation.mutateAsync({
         email,
         token,
         newPassword: values.newPassword,
       });
+
       setIsDone(true);
-      setTimeout(() => router.push("/login"), 2500);
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 2500);
     } catch (error) {
       if (error instanceof ApiRequestError) {
-        if (error.code === "VALIDATION_ERROR" && applyServerValidationErrors(form, error.issues)) {
+        if (
+          error.code === "VALIDATION_ERROR" &&
+          applyServerValidationErrors(form, error.issues)
+        ) {
           return;
         }
+
         const retrySuffix = error.retryAfterSeconds
           ? ` (intenta de nuevo en ${error.retryAfterSeconds}s)`
           : "";
+
         setFormError(`${error.message}${retrySuffix}`);
         return;
       }
+
       setFormError("Ocurrió un error inesperado. Intenta de nuevo.");
     }
   }
@@ -90,10 +99,12 @@ export function ResetPasswordForm() {
         <Alert variant="destructive">
           <TriangleAlert className="h-4 w-4" />
           <AlertTitle>Enlace incompleto</AlertTitle>
+
           <AlertDescription>
             Este enlace de recuperación no es válido. Solicita uno nuevo.
           </AlertDescription>
         </Alert>
+
         <Link
           href="/forgot-password"
           className="mt-4 block text-center text-sm font-medium text-[#004B87] hover:underline"
@@ -109,66 +120,82 @@ export function ResetPasswordForm() {
       <AuthShell title="Contraseña actualizada">
         <Alert>
           <CheckCircle2 className="h-4 w-4" />
+
           <AlertDescription>
-            Tu contraseña se actualizó correctamente. Te redirigimos al inicio de sesión…
+            Tu contraseña se actualizó correctamente. Te redirigimos al inicio
+            de sesión…
           </AlertDescription>
         </Alert>
       </AuthShell>
     );
   }
 
+  const newPasswordError = form.formState.errors.newPassword;
+  const confirmPasswordError = form.formState.errors.confirmPassword;
+
   return (
-    <AuthShell title="Restablece tu contraseña" description={`Cuenta: ${email}`}>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
-          {formError ? (
-            <Alert variant="destructive">
-              <TriangleAlert className="h-4 w-4" />
-              <AlertTitle>No se pudo actualizar la contraseña</AlertTitle>
-              <AlertDescription>{formError}</AlertDescription>
-            </Alert>
+    <AuthShell
+      title="Restablece tu contraseña"
+      description={`Cuenta: ${email}`}
+    >
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+        noValidate
+      >
+        {formError ? (
+          <Alert variant="destructive">
+            <TriangleAlert className="h-4 w-4" />
+
+            <AlertTitle>No se pudo actualizar la contraseña</AlertTitle>
+
+            <AlertDescription>{formError}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <Field data-invalid={!!newPasswordError}>
+          <FieldLabel htmlFor="newPassword">Nueva contraseña</FieldLabel>
+
+          <Input
+            id="newPassword"
+            type="password"
+            autoComplete="new-password"
+            aria-invalid={!!newPasswordError}
+            {...form.register("newPassword")}
+          />
+
+          {newPasswordError ? <FieldError errors={[newPasswordError]} /> : null}
+        </Field>
+
+        <Field data-invalid={!!confirmPasswordError}>
+          <FieldLabel htmlFor="confirmPassword">
+            Confirma tu nueva contraseña
+          </FieldLabel>
+
+          <Input
+            id="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            aria-invalid={!!confirmPasswordError}
+            {...form.register("confirmPassword")}
+          />
+
+          {confirmPasswordError ? (
+            <FieldError errors={[confirmPasswordError]} />
           ) : null}
+        </Field>
 
-          <FormField
-            control={form.control}
-            name="newPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nueva contraseña</FormLabel>
-                <FormControl>
-                  <Input type="password" autoComplete="new-password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirma tu nueva contraseña</FormLabel>
-                <FormControl>
-                  <Input type="password" autoComplete="new-password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="w-full bg-[#004B87] hover:bg-[#003a68]"
-            disabled={resetPasswordMutation.isPending}
-          >
-            {resetPasswordMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : null}
-            Actualizar contraseña
-          </Button>
-        </form>
-      </Form>
+        <Button
+          type="submit"
+          className="w-full bg-[#004B87] hover:bg-[#003a68]"
+          disabled={resetPasswordMutation.isPending}
+        >
+          {resetPasswordMutation.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : null}
+          Actualizar contraseña
+        </Button>
+      </form>
     </AuthShell>
   );
 }

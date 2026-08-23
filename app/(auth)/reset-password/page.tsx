@@ -1,16 +1,10 @@
-import { AuthCard } from "@/components/ui/primitives";
-import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
+import { Suspense } from "react";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
-export default async function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ email?: string }>;
-}) {
-  const params = await searchParams;
-
+export default function ResetPasswordPage() {
   return (
-    <AuthCard eyebrow="Afiliados" title="Elige una nueva contraseña" subtitle="Ingresa el código que recibiste y tu nueva contraseña.">
-      <ResetPasswordForm initialEmail={params.email ?? ""} />
-    </AuthCard>
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

@@ -2,11 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
+import type { ComponentProps } from "react";
 
 import { useLogoutMutation } from "@/lib/hooks/use-auth";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
-interface LogoutButtonProps extends Omit<ButtonProps, "onClick"> {
+interface LogoutButtonProps extends Omit<
+  ComponentProps<typeof Button>,
+  "onClick"
+> {
   redirectTo?: string;
 }
 

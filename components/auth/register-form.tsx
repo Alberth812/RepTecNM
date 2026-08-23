@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import type { z } from "zod";
@@ -15,14 +15,7 @@ import { applyServerValidationErrors } from "@/lib/forms/apply-server-errors";
 import { AuthShell } from "./auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type RegisterValues = z.infer<typeof registerSchema>;
@@ -34,27 +27,37 @@ export function RegisterForm() {
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
   });
 
   async function onSubmit(values: RegisterValues) {
     setFormError(null);
+
     try {
       const result = await registerMutation.mutateAsync(values);
-      // El backend siempre crea la cuenta como AFILIADO y dispara el primer
-      // OTP (RF-AUTH-001/002); mandamos al usuario a verificarlo.
+
       router.push(`/verify-email?email=${encodeURIComponent(result.email)}`);
     } catch (error) {
       if (error instanceof ApiRequestError) {
-        if (error.code === "VALIDATION_ERROR" && applyServerValidationErrors(form, error.issues)) {
+        if (
+          error.code === "VALIDATION_ERROR" &&
+          applyServerValidationErrors(form, error.issues)
+        ) {
           return;
         }
+
         const retrySuffix = error.retryAfterSeconds
           ? ` (intenta de nuevo en ${error.retryAfterSeconds}s)`
           : "";
+
         setFormError(`${error.message}${retrySuffix}`);
         return;
       }
+
       setFormError("Ocurrió un error inesperado. Intenta de nuevo.");
     }
   }
@@ -66,84 +69,101 @@ export function RegisterForm() {
       footer={
         <>
           ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="font-medium text-[#004B87] hover:underline">
+          <Link
+            href="/login"
+            className="font-medium text-[#004B87] hover:underline"
+          >
             Inicia sesión
           </Link>
         </>
       }
     >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
-          {formError ? (
-            <Alert variant="destructive">
-              <TriangleAlert className="h-4 w-4" />
-              <AlertTitle>No se pudo completar el registro</AlertTitle>
-              <AlertDescription>{formError}</AlertDescription>
-            </Alert>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+        noValidate
+      >
+        {formError ? (
+          <Alert variant="destructive">
+            <TriangleAlert className="h-4 w-4" />
+            <AlertTitle>No se pudo completar el registro</AlertTitle>
+            <AlertDescription>{formError}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <Controller
+          control={form.control}
+          name="name"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Nombre completo</FieldLabel>
+
+              <Input
+                {...field}
+                id={field.name}
+                placeholder="Juana Pérez"
+                autoComplete="name"
+                aria-invalid={fieldState.invalid}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Correo electrónico</FieldLabel>
+
+              <Input
+                {...field}
+                id={field.name}
+                type="email"
+                placeholder="tucorreo@ejemplo.com"
+                autoComplete="email"
+                aria-invalid={fieldState.invalid}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="password"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>Contraseña</FieldLabel>
+
+              <Input
+                {...field}
+                id={field.name}
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                aria-invalid={fieldState.invalid}
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+
+        <Button
+          type="submit"
+          className="w-full bg-[#004B87] hover:bg-[#003a68]"
+          disabled={registerMutation.isPending}
+        >
+          {registerMutation.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : null}
-
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre completo</FormLabel>
-                <FormControl>
-                  <Input placeholder="Juana Pérez" autoComplete="name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Correo electrónico</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="tucorreo@ejemplo.com"
-                    autoComplete="email"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contraseña</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button
-            type="submit"
-            className="w-full bg-[#004B87] hover:bg-[#003a68]"
-            disabled={registerMutation.isPending}
-          >
-            {registerMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Crear cuenta
-          </Button>
-        </form>
-      </Form>
+          Crear cuenta
+        </Button>
+      </form>
     </AuthShell>
   );
 }
