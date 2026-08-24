@@ -1,103 +1,94 @@
 /**
- * Procedimiento seguro de siembra del administrador raíz (RF-AUTH-013).
+ * RF-AUTH-013: "Durante el despliegue inicial del sistema se crea mediante
+ * un procedimiento seguro (seed) una cuenta ADMINISTRADOR con subtipo
+ * GENERAL y atributo is_root = true, denominada administrador raíz."
+ *
+ * Este script es ese procedimiento. Se ejecuta UNA sola vez, fuera de la API
+ * HTTP (nunca hay una ruta que permita crear is_root=true), leyendo las
+ * credenciales desde variables de entorno.
  *
  * Uso:
- *   npm run seed:root-admin
- *
- * Lee ROOT_ADMIN_EMAIL / ROOT_ADMIN_PASSWORD / ROOT_ADMIN_NAME de las
- * variables de entorno (ver .env.example). Es idempotente: si ya existe un
- * administrador con is_root = true, se aborta sin hacer nada.
- *
- * Este script es, deliberadamente, el ÚNICO lugar de todo el proyecto que
- * puede asignar is_root = true. Ninguna ruta HTTP lo permite (RF-AUTH-013).
+ *   ROOT_ADMIN_EMAIL=... ROOT_ADMIN_PASSWORD=... ROOT_ADMIN_NAME=... \
+ *     npm run seed:root-admin
  */
-import { hashPassword } from "better-auth/crypto";
-import { randomUUID } from "crypto";
 import "dotenv/config";
-import { db } from "../src/db";
-import {
-  account as accountTable,
-  administradores,
-  user as userTable,
-} from "../src/db/schema";
-import { validatePassword } from "../src/lib/password-policy";
+import { eq } from "drizzle-orm";
+import { auth } from "@/lib/auth/auth";
+import { db } from "@/lib/db/client";
+import { users } from "@/lib/db/schema/auth-schema";
+import { administradores } from "@/lib/db/schema/administradores";
+import { validatePassword } from "@/lib/validation/password";
 
 async function main() {
-  const email = process.env.ROOT_ADMIN_EMAIL?.trim().toLowerCase();
+  const email = process.env.ROOT_ADMIN_EMAIL;
   const password = process.env.ROOT_ADMIN_PASSWORD;
-  const name = process.env.ROOT_ADMIN_NAME?.trim() || "Administrador Raíz";
+  const name = process.env.ROOT_ADMIN_NAME ?? "Administrador Raíz";
 
-  if (!email || !email.includes("@")) {
+  if (!email || !password) {
     throw new Error(
-      "ROOT_ADMIN_EMAIL no está definida o no es un correo válido.",
+      "Define ROOT_ADMIN_EMAIL y ROOT_ADMIN_PASSWORD antes de correr este script.",
     );
   }
-  if (!password) {
-    throw new Error("ROOT_ADMIN_PASSWORD no está definida.");
-  }
+
   const passwordCheck = validatePassword(password);
-  if (!passwordCheck.valid) {
-    throw new Error(
-      `ROOT_ADMIN_PASSWORD no cumple la política de contraseñas: ${passwordCheck.message}`,
-    );
+  if (!passwordCheck.ok) {
+    throw new Error(`ROOT_ADMIN_PASSWORD inválida: ${passwordCheck.message}`);
   }
 
-  const existingRoot = await db.query.administradores.findFirst({
-    where: { isRoot: true },
-  });
+  const [existingRoot] = await db
+    .select({ userId: administradores.userId })
+    .from(administradores)
+    .where(eq(administradores.isRoot, true))
+    .limit(1);
+
   if (existingRoot) {
-    console.log("Ya existe un administrador raíz. No se hace nada.");
-    process.exit(0);
-  }
-
-  const existingEmail = await db.query.user.findFirst({ where: { email } });
-  if (existingEmail) {
     throw new Error(
-      `Ya existe una cuenta con el correo ${email}. Elige otro correo para la raíz.`,
+      `Ya existe un administrador raíz (userId=${existingRoot.userId}). Este script es solo para el despliegue inicial; usa scripts/recover-root-admin.ts para recuperar el acceso.`,
     );
   }
 
-  const now = new Date();
-  const userId = randomUUID();
-  const passwordHash = await hashPassword(password);
+  const [existingEmail] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+  if (existingEmail) {
+    throw new Error(`Ya existe una cuenta con el correo ${email}.`);
+  }
+
+  await auth.api.signUpEmail({ body: { name, email, password } });
+
+  const [createdUser] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+  if (!createdUser) {
+    throw new Error("signUpEmail no creó la cuenta esperada.");
+  }
+  const userId = createdUser.id;
 
   await db.transaction(async (tx) => {
-    await tx.insert(userTable).values({
-      id: userId,
-      name,
-      email,
-      emailVerified: true,
-      emailVerifiedAt: now,
-      role: "ADMINISTRADOR",
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    await tx.insert(accountTable).values({
-      id: randomUUID(),
-      accountId: userId,
-      providerId: "credential",
-      userId,
-      password: passwordHash,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await tx
+      .update(users)
+      .set({ role: "ADMINISTRADOR", emailVerified: true })
+      .where(eq(users.id, userId));
 
     await tx.insert(administradores).values({
-      accountId: userId,
+      userId,
       nombreCompleto: name,
       subtype: "GENERAL",
       isRoot: true,
-      createdAt: now,
-      updatedAt: now,
     });
   });
 
-  console.log(`Administrador raíz creado: ${email}`);
+  console.log(
+    `Administrador raíz creado correctamente: ${email} (userId=${userId})`,
+  );
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((error) => {
+  console.error("Error al crear el administrador raíz:", error);
   process.exit(1);
 });

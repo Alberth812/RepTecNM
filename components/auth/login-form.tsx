@@ -46,7 +46,7 @@ export function LoginForm() {
         toast.success(result.message);
       }
 
-      router.push("/");
+      router.push("/inicio");
       router.refresh();
     } catch (error) {
       if (error instanceof ApiRequestError) {

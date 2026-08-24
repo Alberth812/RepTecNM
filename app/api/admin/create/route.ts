@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth/auth";
 import { requireAdminGeneral } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { users } from "@/lib/db/schema/auth-schema";
-import { administradores } from "@/lib/db/schema/administradores-schema";
+import { administradores } from "@/lib/db/schema/administradores";
 import { createAdminSchema } from "@/lib/validation/schemas";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 import { ApiError } from "@/lib/errors";
