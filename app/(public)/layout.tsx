@@ -8,6 +8,7 @@ import { GuardiaPublica } from "@/components/public/guardia-publica";
 import { SoloNoAdmin } from "@/components/public/solo-no-admin";
 import { SoloVisitante } from "@/components/public/solo-visitante";
 import { FranjaSuperior } from "@/components/public/franja-superior";
+import { AvisosFlotantes } from "@/components/public/avisos-flotantes";
 import { EstructuraSesion } from "@/components/public/estructura-sesion";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -62,6 +63,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         </div>
       </header>
       </SoloNoAdmin>
+
+      <AvisosFlotantes />
 
       <main className="flex-1">
         <GuardiaPublica>
