@@ -8,16 +8,16 @@ import {
   LayoutDashboard, LogOut, MessageSquareText, PencilLine, Search, Settings, Users, UserCheck,
 } from "lucide-react";
 
-import { conversacionesIniciales } from "@/lib/mock/mensajeria";
+import { cargarMensajes } from "@/lib/mensajes";
 import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
 import { BadgeEstado } from "@/components/public/badge-estado";
 import { useRol, type Rol } from "@/lib/use-rol";
 
 export function contarMensajesNoLeidos(): number {
   if (typeof window === "undefined") return 0;
-  const g = localStorage.getItem("rep-msg-no-leidos");
-  if (g !== null) return Number(g) || 0;
-  return conversacionesIniciales.reduce((acc, cv) => acc + cv.noLeidos, 0);
+  const rol = localStorage.getItem("rep-rol");
+  if (rol !== "admin" && rol !== "afiliado") return 0;
+  return cargarMensajes().filter((m) => !m.leido && m.para.rol === rol).length;
 }
 
 export const MENU_AFILIADO = [

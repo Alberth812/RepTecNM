@@ -180,10 +180,12 @@ export function CatalogoCliente() {
                     </span>
                   </div>
                 ) : (
-                  <Button variant="outline" size="sm" className="w-full">
-                    <MessageSquareText className="mr-2 h-4 w-4" />
-                    Contactar vía plataforma
-                  </Button>
+                  <Link href={`/catalogo/${p.id}`} className="w-full">
+                    <Button variant="outline" size="sm" className="w-full">
+                      <MessageSquareText className="mr-2 h-4 w-4" />
+                      Ver perfil y enviar mensaje
+                    </Button>
+                  </Link>
                 )}
               </CardFooter>
             </Card>
