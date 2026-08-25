@@ -2,6 +2,7 @@ import { defineRelations } from "drizzle-orm";
 import { users, sessions, accounts, verifications } from "./auth-schema";
 import { administradores } from "./administradores";
 import { afiliados, proyectosRelevantes, datosEmergencia } from "./afiliados";
+import { archivos } from "./archivo";
 
 export const relations = defineRelations(
   {
@@ -13,6 +14,7 @@ export const relations = defineRelations(
     afiliados,
     proyectosRelevantes,
     datosEmergencia,
+    archivos,
   },
   (r) => ({
     users: {
@@ -73,6 +75,16 @@ export const relations = defineRelations(
         from: r.afiliados.userId,
         to: r.datosEmergencia.afiliadoId,
       }),
+
+      fotografia: r.one.archivos({
+        from: r.afiliados.fotografiaArchivoId,
+        to: r.archivos.id,
+      }),
+
+      comprobanteMembresia: r.one.archivos({
+        from: r.afiliados.comprobanteMembresiaArchivoId,
+        to: r.archivos.id,
+      }),
     },
 
     proyectosRelevantes: {
@@ -86,6 +98,18 @@ export const relations = defineRelations(
       afiliado: r.one.afiliados({
         from: r.datosEmergencia.afiliadoId,
         to: r.afiliados.userId,
+      }),
+    },
+
+    archivos: {
+      fotografiaAfiliados: r.many.afiliados({
+        from: r.archivos.id,
+        to: r.afiliados.fotografiaArchivoId,
+      }),
+
+      comprobantesMembresiaAfiliados: r.many.afiliados({
+        from: r.archivos.id,
+        to: r.afiliados.comprobanteMembresiaArchivoId,
       }),
     },
   }),

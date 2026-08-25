@@ -20,12 +20,29 @@ export async function requireSession() {
 /** Exige sesión de un AFILIADO. */
 export async function requireAfiliado() {
   const session = await requireSession();
+
   if (session.user.role !== ROLES.AFILIADO) {
     throw ApiError.forbidden(
       "Esta operación es solo para cuentas de afiliado.",
     );
   }
-  return session;
+
+  const afiliado = await db.query.afiliados.findFirst({
+    where: {
+      userId: session.user.id,
+    },
+  });
+
+  if (!afiliado) {
+    throw ApiError.forbidden(
+      "La cuenta no tiene un perfil de afiliado asociado.",
+    );
+  }
+
+  return {
+    session,
+    afiliado,
+  };
 }
 
 /** Exige sesión de un ADMINISTRADOR y devuelve también su perfil (subtype/isRoot). */

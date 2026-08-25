@@ -1,14 +1,28 @@
-import { createAfiliado } from "@/lib/db/afiliados/queries";
+import { requireAfiliado } from "@/lib/auth/session";
+import { updateAfiliado } from "@/lib/db/afiliados/queries";
+import { toErrorResponse } from "@/lib/http/responses";
 import { parseRegistroFormData } from "@/lib/registro/formData";
 import { registroServerSchema } from "@/lib/registro/schema";
-import { uploadFile } from "@/lib/storage";
+import { deleteFile, uploadFile } from "@/lib/storage";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-// Este endpoint recibe `multipart/form-data` (no JSON) porque el formulario
-// incluye archivos (fotografía y, opcionalmente, comprobante de membresía).
-
 export async function POST(request: Request) {
+  const { afiliado } = await requireAfiliado();
+
+  if (afiliado.membershipStatus === "PENDIENTE_APROBACION") {
+    /**
+     * membershipStatus: "NO_INICIADA" | "PENDIENTE_APROBACION" | "REQUIERE_CORRECCION" | "RECHAZADO" | "ACTIVO" | "INACTIVO" | "SUSPENDIDO" | "BAJA"
+     *
+     * NO_INICIADA -> signiifca que es la primera vez que envía
+     * REQUIERE_CORRECCION -> signiifca que ya envío una respuesta anterior
+     * RECHAZADO, INACTIVO, SUSPENDIDO o BAJA -> No puede enviar nada
+     * ACTIVO -> signfica que ya fue aprobado así que no tiene sentido que envíe esto
+     * */
+  }
+
+  // (afiliado.membershipStatus === "PENDIENTE_APROBACION")
+
   let raw: Record<string, unknown>;
 
   try {
@@ -16,7 +30,9 @@ export async function POST(request: Request) {
     raw = parseRegistroFormData(formData);
   } catch {
     return NextResponse.json(
-      { message: "No se pudo leer la solicitud. Verifica el formato enviado." },
+      {
+        message: "No se pudo leer la solicitud. Verifica el formato enviado.",
+      },
       { status: 400 },
     );
   }
@@ -24,7 +40,6 @@ export async function POST(request: Request) {
   const result = await registroServerSchema.safeParseAsync(raw);
 
   if (!result.success) {
-    // Usamos la nueva función recomendada por Zod
     const flattened = z.flattenError(result.error);
 
     return NextResponse.json(
@@ -38,23 +53,57 @@ export async function POST(request: Request) {
 
   const data = result.data;
 
-  try {
-    // 1. Subir los archivos antes de tocar la base de datos: si algo falla
-    //    aquí, no queda ningún registro a medias.
-    const fotografiaUrl = await uploadFile(data.fotografia, "fotografias");
-    const comprobanteUrl = data.comprobante_membresia
-      ? await uploadFile(data.comprobante_membresia, "comprobantes")
-      : null;
+  let fotografia: Awaited<ReturnType<typeof uploadFile>> | null = null;
+  let membresia: Awaited<ReturnType<typeof uploadFile>> | null = null;
 
-    // 2. Insertar afiliado + proyectos + datos de emergencia en una sola
-    //    transacción (ver `lib/db/queries.ts`).
-    /* const afiliado = await createAfiliado({
+  try {
+    /*
+     * 1. Subimos ambos objetos a Garage.
+     */
+    fotografia = await uploadFile({
+      file: data.fotografia,
+      ownerId: afiliado.userId,
+      folder: "fotografia",
+    });
+
+    membresia = await uploadFile({
+      file: data.comprobante_membresia,
+      ownerId: afiliado.userId,
+      folder: "membresia",
+    });
+
+    /**
+     * 2. Guardamos las referencias en Postgres.
+     *
+     * updateAfiliado debe ejecutar todas sus operaciones en una
+     * única transacción.
+     */
+    const updatedAfiliado = await updateAfiliado({
+      userId: afiliado.userId,
+
+      archivos: {
+        fotografia: {
+          bucket: fotografia.bucket,
+          objectKey: fotografia.objectKey,
+          originalName: fotografia.originalName,
+          contentType: fotografia.contentType,
+          size: fotografia.size,
+        },
+
+        comprobanteMembresia: {
+          bucket: membresia.bucket,
+          objectKey: membresia.objectKey,
+          originalName: membresia.originalName,
+          contentType: membresia.contentType,
+          size: membresia.size,
+        },
+      },
+
       afiliado: {
         apellidoPaterno: data.apellido_paterno,
         apellidoMaterno: data.apellido_materno,
         nombres: data.nombres,
-        fotografiaUrl,
-        comprobanteMembresiaUrl: comprobanteUrl,
+
         genero: data.genero,
 
         telefonoCelular: data.telefono_celular,
@@ -70,6 +119,7 @@ export async function POST(request: Request) {
 
         areaConocimiento: data.area_conocimiento,
         areaConocimientoOtro: emptyToNull(data.area_conocimiento_otro),
+
         perfilProfesional: data.perfil_profesional,
         palabrasClave: data.palabras_clave,
         habilidadesTecnologicas: data.habilidades_tecnologicas,
@@ -77,21 +127,26 @@ export async function POST(request: Request) {
         tipoServicios: data.tipo_servicios,
         tipoServiciosOtro: emptyToNull(data.tipo_servicios_otro),
         descripcionServicios: data.descripcion_servicios,
+
         sectores: data.sectores,
         sectoresOtro: emptyToNull(data.sectores_otro),
+
         modalidadServicios: data.modalidad_servicios,
+
         interesadoEn: data.interesado_en,
         interesadoEnOtro: emptyToNull(data.interesado_en_otro),
 
         autorizaPublicacion: data.autoriza_publicacion,
         datosPublicos: data.datos_publicos,
       },
+
       proyectos: data.proyectos_relevantes.map((proyecto) => ({
         nombre: proyecto.nombre,
         descripcion: proyecto.descripcion,
         rol: proyecto.rol,
         anio: proyecto.anio,
       })),
+
       datosEmergencia: {
         nombreContacto: data.nombre_contacto_emergencia,
         parentesco: data.parentesco_contacto_emergencia,
@@ -103,36 +158,59 @@ export async function POST(request: Request) {
         ),
         mostrarEnQr: data.privacidad_datos_emergencia,
       },
-    }); 
+    });
+
+    /**
+     * 3. Si la transacción de BD tuvo éxito, podemos eliminar
+     *    posteriormente los archivos anteriores si existían.
+     *
+     *    Esto es especialmente importante cuando el afiliado
+     *    vuelve a editar su registro.
+     */
 
     return NextResponse.json(
-      { message: "Registro creado correctamente.", id: afiliado.id },
-      { status: 201 },
-    ); */
+      {
+        message: "Registro actualizado correctamente.",
+        userId: updatedAfiliado.userId,
+      },
+      { status: 200 },
+    );
   } catch (error) {
+    /**
+     * Si Postgres falla, limpiamos los objetos recién subidos.
+     */
+    await cleanupUploadedFiles(fotografia, membresia);
+
     if (isUniqueViolation(error)) {
       return NextResponse.json(
-        { message: "Ya existe un registro con ese correo electrónico." },
+        {
+          message: "Ya existe un registro con ese correo electrónico.",
+        },
         { status: 409 },
       );
     }
+
     console.error("Error al guardar el registro de afiliado:", error);
-    return NextResponse.json(
-      {
-        message:
-          "Ocurrió un error al guardar el registro. Intenta de nuevo más tarde.",
-      },
-      { status: 500 },
-    );
+
+    return toErrorResponse(error);
   }
 }
 
-/** Convierte cadenas vacías (campos opcionales sin llenar) a `null` para la base de datos. */
+async function cleanupUploadedFiles(
+  fotografia: Awaited<ReturnType<typeof uploadFile>> | null,
+  membresia: Awaited<ReturnType<typeof uploadFile>> | null,
+) {
+  const files = [fotografia, membresia].filter(
+    (file): file is NonNullable<typeof file> => file !== null,
+  );
+
+  await Promise.allSettled(files.map((file) => deleteFile(file.objectKey)));
+}
+
 function emptyToNull(value: string | undefined): string | null {
   return value && value.trim() !== "" ? value : null;
 }
 
-/** Postgres error code 23505 = unique_violation (p. ej. correo_electronico duplicado). */
 function isUniqueViolation(error: unknown): boolean {
   return (
     typeof error === "object" &&

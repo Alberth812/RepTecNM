@@ -16,6 +16,10 @@ export function getClientIp(request: NextRequest): string {
   const headerName = process.env.TRUSTED_IP_HEADER ?? "x-forwarded-for";
   const raw = request.headers.get(headerName);
 
+  if (!raw && process.env.NODE_ENV === "production") {
+    throw new Error(`Missing trusted client IP header: ${headerName}`);
+  }
+
   if (!raw) return "127.0.0.1";
 
   // x-forwarded-for puede traer una cadena "clientIp, proxy1, proxy2"; sin

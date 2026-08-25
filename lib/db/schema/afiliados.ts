@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "./auth-schema";
 import { membershipStatusEnum, tipoSanguineoEnum } from "./enums";
+import { archivos } from "./archivo";
 
 /**
  * Datos "públicos" del afiliado: lo que puede mostrarse en el catálogo de
@@ -22,8 +23,12 @@ export const afiliados = pgTable("afiliados", {
   apellidoPaterno: text("apellido_paterno") /* .notNull() */,
   apellidoMaterno: text("apellido_materno") /* .notNull() */,
   nombres: text("nombres") /* .notNull() */,
-  fotografiaUrl: text("fotografia_url") /* .notNull() */,
-  comprobanteMembresiaUrl: text("comprobante_membresia_url"),
+  fotografiaArchivoId: uuid("fotografia_archivo_id").references(
+    () => archivos.id,
+  ),
+  comprobanteMembresiaArchivoId: uuid(
+    "comprobante_membresia_archivo_id",
+  ).references(() => archivos.id),
   genero: text("genero") /* .notNull() */,
 
   //Estado de membresía
@@ -78,7 +83,8 @@ export const afiliados = pgTable("afiliados", {
     .defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 /** Proyectos relevantes del afiliado (0 a 5, capturados en el paso 4). */
@@ -122,7 +128,8 @@ export const datosEmergencia = pgTable("datos_emergencia", {
 
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .defaultNow(),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export type Afiliado = typeof afiliados.$inferSelect;
