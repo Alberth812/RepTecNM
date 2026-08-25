@@ -53,16 +53,16 @@ export const relations = defineRelations(
         from: r.accounts.userId,
         to: r.users.id,
       }),
-      solicitudesRevisadas: r.many.solicitudes({
-        from: r.administradores.userId,
-        to: r.solicitudes.revisadoPorAdminId,
-      }),
     },
 
     administradores: {
       user: r.one.users({
         from: r.administradores.userId,
         to: r.users.id,
+      }),
+      solicitudesRevisadas: r.many.solicitudes({
+        from: r.administradores.userId,
+        to: r.solicitudes.revisadoPorAdminId,
       }),
     },
 
@@ -99,12 +99,12 @@ export const relations = defineRelations(
       fotografia: r.one.archivos({
         from: r.solicitudes.fotografiaArchivoId,
         to: r.archivos.id,
-        optional: false
+        optional: false,
       }),
       comprobanteMembresia: r.one.archivos({
         from: r.solicitudes.comprobanteMembresiaArchivoId,
         to: r.archivos.id,
-        optional: false
+        optional: false,
       }),
       revisadoPor: r.one.administradores({
         from: r.solicitudes.revisadoPorAdminId,

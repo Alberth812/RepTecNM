@@ -558,3 +558,64 @@ export async function resolverSolicitud(
     return solicitudActualizada;
   });
 }
+
+//---
+
+// lib/db/solicitudes/queries.ts (agregar)
+
+export type SolicitudActualParaAfiliado = {
+  version: number;
+  datos: SolicitudDatosSnapshot;
+  revisionObservaciones: string | null;
+  fotografia: { originalName: string; objectKey: string; contentType: string };
+  comprobanteMembresia: {
+    originalName: string;
+    objectKey: string;
+    contentType: string;
+  };
+};
+
+/**
+ * Última versión de la solicitud de un afiliado, pensada para precargar el
+ * formulario de registro cuando su estado es REQUIERE_CORRECCION. Devuelve
+ * `objectKey` (no una URL firmada) para no acoplar esta query a Garage; el
+ * caller decide cuándo y con qué expiración generar la URL.
+ */
+export async function obtenerSolicitudActualParaAfiliado(
+  afiliadoId: string,
+): Promise<SolicitudActualParaAfiliado | null> {
+  const solicitud = await db.query.solicitudes.findFirst({
+    where: {
+      afiliadoId: afiliadoId,
+    },
+    orderBy: {
+      version: "desc",
+    },
+    with: {
+      fotografia: {
+        columns: {
+          originalName: true,
+          objectKey: true,
+          contentType: true,
+        },
+      },
+      comprobanteMembresia: {
+        columns: {
+          originalName: true,
+          objectKey: true,
+          contentType: true,
+        },
+      },
+    },
+  });
+
+  if (!solicitud) return null;
+
+  return {
+    version: solicitud.version,
+    datos: solicitud.datos,
+    revisionObservaciones: solicitud.revisionObservaciones,
+    fotografia: solicitud.fotografia,
+    comprobanteMembresia: solicitud.comprobanteMembresia,
+  };
+}

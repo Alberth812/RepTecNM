@@ -103,10 +103,10 @@ export function SessionDashboard() {
               {me.membershipStatus !== "PENDIENTE_APROBACION" ? (
                 <>
                 <p>Continua con tu formulario de registro por favor</p>
-                <p><Link href={"/registro-prueba"}>Continuar</Link></p>
+                <p><Link href={"/registro"}>Continuar</Link></p>
                 </>
               ) : (
-                <p>Espera a tu formulario</p>
+                <p>Espera a que tu solicitud sea registrada</p>
               )}
             </CardTitle>
             <CardDescription>{me.email}</CardDescription>
