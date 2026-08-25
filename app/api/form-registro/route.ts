@@ -1,8 +1,13 @@
+// route.ts
 import { requireAfiliado } from "@/lib/auth/session";
-import { updateAfiliado } from "@/lib/db/afiliados/queries";
+import {
+  crearSolicitud,
+  EstadoInvalidoError,
+} from "@/lib/db/solicitudes/queries";
 import { toErrorResponse } from "@/lib/http/responses";
 import { parseRegistroFormData } from "@/lib/registro/formData";
 import { registroServerSchema } from "@/lib/registro/schema";
+import { toSolicitudSnapshot } from "@/lib/registro/solicitud-snapshot";
 import { deleteFile, uploadFile } from "@/lib/storage";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -17,35 +22,22 @@ export async function POST(request: Request) {
       { message: "No puedes enviar el registro en tu estado actual." },
       { status: 409 },
     );
-    /**
-     * membershipStatus: "NO_INICIADA" | "PENDIENTE_APROBACION" | "REQUIERE_CORRECCION" | "RECHAZADO" | "ACTIVO" | "INACTIVO" | "SUSPENDIDO" | "BAJA"
-     *
-     * NO_INICIADA -> signiifca que es la primera vez que envía
-     * REQUIERE_CORRECCION -> signiifca que ya envío una respuesta anterior
-     * RECHAZADO, INACTIVO, SUSPENDIDO o BAJA -> No puede enviar nada
-     * ACTIVO -> signfica que ya fue aprobado así que no tiene sentido que envíe esto
-     * */
   }
 
   let raw: Record<string, unknown>;
-
   try {
     const formData = await request.formData();
     raw = parseRegistroFormData(formData);
   } catch {
     return NextResponse.json(
-      {
-        message: "No se pudo leer la solicitud. Verifica el formato enviado.",
-      },
+      { message: "No se pudo leer la solicitud. Verifica el formato enviado." },
       { status: 400 },
     );
   }
 
   const result = await registroServerSchema.safeParseAsync(raw);
-
   if (!result.success) {
     const flattened = z.flattenError(result.error);
-
     return NextResponse.json(
       {
         message: "Hay errores de validación en el registro.",
@@ -61,9 +53,6 @@ export async function POST(request: Request) {
   let membresia: Awaited<ReturnType<typeof uploadFile>> | null = null;
 
   try {
-    /*
-     * 1. Subimos ambos objetos a Garage.
-     */
     fotografia = await uploadFile({
       file: data.fotografia,
       ownerId: afiliado.userId,
@@ -76,15 +65,9 @@ export async function POST(request: Request) {
       folder: "membresia",
     });
 
-    /**
-     * 2. Guardamos las referencias en Postgres.
-     *
-     * updateAfiliado debe ejecutar todas sus operaciones en una
-     * única transacción.
-     */
-    const updatedAfiliado = await updateAfiliado({
-      userId: afiliado.userId,
-
+    const { solicitud, archivosParaEliminar } = await crearSolicitud({
+      afiliadoId: afiliado.userId,
+      datos: toSolicitudSnapshot(data),
       archivos: {
         fotografia: {
           bucket: fotografia.bucket,
@@ -93,7 +76,6 @@ export async function POST(request: Request) {
           contentType: fotografia.contentType,
           size: fotografia.size,
         },
-
         comprobanteMembresia: {
           bucket: membresia.bucket,
           objectKey: membresia.objectKey,
@@ -102,104 +84,35 @@ export async function POST(request: Request) {
           size: membresia.size,
         },
       },
-
-      afiliado: {
-        apellidoPaterno: data.apellido_paterno,
-        apellidoMaterno: data.apellido_materno,
-        nombres: data.nombres,
-
-        genero: data.genero,
-
-        telefonoCelular: data.telefono_celular,
-        telefonoCasa: emptyToNull(data.telefono_casa),
-        correoElectronico: data.correo_electronico,
-        linkedin: emptyToNull(data.linkedin),
-        orcid: emptyToNull(data.orcid),
-        sitioWeb: emptyToNull(data.sitio_web),
-
-        estadoResidencia: data.estado_residencia,
-        ciudadResidencia: data.ciudad_residencia,
-        disponibilidadGeografica: data.disponibilidad_geografica,
-
-        areaConocimiento: data.area_conocimiento,
-        areaConocimientoOtro: emptyToNull(data.area_conocimiento_otro),
-
-        perfilProfesional: data.perfil_profesional,
-        palabrasClave: data.palabras_clave,
-        habilidadesTecnologicas: data.habilidades_tecnologicas,
-
-        tipoServicios: data.tipo_servicios,
-        tipoServiciosOtro: emptyToNull(data.tipo_servicios_otro),
-        descripcionServicios: data.descripcion_servicios,
-
-        sectores: data.sectores,
-        sectoresOtro: emptyToNull(data.sectores_otro),
-
-        modalidadServicios: data.modalidad_servicios,
-
-        interesadoEn: data.interesado_en,
-        interesadoEnOtro: emptyToNull(data.interesado_en_otro),
-
-        autorizaPublicacion: data.autoriza_publicacion,
-        datosPublicos: data.datos_publicos,
-      },
-
-      proyectos: data.proyectos_relevantes.map((proyecto) => ({
-        nombre: proyecto.nombre,
-        descripcion: proyecto.descripcion,
-        rol: proyecto.rol,
-        anio: proyecto.anio,
-      })),
-
-      datosEmergencia: {
-        nombreContacto: data.nombre_contacto_emergencia,
-        parentesco: data.parentesco_contacto_emergencia,
-        parentescoOtro: emptyToNull(data.parentesco_contacto_emergencia_otro),
-        telefono: data.telefono_contacto_emergencia,
-        tipoSanguineo: data.tipo_sanguineo,
-        alergiasCondicionesMedicas: emptyToNull(
-          data.alergias_condiciones_medicas,
-        ),
-        mostrarEnQr: data.privacidad_datos_emergencia,
-      },
     });
 
-    await Promise.allSettled(
-      updatedAfiliado.archivosAEliminar.map((a) => deleteFile(a.objectKey)),
-    );
-
-    /**
-     * 3. Si la transacción de BD tuvo éxito, podemos eliminar
-     *    posteriormente los archivos anteriores si existían.
-     *
-     *    Esto es especialmente importante cuando el afiliado
-     *    vuelve a editar su registro.
-     */
+    // Tx confirmada: ahora sí borramos del storage los archivos de
+    // versiones podadas. Si esto falla no tumbamos la respuesta —
+    // quedarían objetos huérfanos en Garage, limpiables después.
+    if (archivosParaEliminar.length > 0) {
+      await Promise.allSettled(
+        archivosParaEliminar.map((a) => deleteFile(a.objectKey)),
+      );
+    }
 
     return NextResponse.json(
       {
-        message: "Registro actualizado correctamente.",
-        userId: updatedAfiliado.userId,
+        message: "Registro enviado correctamente.",
+        version: solicitud.version,
       },
       { status: 200 },
     );
   } catch (error) {
-    /**
-     * Si Postgres falla, limpiamos los objetos recién subidos.
-     */
     await cleanupUploadedFiles(fotografia, membresia);
 
-    if (isUniqueViolation(error)) {
+    if (error instanceof EstadoInvalidoError) {
       return NextResponse.json(
-        {
-          message: "Ya existe un registro con ese correo electrónico.",
-        },
+        { message: "No puedes enviar el registro en tu estado actual." },
         { status: 409 },
       );
     }
 
-    console.error("Error al guardar el registro de afiliado:", error);
-
+    console.error("Error al guardar la solicitud del afiliado:", error);
     return toErrorResponse(error);
   }
 }
@@ -211,19 +124,5 @@ async function cleanupUploadedFiles(
   const files = [fotografia, membresia].filter(
     (file): file is NonNullable<typeof file> => file !== null,
   );
-
   await Promise.allSettled(files.map((file) => deleteFile(file.objectKey)));
-}
-
-function emptyToNull(value: string | undefined): string | null {
-  return value && value.trim() !== "" ? value : null;
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    (error as { code?: string }).code === "23505"
-  );
 }

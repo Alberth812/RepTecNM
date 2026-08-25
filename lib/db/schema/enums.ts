@@ -31,3 +31,10 @@ export const membershipStatusEnum = pgEnum("membership_status", [
   "SUSPENDIDO",
   "BAJA",
 ]);
+
+// db/schema/enums.ts (agregar)
+export const revisionDecisionEnum = pgEnum("revision_decision", [
+  "APROBADO",
+  "REQUIERE_CORRECCION",
+  "RECHAZADO",
+]);
