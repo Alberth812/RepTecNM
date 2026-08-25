@@ -10,10 +10,7 @@ export type SolicitudEstado =
   | "RECHAZADA"
   | "APROBADA";
 
-export type RevisionDecision =
-  | "APROBADO"
-  | "REQUIERE_CORRECCION"
-  | "RECHAZADO";
+export type RevisionDecision = "APROBADO" | "REQUIERE_CORRECCION" | "RECHAZADO";
 
 export type SolicitudListItem = {
   solicitudId: string;

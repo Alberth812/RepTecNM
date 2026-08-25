@@ -1,6 +1,5 @@
-import { Client } from "pg";
-import { execSync } from "node:child_process";
 import "dotenv/config";
+import { Client } from "pg";
 
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
@@ -19,9 +18,9 @@ async function reset() {
   console.log("✅ Base de datos limpia");
   console.log("Ejecutando migraciones...");
 
-  execSync("npx drizzle-kit migrate", {
+  /*execSync("npx drizzle-kit migrate", {
     stdio: "inherit",
-  });
+  });*/
 
   console.log("✅ Base de datos lista");
 }

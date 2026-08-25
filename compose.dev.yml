@@ -46,14 +46,14 @@ services:
       - backend
 
   postgres:
-    image: postgres:17-alpine
+    image: postgres:18.6-alpine
     container_name: dev-postgres
     environment:
       POSTGRES_DB: app
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app_dev_password
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U app -d app"]
       interval: 5s
@@ -95,12 +95,25 @@ services:
     networks:
       - backend
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: dev-portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - app
+
 volumes:
   postgres_data:
   garage_meta:
   garage_data:
   next_node_modules:
   next_cache:
+  portainer_data:
 
 networks:
   app:

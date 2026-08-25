@@ -24,7 +24,9 @@ async function throwApiRequestError(res: Response): Promise<never> {
     payload?.error?.message ?? "Ocurrió un error inesperado.",
     {
       issues: payload?.error?.issues,
-      retryAfterSeconds: retryAfterHeader ? Number(retryAfterHeader) : undefined,
+      retryAfterSeconds: retryAfterHeader
+        ? Number(retryAfterHeader)
+        : undefined,
     },
   );
 }
