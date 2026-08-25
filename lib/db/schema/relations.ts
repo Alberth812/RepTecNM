@@ -53,6 +53,10 @@ export const relations = defineRelations(
         from: r.accounts.userId,
         to: r.users.id,
       }),
+      solicitudesRevisadas: r.many.solicitudes({
+        from: r.administradores.userId,
+        to: r.solicitudes.revisadoPorAdminId,
+      }),
     },
 
     administradores: {
@@ -88,7 +92,6 @@ export const relations = defineRelations(
     },
 
     solicitudes: {
-      // <-- nuevo bloque
       afiliado: r.one.afiliados({
         from: r.solicitudes.afiliadoId,
         to: r.afiliados.userId,

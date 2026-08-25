@@ -1,4 +1,5 @@
 // db/schema/solicitudes.ts
+import type { SolicitudDatosSnapshot } from "@/lib/registro/solicitud-snapshot";
 import {
   integer,
   jsonb,
@@ -8,12 +9,10 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { users } from "./auth-schema";
 import { administradores } from "./administradores";
 import { afiliados } from "./afiliados";
 import { archivos } from "./archivo";
 import { revisionDecisionEnum } from "./enums";
-import type { SolicitudDatosSnapshot } from "@/lib/registro/solicitud-snapshot";
 
 /**
  * Cada fila es una versión inmutable de la solicitud de registro de un

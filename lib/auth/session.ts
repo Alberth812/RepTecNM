@@ -67,6 +67,44 @@ export async function requireAdministrador() {
   return { session, profile };
 }
 
+export async function requireAdminGeneralv2() {
+  const session = await getCurrentSession(); // <-- tu helper real de sesión
+
+  if (!session?.user) {
+    throw new NoAutenticadoError();
+  }
+
+  const admin = await db.query.administradores.findFirst({
+    where: eq(administradores.userId, session.user.id),
+  });
+
+  if (!admin) {
+    throw new NoAutorizadoError("No tienes permisos de administrador.");
+  }
+
+  if (admin.subtype !== "GENERAL") {
+    throw new NoAutorizadoError(
+      "Esta acción requiere un administrador de tipo GENERAL.",
+    );
+  }
+
+  return { admin };
+}
+
+export class NoAutenticadoError extends Error {
+  constructor() {
+    super("No autenticado.");
+    this.name = "NoAutenticadoError";
+  }
+}
+
+export class NoAutorizadoError extends Error {
+  constructor(message = "No tienes permisos para esta acción.") {
+    super(message);
+    this.name = "NoAutorizadoError";
+  }
+}
+
 /** RF-AUTH-013/014: exige específicamente subtipo GENERAL. */
 export async function requireAdminGeneral() {
   const { session, profile } = await requireAdministrador();
