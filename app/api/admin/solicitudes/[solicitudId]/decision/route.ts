@@ -71,7 +71,7 @@ export async function POST(
   try {
     const solicitud = await resolverSolicitud({
       solicitudId,
-      adminId: admin.userId,
+      adminId: admin[0].userId,
       decision: result.data.decision,
       observaciones: result.data.observaciones?.trim() || null,
     });

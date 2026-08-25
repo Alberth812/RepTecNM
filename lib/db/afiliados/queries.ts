@@ -4,21 +4,20 @@ import {
   afiliados,
   datosEmergencia,
   proyectosRelevantes,
-  solicitudesAfiliado,
   type NewDatosEmergencia,
   type NewProyectoRelevante,
-  type NewSolicitudAfiliado,
 } from "../schema/afiliados";
 import { archivos, type NewArchivo } from "../schema/archivo";
+import { NewSolicitud, solicitudes } from "../schema/solicitudes";
 
-export async function updateAfiliado(input: {
+/*export async function updateAfiliado(input: {
   userId: string;
   archivos: {
     fotografia: NewArchivo;
     comprobanteMembresia: NewArchivo;
   };
   afiliado: Omit<
-    NewSolicitudAfiliado,
+    NewSolicitud,
     | "id"
     | "afiliadoId"
     | "tipo"
@@ -48,11 +47,11 @@ export async function updateAfiliado(input: {
     // 1. La 'ANTERIOR' existente (si la hay) se descarta por completo.
     const [anteriorPrevia] = await tx
       .select()
-      .from(solicitudesAfiliado)
+      .from(solicitudes)
       .where(
         and(
-          eq(solicitudesAfiliado.afiliadoId, input.userId),
-          eq(solicitudesAfiliado.tipo, "ANTERIOR"),
+          eq(solicitudes.afiliadoId, input.userId),
+          eq(solicitudes.tipo, "ANTERIOR"),
         ),
       )
       .limit(1);
@@ -78,9 +77,7 @@ export async function updateAfiliado(input: {
         );
 
       // Borra la solicitud (cascada: proyectos, datos_emergencia, revision)
-      await tx
-        .delete(solicitudesAfiliado)
-        .where(eq(solicitudesAfiliado.id, anteriorPrevia.id));
+      await tx.delete(solicitudes).where(eq(solicitudes.id, anteriorPrevia.id));
 
       // Ya no hay FK apuntando a estos archivos: se pueden borrar de Postgres.
       await tx.delete(archivos).where(
@@ -98,12 +95,12 @@ export async function updateAfiliado(input: {
 
     // 2. La 'ACTUAL' existente pasa a ser 'ANTERIOR'.
     await tx
-      .update(solicitudesAfiliado)
+      .update(solicitudes)
       .set({ tipo: "ANTERIOR" })
       .where(
         and(
-          eq(solicitudesAfiliado.afiliadoId, input.userId),
-          eq(solicitudesAfiliado.tipo, "ACTUAL"),
+          eq(solicitudes.afiliadoId, input.userId),
+          eq(solicitudes.tipo, "ACTUAL"),
         ),
       );
 
@@ -120,7 +117,7 @@ export async function updateAfiliado(input: {
 
     // 4. Insertamos la nueva solicitud como 'ACTUAL'.
     const [nuevaSolicitud] = await tx
-      .insert(solicitudesAfiliado)
+      .insert(solicitudes)
       .values({
         ...input.afiliado,
         afiliadoId: input.userId,
@@ -160,3 +157,4 @@ export async function updateAfiliado(input: {
     };
   });
 }
+*/

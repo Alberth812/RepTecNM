@@ -310,7 +310,7 @@ export async function contarSolicitudes(params: {
 // Detalle (versiones completas de un afiliado, para el tab de solo lectura)
 // ---------------------------------------------------------------------------
 
-export async function obtenerVersionesSolicitud(afiliadoId: string) {
+/* export async function obtenerVersionesSolicitud(afiliadoId: string) {
   return db.query.solicitudes.findMany({
     where: eq(solicitudes.afiliadoId, afiliadoId),
     orderBy: desc(solicitudes.version),
@@ -319,6 +319,27 @@ export async function obtenerVersionesSolicitud(afiliadoId: string) {
       comprobanteMembresia: true,
       revisadoPor: {
         columns: { userId: true, nombreCompleto: true },
+      },
+    },
+  });
+} */
+
+export async function obtenerVersionesSolicitud(afiliadoId: string) {
+  return db.query.solicitudes.findMany({
+    where: {
+      afiliadoId: afiliadoId,
+    },
+    orderBy: {
+      version: "desc",
+    },
+    with: {
+      fotografia: true,
+      comprobanteMembresia: true,
+      revisadoPor: {
+        columns: {
+          userId: true,
+          nombreCompleto: true,
+        },
       },
     },
   });
