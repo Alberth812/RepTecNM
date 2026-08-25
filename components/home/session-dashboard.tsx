@@ -18,20 +18,29 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
 
 const MEMBERSHIP_LABELS: Record<string, string> = {
   NO_INICIADA: "No iniciada",
   RECHAZADO: "Rechazado",
   SUSPENDIDO: "Suspendido",
+  PENDIENTE_APROBACION: "Formulario pendiente de aprobación",
+  REQUIERE_CORRECION: "Formulario de registro requiere correción",
+  ACTIVO: "Activo",
 };
 
-const BLOCKED_MEMBERSHIP_STATUSES = new Set(["RECHAZADO", "SUSPENDIDO"]);
+const BLOCKED_MEMBERSHIP_STATUSES = new Set([
+  "RECHAZADO",
+  "SUSPENDIDO",
+  "BAJA",
+]);
 
 export function SessionDashboard() {
   const router = useRouter();
   const { data: me, isLoading, isError, error } = useMeQuery();
 
-  const isUnauthorized = isError && error instanceof ApiRequestError && error.status === 401;
+  const isUnauthorized =
+    isError && error instanceof ApiRequestError && error.status === 401;
 
   useEffect(() => {
     if (isUnauthorized) router.replace("/login");
@@ -69,7 +78,9 @@ export function SessionDashboard() {
           <TriangleAlert className="h-4 w-4" />
           <AlertTitle>No se pudo cargar tu sesión</AlertTitle>
           <AlertDescription>
-            {error instanceof Error ? error.message : "Intenta de nuevo en unos segundos."}
+            {error instanceof Error
+              ? error.message
+              : "Intenta de nuevo en unos segundos."}
           </AlertDescription>
         </Alert>
       </div>
@@ -89,7 +100,14 @@ export function SessionDashboard() {
               ) : (
                 <User className="h-5 w-5 text-[#004B87]" />
               )}
-              Bienvenido
+              {me.membershipStatus !== "PENDIENTE_APROBACION" ? (
+                <>
+                <p>Continua con tu formulario de registro por favor</p>
+                <p><Link href={"/registro-prueba"}>Continuar</Link></p>
+                </>
+              ) : (
+                <p>Espera a tu formulario</p>
+              )}
             </CardTitle>
             <CardDescription>{me.email}</CardDescription>
           </div>
@@ -106,7 +124,9 @@ export function SessionDashboard() {
                 <span className="font-medium">{me.subtype ?? "—"}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Administrador raíz</span>
+                <span className="text-muted-foreground">
+                  Administrador raíz
+                </span>
                 <Badge variant={me.isRoot ? "default" : "secondary"}>
                   {me.isRoot ? "Sí" : "No"}
                 </Badge>
@@ -115,16 +135,20 @@ export function SessionDashboard() {
           ) : (
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Estado de membresía</span>
+                <span className="text-muted-foreground">
+                  Estado de membresía
+                </span>
                 <Badge
                   variant={
-                    me.membershipStatus && BLOCKED_MEMBERSHIP_STATUSES.has(me.membershipStatus)
+                    me.membershipStatus &&
+                    BLOCKED_MEMBERSHIP_STATUSES.has(me.membershipStatus)
                       ? "destructive"
                       : "secondary"
                   }
                 >
                   {me.membershipStatus
-                    ? MEMBERSHIP_LABELS[me.membershipStatus] ?? me.membershipStatus
+                    ? (MEMBERSHIP_LABELS[me.membershipStatus] ??
+                      me.membershipStatus)
                     : "—"}
                 </Badge>
               </div>

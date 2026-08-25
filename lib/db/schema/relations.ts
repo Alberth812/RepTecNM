@@ -99,10 +99,12 @@ export const relations = defineRelations(
       fotografia: r.one.archivos({
         from: r.solicitudes.fotografiaArchivoId,
         to: r.archivos.id,
+        optional: false
       }),
       comprobanteMembresia: r.one.archivos({
         from: r.solicitudes.comprobanteMembresiaArchivoId,
         to: r.archivos.id,
+        optional: false
       }),
       revisadoPor: r.one.administradores({
         from: r.solicitudes.revisadoPorAdminId,

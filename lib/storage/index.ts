@@ -5,6 +5,8 @@ import {
 } from "@aws-sdk/client-s3";
 import crypto from "node:crypto";
 import path from "node:path";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
@@ -15,6 +17,7 @@ function getRequiredEnv(name: string): string {
 
   return value;
 }
+
 
 const endpoint = getRequiredEnv("S3_ENDPOINT");
 const region = getRequiredEnv("S3_REGION");
@@ -33,6 +36,19 @@ export const s3 = new S3Client({
   // Muy útil con servicios S3 compatibles como Garage.
   forcePathStyle: true,
 });
+
+/**
+ * Genera una URL firmada de solo lectura para un objeto de Garage.
+ * Se usa para mostrar/descargar archivos privados (fotografía, comprobante)
+ * en el panel de administración, sin hacer el bucket público.
+ */
+export async function getFileUrl(
+  objectKey: string,
+  expiresInSeconds = 900, // 15 minutos
+): Promise<string> {
+  const command = new GetObjectCommand({ Bucket: bucket, Key: objectKey });
+  return getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
+}
 
 export interface UploadedFile {
   bucket: string;

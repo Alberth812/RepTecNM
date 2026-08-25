@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     await db
       .update(afiliados)
       .set({ lastEmailChangeAt: new Date() })
-      .where(eq(afiliados.userId, session.user.id));
+      .where(eq(afiliados.userId, session.afiliado.userId));
 
     return ok({
       message: "Tu correo se actualizó correctamente.",

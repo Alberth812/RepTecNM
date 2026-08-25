@@ -42,3 +42,47 @@ export class ApiError extends Error {
     return new ApiError(409, code, message);
   }
 }
+
+export class ApiErrorv2 extends Error {
+  status: number;
+  errors?: Record<string, string[]>;
+
+  constructor(
+    message: string,
+    status: number,
+    errors?: Record<string, string[]>,
+  ) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.errors = errors;
+  }
+}
+
+export async function apiFetch<T>(
+  input: string,
+  init?: RequestInit,
+): Promise<T> {
+  const response = await fetch(input, {
+    ...init,
+    headers: {
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...init?.headers,
+    },
+  });
+
+  const isJson = response.headers
+    .get("content-type")
+    ?.includes("application/json");
+  const body = isJson ? await response.json() : null;
+
+  if (!response.ok) {
+    throw new ApiErrorv2(
+      body?.message ?? "Ocurrió un error inesperado.",
+      response.status,
+      body?.errors,
+    );
+  }
+
+  return body as T;
+}

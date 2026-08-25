@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const [afiliado] = await db
       .select({ lastEmailChangeAt: afiliados.lastEmailChangeAt })
       .from(afiliados)
-      .where(eq(afiliados.userId, session.user.id))
+      .where(eq(afiliados.userId, session.afiliado.userId))
       .limit(1);
 
     if (afiliado?.lastEmailChangeAt) {
@@ -94,13 +94,13 @@ export async function POST(request: NextRequest) {
     // 4) Mismos límites de generación de código que la verificación de signup.
     await enforceMinInterval({
       type: "EMAIL_VERIFICATION_OTP_SENT",
-      dimension: { column: "userId", value: session.user.id },
+      dimension: { column: "userId", value: session.afiliado.userId },
       minIntervalMs: AUTH_RULES.RESEND_MIN_INTERVAL_MS,
       message: "Debes esperar antes de solicitar un nuevo código.",
     });
     await enforceRollingLimit({
       type: "EMAIL_VERIFICATION_OTP_SENT",
-      dimension: { column: "userId", value: session.user.id },
+      dimension: { column: "userId", value: session.afiliado.userId },
       windowMs: AUTH_RULES.EMAIL_OTP_MAX_PER_ACCOUNT_WINDOW_MS,
       max: AUTH_RULES.EMAIL_OTP_MAX_PER_ACCOUNT,
       message:
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     await recordAuthEvent({
       type: "EMAIL_VERIFICATION_OTP_SENT",
-      userId: session.user.id,
+      userId: session.afiliado.userId,
       email: body.newEmail,
       ipAddress: ip,
     });

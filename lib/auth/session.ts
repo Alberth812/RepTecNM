@@ -79,7 +79,7 @@ export async function requireAdminGeneralv2() {
       eq(administradores.userId, session.user.id),
   }); */
 
-  const admin = await db
+  const [admin] = await db
     .select()
     .from(administradores)
     .where(eq(administradores.userId, session.user.id))
@@ -89,7 +89,7 @@ export async function requireAdminGeneralv2() {
     throw new NoAutorizadoError("No tienes permisos de administrador.");
   }
 
-  if (admin[0].subtype !== "GENERAL") {
+  if (admin.subtype !== "GENERAL") {
     throw new NoAutorizadoError(
       "Esta acción requiere un administrador de tipo GENERAL.",
     );
