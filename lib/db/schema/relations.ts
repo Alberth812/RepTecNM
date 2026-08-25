@@ -1,7 +1,13 @@
 import { defineRelations } from "drizzle-orm";
 import { users, sessions, accounts, verifications } from "./auth-schema";
 import { administradores } from "./administradores";
-import { afiliados, proyectosRelevantes, datosEmergencia } from "./afiliados";
+import {
+  afiliados,
+  proyectosRelevantes,
+  datosEmergencia,
+  solicitudesAfiliado,
+  revisiones,
+} from "./afiliados";
 import { archivos } from "./archivo";
 
 export const relations = defineRelations(
@@ -12,104 +18,105 @@ export const relations = defineRelations(
     verifications,
     administradores,
     afiliados,
+    solicitudesAfiliado,
     proyectosRelevantes,
     datosEmergencia,
+    revisiones,
     archivos,
   },
   (r) => ({
     users: {
-      sessions: r.many.sessions({
-        from: r.users.id,
-        to: r.sessions.userId,
-      }),
-
-      accounts: r.many.accounts({
-        from: r.users.id,
-        to: r.accounts.userId,
-      }),
-
+      sessions: r.many.sessions({ from: r.users.id, to: r.sessions.userId }),
+      accounts: r.many.accounts({ from: r.users.id, to: r.accounts.userId }),
       administrador: r.one.administradores({
         from: r.users.id,
         to: r.administradores.userId,
       }),
-
-      afiliado: r.one.afiliados({
-        from: r.users.id,
-        to: r.afiliados.userId,
-      }),
+      afiliado: r.one.afiliados({ from: r.users.id, to: r.afiliados.userId }),
     },
 
     sessions: {
-      user: r.one.users({
-        from: r.sessions.userId,
-        to: r.users.id,
-      }),
+      user: r.one.users({ from: r.sessions.userId, to: r.users.id }),
     },
-
     accounts: {
-      user: r.one.users({
-        from: r.accounts.userId,
-        to: r.users.id,
-      }),
+      user: r.one.users({ from: r.accounts.userId, to: r.users.id }),
     },
-
     administradores: {
-      user: r.one.users({
+      user: r.one.users({ from: r.administradores.userId, to: r.users.id }),
+      revisiones: r.many.revisiones({
         from: r.administradores.userId,
-        to: r.users.id,
+        to: r.revisiones.adminId,
       }),
     },
 
     afiliados: {
-      user: r.one.users({
+      user: r.one.users({ from: r.afiliados.userId, to: r.users.id }),
+      solicitudes: r.many.solicitudesAfiliado({
         from: r.afiliados.userId,
-        to: r.users.id,
+        to: r.solicitudesAfiliado.afiliadoId,
       }),
+    },
 
+    solicitudesAfiliado: {
+      afiliado: r.one.afiliados({
+        from: r.solicitudesAfiliado.afiliadoId,
+        to: r.afiliados.userId,
+      }),
       proyectosRelevantes: r.many.proyectosRelevantes({
-        from: r.afiliados.userId,
-        to: r.proyectosRelevantes.afiliadoId,
+        from: r.solicitudesAfiliado.id,
+        to: r.proyectosRelevantes.solicitudId,
       }),
-
       datosEmergencia: r.one.datosEmergencia({
-        from: r.afiliados.userId,
-        to: r.datosEmergencia.afiliadoId,
+        from: r.solicitudesAfiliado.id,
+        to: r.datosEmergencia.solicitudId,
       }),
-
+      revision: r.one.revisiones({
+        from: r.solicitudesAfiliado.id,
+        to: r.revisiones.solicitudId,
+      }),
       fotografia: r.one.archivos({
-        from: r.afiliados.fotografiaArchivoId,
+        from: r.solicitudesAfiliado.fotografiaArchivoId,
         to: r.archivos.id,
       }),
-
       comprobanteMembresia: r.one.archivos({
-        from: r.afiliados.comprobanteMembresiaArchivoId,
+        from: r.solicitudesAfiliado.comprobanteMembresiaArchivoId,
         to: r.archivos.id,
       }),
     },
 
     proyectosRelevantes: {
-      afiliado: r.one.afiliados({
-        from: r.proyectosRelevantes.afiliadoId,
-        to: r.afiliados.userId,
+      solicitud: r.one.solicitudesAfiliado({
+        from: r.proyectosRelevantes.solicitudId,
+        to: r.solicitudesAfiliado.id,
       }),
     },
 
     datosEmergencia: {
-      afiliado: r.one.afiliados({
-        from: r.datosEmergencia.afiliadoId,
-        to: r.afiliados.userId,
+      solicitud: r.one.solicitudesAfiliado({
+        from: r.datosEmergencia.solicitudId,
+        to: r.solicitudesAfiliado.id,
+      }),
+    },
+
+    revisiones: {
+      solicitud: r.one.solicitudesAfiliado({
+        from: r.revisiones.solicitudId,
+        to: r.solicitudesAfiliado.id,
+      }),
+      admin: r.one.administradores({
+        from: r.revisiones.adminId,
+        to: r.administradores.userId,
       }),
     },
 
     archivos: {
-      fotografiaAfiliados: r.many.afiliados({
+      fotografiaSolicitudes: r.many.solicitudesAfiliado({
         from: r.archivos.id,
-        to: r.afiliados.fotografiaArchivoId,
+        to: r.solicitudesAfiliado.fotografiaArchivoId,
       }),
-
-      comprobantesMembresiaAfiliados: r.many.afiliados({
+      comprobantesMembresiaSolicitudes: r.many.solicitudesAfiliado({
         from: r.archivos.id,
-        to: r.afiliados.comprobanteMembresiaArchivoId,
+        to: r.solicitudesAfiliado.comprobanteMembresiaArchivoId,
       }),
     },
   }),

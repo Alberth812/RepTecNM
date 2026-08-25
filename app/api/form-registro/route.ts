@@ -10,7 +10,13 @@ import { z } from "zod";
 export async function POST(request: Request) {
   const { afiliado } = await requireAfiliado();
 
-  if (afiliado.membershipStatus === "PENDIENTE_APROBACION") {
+  if (
+    !["NO_INICIADA", "REQUIERE_CORRECCION"].includes(afiliado.membershipStatus)
+  ) {
+    return NextResponse.json(
+      { message: "No puedes enviar el registro en tu estado actual." },
+      { status: 409 },
+    );
     /**
      * membershipStatus: "NO_INICIADA" | "PENDIENTE_APROBACION" | "REQUIERE_CORRECCION" | "RECHAZADO" | "ACTIVO" | "INACTIVO" | "SUSPENDIDO" | "BAJA"
      *
@@ -20,8 +26,6 @@ export async function POST(request: Request) {
      * ACTIVO -> signfica que ya fue aprobado así que no tiene sentido que envíe esto
      * */
   }
-
-  // (afiliado.membershipStatus === "PENDIENTE_APROBACION")
 
   let raw: Record<string, unknown>;
 
@@ -159,6 +163,10 @@ export async function POST(request: Request) {
         mostrarEnQr: data.privacidad_datos_emergencia,
       },
     });
+
+    await Promise.allSettled(
+      updatedAfiliado.archivosAEliminar.map((a) => deleteFile(a.objectKey)),
+    );
 
     /**
      * 3. Si la transacción de BD tuvo éxito, podemos eliminar

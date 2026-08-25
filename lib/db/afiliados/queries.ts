@@ -1,187 +1,162 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../client";
 import {
   afiliados,
   datosEmergencia,
   proyectosRelevantes,
-  type NewAfiliado,
+  solicitudesAfiliado,
   type NewDatosEmergencia,
   type NewProyectoRelevante,
+  type NewSolicitudAfiliado,
 } from "../schema/afiliados";
-import { archivos } from "../schema/archivo";
+import { archivos, type NewArchivo } from "../schema/archivo";
 
-export interface CreateAfiliadoInput {
-  afiliado: Omit<NewAfiliado, "id" | "createdAt" | "updatedAt">;
-  proyectos: Omit<NewProyectoRelevante, "id" | "afiliadoId">[];
+export async function updateAfiliado(input: {
+  userId: string;
+  archivos: {
+    fotografia: NewArchivo;
+    comprobanteMembresia: NewArchivo;
+  };
+  afiliado: Omit<
+    NewSolicitudAfiliado,
+    | "id"
+    | "afiliadoId"
+    | "tipo"
+    | "createdAt"
+    | "fotografiaArchivoId"
+    | "comprobanteMembresiaArchivoId"
+  >;
+  proyectos: Omit<NewProyectoRelevante, "id" | "solicitudId">[];
   datosEmergencia: Omit<
     NewDatosEmergencia,
-    "id" | "afiliadoId" | "createdAt" | "updatedAt"
+    "id" | "solicitudId" | "createdAt" | "updatedAt"
   >;
-}
-
-/**
- * Inserta el afiliado junto con sus proyectos relevantes y sus datos de
- * emergencia dentro de una única transacción: si cualquiera de los inserts
- * falla (p. ej. el correo ya está registrado), no queda ningún registro
- * huérfano en la base de datos.
- */
-export async function createAfiliado(input: CreateAfiliadoInput) {
+}) {
   return db.transaction(async (tx) => {
+    // Bloquea la fila para evitar que dos envíos concurrentes del mismo
+    // afiliado corrompan la rotación.
     const [afiliado] = await tx
-      .insert(afiliados)
-      .values(input.afiliado)
+      .select()
+      .from(afiliados)
+      .where(eq(afiliados.userId, input.userId))
+      .for("update");
+
+    if (!afiliado) {
+      throw new Error("Afiliado no encontrado");
+    }
+
+    // 1. La 'ANTERIOR' existente (si la hay) se descarta por completo.
+    const [anteriorPrevia] = await tx
+      .select()
+      .from(solicitudesAfiliado)
+      .where(
+        and(
+          eq(solicitudesAfiliado.afiliadoId, input.userId),
+          eq(solicitudesAfiliado.tipo, "ANTERIOR"),
+        ),
+      )
+      .limit(1);
+
+    let archivosAEliminar: {
+      bucket: string;
+      objectKey: string;
+    }[] = [];
+
+    if (anteriorPrevia) {
+      const archivosDescartados = await tx
+        .select({
+          id: archivos.id,
+          bucket: archivos.bucket,
+          objectKey: archivos.objectKey,
+        })
+        .from(archivos)
+        .where(
+          inArray(archivos.id, [
+            anteriorPrevia.fotografiaArchivoId,
+            anteriorPrevia.comprobanteMembresiaArchivoId,
+          ]),
+        );
+
+      // Borra la solicitud (cascada: proyectos, datos_emergencia, revision)
+      await tx
+        .delete(solicitudesAfiliado)
+        .where(eq(solicitudesAfiliado.id, anteriorPrevia.id));
+
+      // Ya no hay FK apuntando a estos archivos: se pueden borrar de Postgres.
+      await tx.delete(archivos).where(
+        inArray(
+          archivos.id,
+          archivosDescartados.map((a) => a.id),
+        ),
+      );
+
+      archivosAEliminar = archivosDescartados.map(({ bucket, objectKey }) => ({
+        bucket,
+        objectKey,
+      }));
+    }
+
+    // 2. La 'ACTUAL' existente pasa a ser 'ANTERIOR'.
+    await tx
+      .update(solicitudesAfiliado)
+      .set({ tipo: "ANTERIOR" })
+      .where(
+        and(
+          eq(solicitudesAfiliado.afiliadoId, input.userId),
+          eq(solicitudesAfiliado.tipo, "ACTUAL"),
+        ),
+      );
+
+    // 3. Insertamos los archivos de la nueva solicitud.
+    const [fotografia] = await tx
+      .insert(archivos)
+      .values(input.archivos.fotografia)
       .returning();
 
+    const [comprobante] = await tx
+      .insert(archivos)
+      .values(input.archivos.comprobanteMembresia)
+      .returning();
+
+    // 4. Insertamos la nueva solicitud como 'ACTUAL'.
+    const [nuevaSolicitud] = await tx
+      .insert(solicitudesAfiliado)
+      .values({
+        ...input.afiliado,
+        afiliadoId: input.userId,
+        tipo: "ACTUAL",
+        fotografiaArchivoId: fotografia.id,
+        comprobanteMembresiaArchivoId: comprobante.id,
+      })
+      .returning();
+
+    // 5. Proyectos y datos de emergencia de la nueva solicitud.
     if (input.proyectos.length > 0) {
       await tx.insert(proyectosRelevantes).values(
-        input.proyectos.map((proyecto) => ({
-          ...proyecto,
-          afiliadoId: afiliado.userId,
+        input.proyectos.map((p) => ({
+          ...p,
+          solicitudId: nuevaSolicitud.id,
         })),
       );
     }
 
     await tx.insert(datosEmergencia).values({
       ...input.datosEmergencia,
-      afiliadoId: afiliado.userId,
+      solicitudId: nuevaSolicitud.id,
     });
 
-    return afiliado;
-  });
-}
-
-export interface UpdateAfiliadoInput {
-  userId: string;
-
-  afiliado: Omit<
-    NewAfiliado,
-    "userId" | "createdAt" | "updatedAt" | "membershipStatus"
-  >;
-
-  proyectos: Omit<NewProyectoRelevante, "id" | "afiliadoId">[];
-
-  datosEmergencia: Omit<
-    NewDatosEmergencia,
-    "id" | "afiliadoId" | "createdAt" | "updatedAt"
-  >;
-
-  archivos: {
-    fotografia: {
-      bucket: string;
-      objectKey: string;
-      originalName: string;
-      contentType: string;
-      size: number;
-    };
-
-    comprobanteMembresia: {
-      bucket: string;
-      objectKey: string;
-      originalName: string;
-      contentType: string;
-      size: number;
-    };
-  };
-}
-
-export async function updateAfiliado(input: UpdateAfiliadoInput) {
-  return db.transaction(async (tx) => {
-    // 1. Actualizar datos principales
-    const [afiliado] = await tx
+    // 6. Estado de membresía.
+    await tx
       .update(afiliados)
       .set({
-        ...input.afiliado,
-        updatedAt: new Date(),
+        membershipStatus: "PENDIENTE_APROBACION",
       })
-      .where(eq(afiliados.userId, input.userId))
-      .returning();
+      .where(eq(afiliados.userId, input.userId));
 
-    if (!afiliado) {
-      throw new Error("Afiliado no encontrado");
-    }
-
-    // 2. Reemplazar proyectos
-    await tx
-      .delete(proyectosRelevantes)
-      .where(eq(proyectosRelevantes.afiliadoId, input.userId));
-
-    if (input.proyectos.length > 0) {
-      await tx.insert(proyectosRelevantes).values(
-        input.proyectos.map((proyecto) => ({
-          ...proyecto,
-          afiliadoId: input.userId,
-        })),
-      );
-    }
-
-    // 3. Upsert datos de emergencia
-    await tx
-      .insert(datosEmergencia)
-      .values({
-        ...input.datosEmergencia,
-        afiliadoId: input.userId,
-      })
-      .onConflictDoUpdate({
-        target: datosEmergencia.afiliadoId,
-        set: {
-          ...input.datosEmergencia,
-          updatedAt: new Date(),
-        },
-      });
-
-    // 4. Crear archivo de fotografía
-    const [fotografiaArchivo] = await tx
-      .insert(archivos)
-      .values({
-        bucket: input.archivos.fotografia.bucket,
-        objectKey: input.archivos.fotografia.objectKey,
-        originalName: input.archivos.fotografia.originalName,
-        contentType: input.archivos.fotografia.contentType,
-        size: input.archivos.fotografia.size,
-      })
-      .returning({
-        id: archivos.id,
-      });
-
-    if (!fotografiaArchivo) {
-      throw new Error("No se pudo crear el archivo de fotografía");
-    }
-
-    // 5. Crear archivo de comprobante de membresía
-    const [membresiaArchivo] = await tx
-      .insert(archivos)
-      .values({
-        bucket: input.archivos.comprobanteMembresia.bucket,
-        objectKey: input.archivos.comprobanteMembresia.objectKey,
-        originalName: input.archivos.comprobanteMembresia.originalName,
-        contentType: input.archivos.comprobanteMembresia.contentType,
-        size: input.archivos.comprobanteMembresia.size,
-      })
-      .returning({
-        id: archivos.id,
-      });
-
-    if (!membresiaArchivo) {
-      throw new Error(
-        "No se pudo crear el archivo de comprobante de membresía",
-      );
-    }
-
-    // 6. Asociar archivos al afiliado
-    const [afiliadoActualizado] = await tx
-      .update(afiliados)
-      .set({
-        fotografiaArchivoId: fotografiaArchivo.id,
-        comprobanteMembresiaArchivoId: membresiaArchivo.id,
-        updatedAt: new Date(),
-      })
-      .where(eq(afiliados.userId, input.userId))
-      .returning();
-
-    if (!afiliadoActualizado) {
-      throw new Error("No se pudo actualizar los archivos del afiliado");
-    }
-
-    return afiliadoActualizado;
+    return {
+      userId: input.userId,
+      solicitudId: nuevaSolicitud.id,
+      archivosAEliminar,
+    };
   });
 }
