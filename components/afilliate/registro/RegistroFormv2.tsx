@@ -20,6 +20,7 @@ import {
 } from "@/lib/registro/schema";
 import { buildRegistroFormData } from "@/lib/registro/formData";
 import { getImageDimensions } from "@/lib/registro/validators";
+import { urlToFile } from "@/lib/registro/prefill";
 import { FORM_STEPS } from "@/lib/registro/types";
 import StepIndicator from "./StepIndicator";
 import Step1DatosGenerales from "./steps/Step1DatosGenerales";
@@ -44,19 +45,13 @@ const LAST_STEP = FORM_STEPS.length - 1;
 const SUBMIT_ENDPOINT = "/api/form-registro";
 
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
+type PrefillStatus = "idle" | "loading" | "done" | "error";
 
 type ArchivoActualRef = { originalName: string; url: string };
 
 interface RegistroFormProps {
-  /**
-   * Presente solo cuando el afiliado está en REQUIERE_CORRECCION: valores
-   * ya enviados anteriormente (sin los archivos, que siempre se vuelven a
-   * adjuntar).
-   */
   initialData?: Omit<RegistroFormInput, "fotografia" | "comprobante_membresia">;
-  /** Observaciones del administrador que originaron la corrección. */
   observaciones?: string | null;
-  /** Referencias de solo lectura a los archivos del envío anterior. */
   archivosActuales?: {
     fotografia: ArchivoActualRef;
     comprobanteMembresia: ArchivoActualRef;
@@ -76,6 +71,10 @@ export default function RegistroForm({
   );
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [prefillStatus, setPrefillStatus] = useState<PrefillStatus>(
+    archivosActuales ? "loading" : "idle",
+  );
+  const [prefillError, setPrefillError] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   const schema = useMemo(
@@ -98,17 +97,74 @@ export default function RegistroForm({
     reValidateMode: "onChange",
   });
 
-  const { trigger, handleSubmit, getFieldState, formState } = methods;
+  const { trigger, handleSubmit, getFieldState, formState, setValue } = methods;
   const { isValid } = formState;
 
-  // Si venimos de una corrección, validamos de una vez para que el paso de
-  // archivos (que siempre arranca vacío) se marque en rojo desde el inicio.
   useEffect(() => {
     if (esCorreccion) {
       trigger();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Precarga la fotografía y el comprobante del envío anterior (si existen)
+  // para que el afiliado no tenga que descargarlos y volver a subirlos a
+  // mano. Si la descarga falla (URL firmada vencida, red, CORS, etc.) se
+  // deja constancia del error; el afiliado siempre puede usar los enlaces
+  // de solo lectura para revisarlos y subirlos manualmente.
+  useEffect(() => {
+    if (!archivosActuales) return;
+
+    let cancelled = false;
+    setPrefillStatus("loading");
+    setPrefillError(null);
+
+    (async () => {
+      const [fotoResult, comprobanteResult] = await Promise.allSettled([
+        urlToFile(
+          archivosActuales.fotografia.url,
+          archivosActuales.fotografia.originalName,
+        ),
+        urlToFile(
+          archivosActuales.comprobanteMembresia.url,
+          archivosActuales.comprobanteMembresia.originalName,
+        ),
+      ]);
+
+      if (cancelled) return;
+
+      if (fotoResult.status === "fulfilled") {
+        setValue("fotografia", fotoResult.value, {
+          shouldValidate: true,
+          shouldDirty: false,
+        });
+      }
+
+      if (comprobanteResult.status === "fulfilled") {
+        setValue("comprobante_membresia", comprobanteResult.value, {
+          shouldValidate: true,
+          shouldDirty: false,
+        });
+      }
+
+      if (
+        fotoResult.status === "rejected" ||
+        comprobanteResult.status === "rejected"
+      ) {
+        setPrefillStatus("error");
+        setPrefillError(
+          "No se pudieron precargar automáticamente uno o ambos archivos anteriores. Usa los enlaces de arriba para revisarlos y vuelve a subirlos manualmente en el paso 1.",
+        );
+      } else {
+        setPrefillStatus("done");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [archivosActuales]);
 
   const stepHasError = (index: number) =>
     STEP_FIELDS[index].some((field) => getFieldState(field, formState).invalid);
@@ -125,7 +181,7 @@ export default function RegistroForm({
   };
 
   const goToStep = (index: number) => {
-    if (index > furthestStep) return; // solo se puede saltar a pasos ya alcanzados
+    if (index > furthestStep) return;
     setCurrentStep(index);
     scrollToTop();
   };
@@ -235,15 +291,30 @@ export default function RegistroForm({
         <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
           <div className="flex items-start gap-2.5">
             <FileText className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="font-medium text-slate-700">
                 Archivos de tu envío anterior
               </p>
-              <p className="mt-1">
-                Debes volver a adjuntar tu fotografía y tu comprobante de
-                membresía en el paso 1 (puede ser el mismo archivo). Puedes
-                revisar lo que enviaste antes aquí:
-              </p>
+
+              {prefillStatus === "loading" && (
+                <p className="mt-1 flex items-center gap-1.5 text-slate-500">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Precargando tu fotografía y comprobante anteriores…
+                </p>
+              )}
+
+              {prefillStatus === "done" && (
+                <p className="mt-1">
+                  Ya precargamos tu fotografía y tu comprobante de membresía
+                  anteriores en el paso 1. Puedes dejarlos igual o reemplazarlos
+                  si lo necesitas.
+                </p>
+              )}
+
+              {prefillStatus === "error" && (
+                <p className="mt-1 text-amber-700">{prefillError}</p>
+              )}
+
               <ul className="mt-2 space-y-1">
                 <li>
                   <a
@@ -256,6 +327,7 @@ export default function RegistroForm({
                     {archivosActuales.fotografia.originalName})
                   </a>
                 </li>
+
                 <li>
                   <a
                     href={archivosActuales.comprobanteMembresia.url}

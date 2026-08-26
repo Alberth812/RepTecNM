@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Cropper, { type Area } from "react-easy-crop";
 import { RotateCcw, ZoomIn } from "lucide-react";
 import { PHOTO_MIN_HEIGHT, PHOTO_MIN_WIDTH } from "@/lib/registro/validators";
+import { getCroppedImageFile } from "@/lib/registro/cropImage";
 
 interface ImageCropperProps {
   file: File;
@@ -12,203 +14,72 @@ interface ImageCropperProps {
   onConfirm: (file: File) => void;
 }
 
-// Salida a 2x la resolución mínima exigida para dejar margen de calidad.
-const OUTPUT_WIDTH = PHOTO_MIN_WIDTH * 2; // 708
-const OUTPUT_HEIGHT = PHOTO_MIN_HEIGHT * 2; // 944
-//const ASPECT = OUTPUT_WIDTH / OUTPUT_HEIGHT; // 3:4
+const ASPECT = 3 / 4;
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 3;
 
-/** Recortador manual con paneo (arrastrar) y zoom, con relación de aspecto fija 3:4. */
+/** Recortador con relación de aspecto fija 3:4 (arrastre y pellizco en móvil). */
 export default function ImageCropper({
   file,
   onCancel,
   onConfirm,
 }: ImageCropperProps) {
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-
-  const [imageReady, setImageReady] = useState(false);
-  const [minScale, setMinScale] = useState(1);
-  const [scale, setScale] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y: 0 }); // en px del canvas de salida
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef<{
-    x: number;
-    y: number;
-    offsetX: number;
-    offsetY: number;
-  } | null>(null);
+  const [imageUrl] = useState(() => URL.createObjectURL(file));
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* const objectUrl = useMemo(() => URL.createObjectURL(file), [file]);
-
   useEffect(() => {
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [objectUrl]); 
+    return () => URL.revokeObjectURL(imageUrl);
+  }, [imageUrl]);
 
-  // Carga la imagen y calcula el zoom mínimo para "cubrir" el marco de salida.
-  useEffect(() => {
-    const img = new Image();
-    img.onload = () => {
-      if (img.naturalWidth < PHOTO_MIN_WIDTH || img.naturalHeight < PHOTO_MIN_HEIGHT) {
-        setError(
-          `La imagen es demasiado pequeña (${img.naturalWidth}x${img.naturalHeight}px). ` +
-            `Se requieren al menos ${PHOTO_MIN_WIDTH}x${PHOTO_MIN_HEIGHT}px.`
-        );
-      }
-      imageRef.current = img;
-      const coverScale = Math.max(
-        OUTPUT_WIDTH / img.naturalWidth,
-        OUTPUT_HEIGHT / img.naturalHeight
-      );
-      setMinScale(coverScale);
-      setScale(coverScale);
-      setOffset({ x: 0, y: 0 });
-      setImageReady(true);
-    };
-    img.onerror = () => setError("No se pudo cargar la imagen. Intenta con otro archivo.");
-    img.src = objectUrl;
-  }, [objectUrl]);*/
-
-  useEffect(() => {
-    let cancelled = false;
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-
-    img.onload = () => {
-      if (cancelled) return;
-      if (
-        img.naturalWidth < PHOTO_MIN_WIDTH ||
-        img.naturalHeight < PHOTO_MIN_HEIGHT
-      ) {
-        setError(
-          `La imagen es demasiado pequeña (${img.naturalWidth}x${img.naturalHeight}px). ` +
-            `Se requieren al menos ${PHOTO_MIN_WIDTH}x${PHOTO_MIN_HEIGHT}px.`,
-        );
-      }
-      imageRef.current = img;
-      const coverScale = Math.max(
-        OUTPUT_WIDTH / img.naturalWidth,
-        OUTPUT_HEIGHT / img.naturalHeight,
-      );
-      setMinScale(coverScale);
-      setScale(coverScale);
-      setOffset({ x: 0, y: 0 });
-      setImageReady(true);
-    };
-
-    img.onerror = () => {
-      if (cancelled) return;
-      setError("No se pudo cargar la imagen. Intenta con otro archivo.");
-    };
-
-    img.src = url;
-
-    return () => {
-      cancelled = true;
-      URL.revokeObjectURL(url);
-    };
-  }, [file]);
-
-  //------
-
-  const clampOffset = useCallback(
-    (x: number, y: number, currentScale: number) => {
-      const img = imageRef.current;
-      if (!img) return { x: 0, y: 0 };
-      const drawW = img.naturalWidth * currentScale;
-      const drawH = img.naturalHeight * currentScale;
-      const maxX = Math.max(0, (drawW - OUTPUT_WIDTH) / 2);
-      const maxY = Math.max(0, (drawH - OUTPUT_HEIGHT) / 2);
-      return {
-        x: Math.min(maxX, Math.max(-maxX, x)),
-        y: Math.min(maxY, Math.max(-maxY, y)),
-      };
+  const handleCropComplete = useCallback(
+    (_croppedArea: Area, croppedAreaPixelsValue: Area) => {
+      setCroppedAreaPixels(croppedAreaPixelsValue);
     },
     [],
   );
 
-  const draw = useCallback(() => {
-    const canvas = previewCanvasRef.current;
-    const img = imageRef.current;
-    if (!canvas || !img) return;
-    canvas.width = OUTPUT_WIDTH;
-    canvas.height = OUTPUT_HEIGHT;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.clearRect(0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
-    ctx.fillStyle = "#EDEDED";
-    ctx.fillRect(0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
-    const drawW = img.naturalWidth * scale;
-    const drawH = img.naturalHeight * scale;
-    const dx = (OUTPUT_WIDTH - drawW) / 2 + offset.x;
-    const dy = (OUTPUT_HEIGHT - drawH) / 2 + offset.y;
-    ctx.drawImage(img, dx, dy, drawW, drawH);
-  }, [scale, offset]);
-
-  useEffect(() => {
-    if (imageReady) draw();
-  }, [imageReady, draw]);
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!imageReady) return;
-    (e.target as Element).setPointerCapture(e.pointerId);
-    setIsDragging(true);
-    dragStart.current = {
-      x: e.clientX,
-      y: e.clientY,
-      offsetX: offset.x,
-      offsetY: offset.y,
-    };
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDragging || !dragStart.current || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const scaleFactor = OUTPUT_WIDTH / rect.width;
-    const dxScreen = (e.clientX - dragStart.current.x) * scaleFactor;
-    const dyScreen = (e.clientY - dragStart.current.y) * scaleFactor;
-    const next = clampOffset(
-      dragStart.current.offsetX + dxScreen,
-      dragStart.current.offsetY + dyScreen,
-      scale,
-    );
-    setOffset(next);
-  };
-
-  const handlePointerUp = () => {
-    setIsDragging(false);
-    dragStart.current = null;
-  };
-
-  const handleZoomChange = (value: number) => {
-    setScale(value);
-    setOffset((prev) => clampOffset(prev.x, prev.y, value));
-  };
+  const handleMediaLoaded = useCallback(
+    (mediaSize: { naturalWidth: number; naturalHeight: number }) => {
+      if (
+        mediaSize.naturalWidth < PHOTO_MIN_WIDTH ||
+        mediaSize.naturalHeight < PHOTO_MIN_HEIGHT
+      ) {
+        setError(
+          `La imagen es demasiado pequeña (${mediaSize.naturalWidth}x${mediaSize.naturalHeight}px). ` +
+            `Se requieren al menos ${PHOTO_MIN_WIDTH}x${PHOTO_MIN_HEIGHT}px.`,
+        );
+      }
+    },
+    [],
+  );
 
   const handleReset = () => {
-    setScale(minScale);
-    setOffset({ x: 0, y: 0 });
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
   };
 
-  const handleConfirm = () => {
-    const canvas = previewCanvasRef.current;
-    if (!canvas) return;
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          setError("No se pudo generar la imagen recortada. Intenta de nuevo.");
-          return;
-        }
-        const baseName = file.name.replace(/\.[^/.]+$/, "") || "fotografia";
-        const cropped = new File([blob], `${baseName}-recorte.jpg`, {
-          type: "image/jpeg",
-        });
-        onConfirm(cropped);
-      },
-      "image/jpeg",
-      0.92,
-    );
+  const handleConfirm = async () => {
+    if (!croppedAreaPixels) return;
+    setIsProcessing(true);
+    setError(null);
+    try {
+      const cropped = await getCroppedImageFile(
+        imageUrl,
+        croppedAreaPixels,
+        file.name,
+      );
+      onConfirm(cropped);
+    } catch {
+      setError(
+        "No se pudo generar la imagen recortada. Intenta con otro archivo.",
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -218,8 +89,7 @@ export default function ImageCropper({
           Recorta tu fotografía
         </h3>
         <p className="mt-1 text-sm text-slate-500">
-          Arrastra para mover y usa el control de zoom para ajustar el encuadre
-          (relación 3:4).
+          Arrastra o pellizca para ajustar el encuadre (relación 3:4).
         </p>
 
         {error && (
@@ -228,16 +98,20 @@ export default function ImageCropper({
           </p>
         )}
 
-        <div
-          ref={containerRef}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
-          className="mx-auto mt-4 aspect-3/4 w-56 touch-none select-none overflow-hidden rounded-xl border border-slate-200 shadow-inner"
-          style={{ cursor: isDragging ? "grabbing" : "grab" }}
-        >
-          <canvas ref={previewCanvasRef} className="h-full w-full" />
+        <div className="relative mx-auto mt-4 h-72 w-56 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-inner">
+          <Cropper
+            image={imageUrl}
+            crop={crop}
+            zoom={zoom}
+            aspect={ASPECT}
+            minZoom={MIN_ZOOM}
+            maxZoom={MAX_ZOOM}
+            restrictPosition
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={handleCropComplete}
+            onMediaLoaded={handleMediaLoaded}
+          />
         </div>
 
         <div className="mt-4 flex items-center gap-3">
@@ -248,12 +122,11 @@ export default function ImageCropper({
           <input
             type="range"
             aria-label="Zoom"
-            min={minScale}
-            max={minScale * 3}
-            step={minScale / 100}
-            value={scale}
-            onChange={(e) => handleZoomChange(Number(e.target.value))}
-            disabled={!imageReady}
+            min={MIN_ZOOM}
+            max={MAX_ZOOM}
+            step={0.01}
+            value={zoom}
+            onChange={(e) => setZoom(Number(e.target.value))}
             className="h-1.5 w-full appearance-none rounded-full bg-slate-200 accent-[#004B87]"
           />
           <button
@@ -277,10 +150,10 @@ export default function ImageCropper({
           <button
             type="button"
             onClick={handleConfirm}
-            disabled={!imageReady}
+            disabled={!croppedAreaPixels || isProcessing}
             className="rounded-lg bg-[#004B87] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Usar esta foto
+            {isProcessing ? "Procesando…" : "Usar esta foto"}
           </button>
         </div>
       </div>
