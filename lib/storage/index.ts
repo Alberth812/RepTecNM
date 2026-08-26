@@ -18,7 +18,6 @@ function getRequiredEnv(name: string): string {
   return value;
 }
 
-
 const endpoint = getRequiredEnv("S3_ENDPOINT");
 const region = getRequiredEnv("S3_REGION");
 const accessKeyId = getRequiredEnv("S3_ACCESS_KEY_ID");
