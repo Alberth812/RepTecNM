@@ -1,7 +1,6 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-
 import { useTheme } from "@/lib/use-theme";
 
 export function ThemeSwitcher() {
@@ -12,7 +11,9 @@ export function ThemeSwitcher() {
         type="button"
         onClick={() => setTheme("light")}
         className={`rounded-md p-1.5 transition-colors ${
-          theme === "light" ? "bg-background shadow-sm" : "hover:bg-background/50"
+          theme === "light"
+            ? "bg-background shadow-sm"
+            : "hover:bg-background/50"
         }`}
         title="Modo claro"
         aria-label="Modo claro"
@@ -23,7 +24,9 @@ export function ThemeSwitcher() {
         type="button"
         onClick={() => setTheme("dark")}
         className={`rounded-md p-1.5 transition-colors ${
-          theme === "dark" ? "bg-background shadow-sm" : "hover:bg-background/50"
+          theme === "dark"
+            ? "bg-background shadow-sm"
+            : "hover:bg-background/50"
         }`}
         title="Modo oscuro"
         aria-label="Modo oscuro"
