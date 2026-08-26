@@ -21,3 +21,5 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 current.md
+garage/garage-dev.toml
+garage/garage.toml
