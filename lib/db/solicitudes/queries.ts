@@ -13,6 +13,7 @@ import {
 } from "@/lib/db/schema/enums";
 import { emptyToNull } from "@/lib/registro/utils";
 import type { Afiliado } from "@/lib/db/schema/afiliados";
+import { foliosAnuales } from "../schema/foliosAnuales";
 
 const VERSIONES_A_CONSERVAR = 2;
 
@@ -386,6 +387,30 @@ const MEMBERSHIP_STATUS_POR_DECISION: Record<
   RECHAZADO: "RECHAZADO",
 };
 
+async function obtenerSiguienteFolio(tx: Tx): Promise<string> {
+  const anio = new Date().getFullYear();
+
+  const [contador] = await tx
+    .insert(foliosAnuales)
+    .values({
+      anio,
+      ultimoNumero: 1,
+    })
+    .onConflictDoUpdate({
+      target: foliosAnuales.anio,
+      set: {
+        ultimoNumero: sql`${foliosAnuales.ultimoNumero} + 1`,
+      },
+    })
+    .returning({
+      numero: foliosAnuales.ultimoNumero,
+    });
+
+  const numero = String(contador.numero).padStart(6, "0");
+
+  return `REP-${anio}-${numero}`;
+}
+
 /**
  * Copia el snapshot de la solicitud aprobada como datos definitivos del
  * afiliado. No sube archivos nuevos: reapunta los mismos `archivos.id` que
@@ -398,6 +423,8 @@ async function finalizarAfiliado(
 ) {
   const datos = params.solicitud.datos;
 
+  const folio = await obtenerSiguienteFolio(tx);
+
   await tx
     .update(afiliados)
     .set({
@@ -409,6 +436,8 @@ async function finalizarAfiliado(
       fotografiaArchivoId: params.solicitud.fotografiaArchivoId,
       comprobanteMembresiaArchivoId:
         params.solicitud.comprobanteMembresiaArchivoId,
+
+      folio,
 
       telefonoCelular: datos.telefono_celular,
       telefonoCasa: emptyToNull(datos.telefono_casa),

@@ -40,6 +40,10 @@ export const afiliados = pgTable("afiliados", {
   // cooldown de 15 días. NULL si nunca ha cambiado su correo.
   lastEmailChangeAt: timestamp("last_email_change_at", { withTimezone: true }),
 
+  // Folio
+  // REP-{año actual}-{6 digitos}
+  folio: varchar("folio", { length: 15 }).unique(),
+
   // Contacto
   telefonoCelular: varchar("telefono_celular", { length: 10 }) /* .notNull() */,
   telefonoCasa: varchar("telefono_casa", { length: 10 }),

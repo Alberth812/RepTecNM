@@ -1,0 +1,6 @@
+# dxflrs/garage es distroless (sin /bin/sh), así que copiamos
+# solo el binario a una imagen que sí tenga shell.
+FROM dxflrs/garage:v2.3.0 AS garage-bin
+
+FROM alpine:3.21
+COPY --from=garage-bin /garage /usr/local/bin/garage

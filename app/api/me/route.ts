@@ -36,7 +36,7 @@ export async function GET() {
     }
 
     const [profile] = await db
-      .select({ membershipStatus: afiliados.membershipStatus })
+      .select({ membershipStatus: afiliados.membershipStatus, folio: afiliados.folio })
       .from(afiliados)
       .where(eq(afiliados.userId, session.user.id))
       .limit(1);
@@ -45,6 +45,7 @@ export async function GET() {
       id: session.user.id,
       email: session.user.email,
       role: session.user.role,
+      folio: profile.folio,
       membershipStatus: profile?.membershipStatus ?? null,
     });
   } catch (error) {

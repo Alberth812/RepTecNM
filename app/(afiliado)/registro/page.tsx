@@ -22,8 +22,8 @@ export default async function Page() {
     }
 
     const [fotografiaUrl, comprobanteUrl] = await Promise.all([
-      getFileUrl(solicitud.fotografia.objectKey),
-      getFileUrl(solicitud.comprobanteMembresia.objectKey),
+      getFileUrl("afiliados", solicitud.fotografia.objectKey),
+      getFileUrl("afiliados", solicitud.comprobanteMembresia.objectKey),
     ]);
 
     return (

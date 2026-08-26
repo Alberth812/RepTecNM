@@ -54,12 +54,14 @@ export async function POST(request: Request) {
 
   try {
     fotografia = await uploadFile({
+      target: "afiliados",
       file: data.fotografia,
       ownerId: afiliado.userId,
       folder: "fotografia",
     });
 
     membresia = await uploadFile({
+      target: "afiliados",
       file: data.comprobante_membresia,
       ownerId: afiliado.userId,
       folder: "membresia",
@@ -91,7 +93,7 @@ export async function POST(request: Request) {
     // quedarían objetos huérfanos en Garage, limpiables después.
     if (archivosParaEliminar.length > 0) {
       await Promise.allSettled(
-        archivosParaEliminar.map((a) => deleteFile(a.objectKey)),
+        archivosParaEliminar.map((a) => deleteFile("afiliados", a.objectKey)),
       );
     }
 
@@ -124,5 +126,7 @@ async function cleanupUploadedFiles(
   const files = [fotografia, membresia].filter(
     (file): file is NonNullable<typeof file> => file !== null,
   );
-  await Promise.allSettled(files.map((file) => deleteFile(file.objectKey)));
+  await Promise.allSettled(
+    files.map((file) => deleteFile("afiliados", file.objectKey)),
+  );
 }

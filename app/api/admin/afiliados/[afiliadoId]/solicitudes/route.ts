@@ -63,7 +63,11 @@ export async function GET(
         originalName: v.fotografia.originalName,
         contentType: v.fotografia.contentType,
         size: v.fotografia.size,
-        url: await getFileUrl(v.fotografia.objectKey, URL_EXPIRACION_SEGUNDOS),
+        url: await getFileUrl(
+          "afiliados",
+          v.fotografia.objectKey,
+          URL_EXPIRACION_SEGUNDOS,
+        ),
       },
       comprobanteMembresia: {
         id: v.comprobanteMembresia.id,
@@ -71,6 +75,7 @@ export async function GET(
         contentType: v.comprobanteMembresia.contentType,
         size: v.comprobanteMembresia.size,
         url: await getFileUrl(
+          "afiliados",
           v.comprobanteMembresia.objectKey,
           URL_EXPIRACION_SEGUNDOS,
         ),

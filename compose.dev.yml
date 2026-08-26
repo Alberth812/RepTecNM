@@ -21,18 +21,27 @@ services:
     command: sh -c "corepack enable && pnpm next dev --webpack --hostname 0.0.0.0"
     environment:
       NODE_ENV: development
-
       DATABASE_URL: postgresql://app:app_dev_password@postgres:5432/app
+
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
 
       S3_INTERNAL_ENDPOINT: http://garage:3900
       S3_PUBLIC_ENDPOINT: http://s3.localhost:3000
-
       S3_REGION: garage
-      S3_BUCKET: ${GARAGE_DEFAULT_BUCKET}
-      S3_ACCESS_KEY_ID: ${GARAGE_DEFAULT_ACCESS_KEY}
-      S3_SECRET_ACCESS_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
-
       S3_FORCE_PATH_STYLE: "true"
+
+      S3_AFFILIATES_BUCKET: ${GARAGE_AFFILIATES_BUCKET}
+      S3_AFFILIATES_ACCESS_KEY_ID: ${GARAGE_AFFILIATES_ACCESS_KEY}
+      S3_AFFILIATES_SECRET_ACCESS_KEY: ${GARAGE_AFFILIATES_SECRET_KEY}
+
+      S3_CMS_BUCKET: ${GARAGE_CMS_BUCKET}
+      S3_CMS_ACCESS_KEY_ID: ${GARAGE_CMS_ACCESS_KEY}
+      S3_CMS_SECRET_ACCESS_KEY: ${GARAGE_CMS_SECRET_KEY}
+
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      PAYLOAD_SERVER_URL: ${PAYLOAD_SERVER_URL}
 
     volumes:
       - ./:/app
@@ -46,6 +55,10 @@ services:
         condition: service_healthy
       garage:
         condition: service_started
+      garage-init:
+        condition: service_completed_successfully
+      garage-cors-init:
+        condition: service_completed_successfully
 
     networks:
       - app
@@ -73,56 +86,104 @@ services:
   garage:
     image: dxflrs/garage:v2.3.0
     container_name: dev-garage
+    restart: unless-stopped
     command:
       - /garage
       - server
       - --single-node
-      - --default-bucket
-    environment:
-      GARAGE_DEFAULT_ACCESS_KEY: ${GARAGE_DEFAULT_ACCESS_KEY}
-      GARAGE_DEFAULT_SECRET_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
-      GARAGE_DEFAULT_BUCKET: ${GARAGE_DEFAULT_BUCKET}
     volumes:
-      - ./garage/garage-dev.toml:/etc/garage.toml:ro
+      - ./garage/garage.dev.toml:/etc/garage.toml:ro
       - garage_meta:/var/lib/garage/meta
       - garage_data:/var/lib/garage/data
     expose:
       - "3900"
+      - "3901"
+      - "3902"
     networks:
       - backend
 
+  garage-init:
+    build:
+      context: ./garage
+      dockerfile: Dockerfile.init
+    container_name: dev-garage-init
+    depends_on:
+      garage:
+        condition: service_started
+    # Comparte el network namespace de "garage" para poder hablar
+    # por RPC (3901) igual que si hicieras "docker exec garage ...".
+    network_mode: "service:garage"
+    environment:
+      GARAGE_CONFIG_FILE: /etc/garage.toml
+      GARAGE_AFFILIATES_BUCKET: ${GARAGE_AFFILIATES_BUCKET}
+      GARAGE_AFFILIATES_ACCESS_KEY: ${GARAGE_AFFILIATES_ACCESS_KEY}
+      GARAGE_AFFILIATES_SECRET_KEY: ${GARAGE_AFFILIATES_SECRET_KEY}
+      GARAGE_CMS_BUCKET: ${GARAGE_CMS_BUCKET}
+      GARAGE_CMS_ACCESS_KEY: ${GARAGE_CMS_ACCESS_KEY}
+      GARAGE_CMS_SECRET_KEY: ${GARAGE_CMS_SECRET_KEY}
+    volumes:
+      - ./garage/garage.dev.toml:/etc/garage.toml:ro
+      - garage_meta:/var/lib/garage/meta:ro
+      - ./garage/init.sh:/init.sh:ro
+    entrypoint: ["/bin/sh", "/init.sh"]
+    restart: "no"
+
   garage-cors-init:
-    image: amazon/aws-cli:2
+    image: amazon/aws-cli:2.36.33
     container_name: dev-garage-cors-init
     depends_on:
       garage:
         condition: service_started
+      garage-init:
+        condition: service_completed_successfully
     environment:
-      AWS_ACCESS_KEY_ID: ${GARAGE_DEFAULT_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
       AWS_DEFAULT_REGION: garage
+      GARAGE_AFFILIATES_BUCKET: ${GARAGE_AFFILIATES_BUCKET}
+      GARAGE_AFFILIATES_ACCESS_KEY: ${GARAGE_AFFILIATES_ACCESS_KEY}
+      GARAGE_AFFILIATES_SECRET_KEY: ${GARAGE_AFFILIATES_SECRET_KEY}
+      GARAGE_CMS_BUCKET: ${GARAGE_CMS_BUCKET}
+      GARAGE_CMS_ACCESS_KEY: ${GARAGE_CMS_ACCESS_KEY}
+      GARAGE_CMS_SECRET_KEY: ${GARAGE_CMS_SECRET_KEY}
     volumes:
       - ./garage/cors-development.json:/cors.json:ro
-    entrypoint: >
-      sh -c "
-        until aws s3api head-bucket
-          --bucket ${GARAGE_DEFAULT_BUCKET}
-          --endpoint-url http://garage:3900;
-        do
-          echo 'Waiting for Garage...';
-          sleep 3;
-        done;
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
 
-        aws s3api put-bucket-cors
-          --bucket ${GARAGE_DEFAULT_BUCKET}
-          --endpoint-url http://garage:3900
-          --region garage
-          --cors-configuration file:///cors.json;
+        configure_cors() {
+          bucket_name="$$1"
+          access_key="$$2"
+          secret_key="$$3"
 
-        echo 'Garage CORS configured';
-      "
+          export AWS_ACCESS_KEY_ID="$${access_key}"
+          export AWS_SECRET_ACCESS_KEY="$${secret_key}"
+
+          echo "Esperando bucket $${bucket_name}..."
+          until aws s3api head-bucket \
+            --bucket "$${bucket_name}" \
+            --endpoint-url "http://garage:3900" \
+            --region garage
+          do
+            sleep 3
+          done
+
+          echo "Configurando CORS en $${bucket_name}..."
+          aws s3api put-bucket-cors \
+            --bucket "$${bucket_name}" \
+            --endpoint-url "http://garage:3900" \
+            --region garage \
+            --cors-configuration file:///cors.json
+
+          echo "CORS listo en $${bucket_name}."
+        }
+
+        configure_cors "$${GARAGE_AFFILIATES_BUCKET}" "$${GARAGE_AFFILIATES_ACCESS_KEY}" "$${GARAGE_AFFILIATES_SECRET_KEY}"
+        configure_cors "$${GARAGE_CMS_BUCKET}" "$${GARAGE_CMS_ACCESS_KEY}" "$${GARAGE_CMS_SECRET_KEY}"
     networks:
       - backend
+    restart: "no"
 
   mailpit:
     image: axllent/mailpit:v1.31

@@ -8,64 +8,65 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "node:crypto";
 import path from "node:path";
 
-import { storageConfig } from "./config";
+import { storageConfig, type StorageTarget } from "./config";
 
-const commonClientOptions = {
-  region: storageConfig.region,
-  credentials: {
-    accessKeyId: storageConfig.accessKeyId,
-    secretAccessKey: storageConfig.secretAccessKey,
-  },
-  forcePathStyle: storageConfig.forcePathStyle,
-};
+function buildClient(endpoint: string, target: StorageTarget): S3Client {
+  const creds = storageConfig.buckets[target];
+  return new S3Client({
+    region: storageConfig.region,
+    endpoint,
+    forcePathStyle: storageConfig.forcePathStyle,
+    credentials: {
+      accessKeyId: creds.accessKeyId,
+      secretAccessKey: creds.secretAccessKey,
+    },
+  });
+}
+
+// Un cliente por bucket y por "vista" (interna vs pública), creados
+// perezosamente y cacheados.
+const internalClients = new Map<StorageTarget, S3Client>();
+const publicClients = new Map<StorageTarget, S3Client>();
+
+function getInternalClient(target: StorageTarget): S3Client {
+  let client = internalClients.get(target);
+  if (!client) {
+    client = buildClient(storageConfig.internalEndpoint, target);
+    internalClients.set(target, client);
+  }
+  return client;
+}
+
+function getPublicClient(target: StorageTarget): S3Client {
+  let client = publicClients.get(target);
+  if (!client) {
+    client = buildClient(storageConfig.publicEndpoint, target);
+    publicClients.set(target, client);
+  }
+  return client;
+}
 
 /**
- * Cliente utilizado exclusivamente para operaciones internas
- * del servidor contra Garage/S3.
- *
- * Ejemplos:
- * - PUT
- * - DELETE
- */
-const s3Internal = new S3Client({
-  ...commonClientOptions,
-  endpoint: storageConfig.internalEndpoint,
-});
-
-/**
- * Cliente utilizado para generar URLs que serán consumidas
- * por el navegador.
- *
- * IMPORTANTE:
- * El endpoint de este cliente debe ser accesible por el navegador,
- * porque forma parte de la URL presignada.
- */
-const s3Public = new S3Client({
-  ...commonClientOptions,
-  endpoint: storageConfig.publicEndpoint,
-});
-
-/**
- * Genera una URL firmada de solo lectura para un objeto.
- *
- * La URL generada utiliza S3_PUBLIC_ENDPOINT, no
- * S3_INTERNAL_ENDPOINT.
+ * Genera una URL firmada de solo lectura para un objeto de un bucket
+ * específico. Usa S3_PUBLIC_ENDPOINT porque la URL la consume el navegador.
  */
 export async function getFileUrl(
+  target: StorageTarget,
   objectKey: string,
-  expiresInSeconds = 900, // 15 minutos
+  expiresInSeconds = 900,
 ): Promise<string> {
   const command = new GetObjectCommand({
-    Bucket: storageConfig.bucket,
+    Bucket: storageConfig.buckets[target].bucket,
     Key: objectKey,
   });
 
-  return getSignedUrl(s3Public, command, {
+  return getSignedUrl(getPublicClient(target), command, {
     expiresIn: expiresInSeconds,
   });
 }
 
 export interface UploadedFile {
+  target: StorageTarget;
   bucket: string;
   objectKey: string;
   originalName: string;
@@ -74,12 +75,14 @@ export interface UploadedFile {
 }
 
 interface UploadFileOptions {
+  target: StorageTarget;
   file: File;
   ownerId: string;
-  folder: "fotografia" | "membresia";
+  folder: string;
 }
 
 export async function uploadFile({
+  target,
   file,
   ownerId,
   folder,
@@ -89,19 +92,18 @@ export async function uploadFile({
   }
 
   const extension = getExtension(file);
-
+  // Ya no hace falta prefijar con "afiliados/": el bucket mismo
+  // separa el namespace.
   const objectKey = [
-    "afiliados",
     ownerId,
     folder,
     `${crypto.randomUUID()}${extension}`,
   ].join("/");
-
   const body = Buffer.from(await file.arrayBuffer());
 
-  await s3Internal.send(
+  await getInternalClient(target).send(
     new PutObjectCommand({
-      Bucket: storageConfig.bucket,
+      Bucket: storageConfig.buckets[target].bucket,
       Key: objectKey,
       Body: body,
       ContentType: file.type || "application/octet-stream",
@@ -110,7 +112,8 @@ export async function uploadFile({
   );
 
   return {
-    bucket: storageConfig.bucket,
+    target,
+    bucket: storageConfig.buckets[target].bucket,
     objectKey,
     originalName: file.name,
     contentType: file.type || "application/octet-stream",
@@ -118,10 +121,13 @@ export async function uploadFile({
   };
 }
 
-export async function deleteFile(objectKey: string): Promise<void> {
-  await s3Internal.send(
+export async function deleteFile(
+  target: StorageTarget,
+  objectKey: string,
+): Promise<void> {
+  await getInternalClient(target).send(
     new DeleteObjectCommand({
-      Bucket: storageConfig.bucket,
+      Bucket: storageConfig.buckets[target].bucket,
       Key: objectKey,
     }),
   );
@@ -129,24 +135,16 @@ export async function deleteFile(objectKey: string): Promise<void> {
 
 function getExtension(file: File): string {
   const extensionFromName = path.extname(file.name).toLowerCase();
-
-  if (extensionFromName) {
-    return extensionFromName;
-  }
-
+  if (extensionFromName) return extensionFromName;
   switch (file.type) {
     case "image/jpeg":
       return ".jpg";
-
     case "image/png":
       return ".png";
-
     case "image/webp":
       return ".webp";
-
     case "application/pdf":
       return ".pdf";
-
     default:
       return "";
   }

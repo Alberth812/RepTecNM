@@ -6,6 +6,7 @@ export interface MeResponse {
   role: "ADMINISTRADOR" | "AFILIADO";
   // Solo presentes cuando role === "ADMINISTRADOR"
   subtype?: string | null;
+  folio: string | null;
   isRoot?: boolean;
   // Solo presente cuando role === "AFILIADO"
   membershipStatus?: string | null;
