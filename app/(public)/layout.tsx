@@ -36,12 +36,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <SoloNoAdmin>
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
         <div className="flex h-16 w-full items-center justify-between px-4 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 text-primary">
-            <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 rounded-lg object-cover object-[center_15%] ring-1 ring-border" />
-            <span className="text-xl font-bold tracking-tight">
-              REP-<span className="font-light">TecNM</span>
-            </span>
-          </Link>
+          <LogoResponsivo />
 
           <SoloVisitante><nav className="hidden items-center gap-5 text-sm font-medium text-zinc-700 lg:flex">
             <Link href="/" className="hover:text-primary">Inicio</Link>
