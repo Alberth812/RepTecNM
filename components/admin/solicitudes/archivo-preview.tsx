@@ -49,6 +49,7 @@ export function ArchivoPreview({
           <Button
             variant="outline"
             size="sm"
+            nativeButton={false}
             render={<a href={archivo.url} target="_blank" rel="noreferrer" />}
           >
             <ExternalLink className="h-3.5 w-3.5" />

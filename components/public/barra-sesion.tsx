@@ -9,7 +9,15 @@ import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/public/theme-switcher";
 import { useRol } from "@/lib/use-rol";
 
-const RUTAS_CON_SIDEBAR = ["/credencial", "/catalogo", "/repositorio", "/mensajeria", "/seguimiento", "/notificaciones", "/ajustes"];
+const RUTAS_CON_SIDEBAR = [
+  "/credencial",
+  "/catalogo",
+  "/repositorio",
+  "/mensajeria",
+  "/seguimiento",
+  "/notificaciones",
+  "/ajustes",
+];
 
 export function BarraSesion() {
   const { rol, nombre, cambiar } = useRol();
@@ -30,15 +38,20 @@ export function BarraSesion() {
         <span className="flex items-center gap-2">
           <AvatarSesion />
           <span className="hidden text-sm font-medium lg:block">
-            {nombre || (rol === "admin" ? "Administración RepTecNM" : "María Fernanda López Herrera")}
+            {nombre ||
+              (rol === "admin"
+                ? "Administración RepTecNM"
+                : "María Fernanda López Herrera")}
           </span>
         </span>
       )}
 
       {rol === "visitante" && (
         <>
-          <Link href="/registro">
-            <Button className="bg-amber-400 text-amber-950 hover:bg-amber-300">¿Eres nuevo? Afíliate</Button>
+          <Link href="/register">
+            <Button className="bg-amber-400 text-amber-950 hover:bg-amber-300">
+              ¿Eres nuevo? Afíliate
+            </Button>
           </Link>
           <Link href="/login">
             <Button>Iniciar sesión</Button>
