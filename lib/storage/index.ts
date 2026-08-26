@@ -1,52 +1,68 @@
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "node:crypto";
 import path from "node:path";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
+import { storageConfig } from "./config";
 
-  if (!value) {
-    throw new Error(`Falta la variable de entorno: ${name}`);
-  }
-
-  return value;
-}
-
-const endpoint = getRequiredEnv("S3_ENDPOINT");
-const region = getRequiredEnv("S3_REGION");
-const accessKeyId = getRequiredEnv("S3_ACCESS_KEY_ID");
-const secretAccessKey = getRequiredEnv("S3_SECRET_ACCESS_KEY");
-const bucket = getRequiredEnv("S3_BUCKET");
-
-export const s3 = new S3Client({
-  endpoint,
-  region,
+const commonClientOptions = {
+  region: storageConfig.region,
   credentials: {
-    accessKeyId,
-    secretAccessKey,
+    accessKeyId: storageConfig.accessKeyId,
+    secretAccessKey: storageConfig.secretAccessKey,
   },
+  forcePathStyle: storageConfig.forcePathStyle,
+};
 
-  // Muy útil con servicios S3 compatibles como Garage.
-  forcePathStyle: true,
+/**
+ * Cliente utilizado exclusivamente para operaciones internas
+ * del servidor contra Garage/S3.
+ *
+ * Ejemplos:
+ * - PUT
+ * - DELETE
+ */
+const s3Internal = new S3Client({
+  ...commonClientOptions,
+  endpoint: storageConfig.internalEndpoint,
 });
 
 /**
- * Genera una URL firmada de solo lectura para un objeto de Garage.
- * Se usa para mostrar/descargar archivos privados (fotografía, comprobante)
- * en el panel de administración, sin hacer el bucket público.
+ * Cliente utilizado para generar URLs que serán consumidas
+ * por el navegador.
+ *
+ * IMPORTANTE:
+ * El endpoint de este cliente debe ser accesible por el navegador,
+ * porque forma parte de la URL presignada.
+ */
+const s3Public = new S3Client({
+  ...commonClientOptions,
+  endpoint: storageConfig.publicEndpoint,
+});
+
+/**
+ * Genera una URL firmada de solo lectura para un objeto.
+ *
+ * La URL generada utiliza S3_PUBLIC_ENDPOINT, no
+ * S3_INTERNAL_ENDPOINT.
  */
 export async function getFileUrl(
   objectKey: string,
   expiresInSeconds = 900, // 15 minutos
 ): Promise<string> {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: objectKey });
-  return getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
+  const command = new GetObjectCommand({
+    Bucket: storageConfig.bucket,
+    Key: objectKey,
+  });
+
+  return getSignedUrl(s3Public, command, {
+    expiresIn: expiresInSeconds,
+  });
 }
 
 export interface UploadedFile {
@@ -83,9 +99,9 @@ export async function uploadFile({
 
   const body = Buffer.from(await file.arrayBuffer());
 
-  await s3.send(
+  await s3Internal.send(
     new PutObjectCommand({
-      Bucket: bucket,
+      Bucket: storageConfig.bucket,
       Key: objectKey,
       Body: body,
       ContentType: file.type || "application/octet-stream",
@@ -94,7 +110,7 @@ export async function uploadFile({
   );
 
   return {
-    bucket,
+    bucket: storageConfig.bucket,
     objectKey,
     originalName: file.name,
     contentType: file.type || "application/octet-stream",
@@ -103,9 +119,9 @@ export async function uploadFile({
 }
 
 export async function deleteFile(objectKey: string): Promise<void> {
-  await s3.send(
+  await s3Internal.send(
     new DeleteObjectCommand({
-      Bucket: bucket,
+      Bucket: storageConfig.bucket,
       Key: objectKey,
     }),
   );
@@ -121,12 +137,16 @@ function getExtension(file: File): string {
   switch (file.type) {
     case "image/jpeg":
       return ".jpg";
+
     case "image/png":
       return ".png";
+
     case "image/webp":
       return ".webp";
+
     case "application/pdf":
       return ".pdf";
+
     default:
       return "";
   }
