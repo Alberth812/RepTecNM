@@ -1,6 +1,9 @@
 "use client";
+import { AvisoDemo } from "@/components/public/aviso-demo";
+import { useRol } from "@/lib/use-rol";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Download, Eye, FilePlus2, FileText, Flag, MessageSquareText, PencilLine,
@@ -23,22 +26,20 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { documentosIniciales, type Documento } from "@/lib/mock/repositorio";
+import { COMENTARIOS_INICIALES, type Comentario } from "@/lib/mock/comentarios";
 
 const ANIO_ACTUAL = new Date().getFullYear();
 const TIPOS = ["Artículo", "Tesis", "Libro", "Memoria de congreso", "Presentación", "Ensayo", "Reporte técnico", "Otro"];
+const MOTIVOS_RETIRO = [
+  "Autoría no verificada",
+  "Incongruencias en los datos",
+  "Contenido duplicado",
+  "Incumplimiento del aviso de privacidad",
+  "Derechos de autor / plagio",
+  "Otro",
+];
+
 const MOTIVOS_REPORTE = ["Derechos de autor", "Contenido inapropiado", "Información confidencial", "Plagio", "Spam", "Otro"];
-
-interface Comentario { autor: string; texto: string; fecha: string }
-
-const COMENTARIOS_INICIALES: Record<string, Comentario[]> = {
-  "DOC-2026-0001": [
-    { autor: "Jorge Alberto Ramírez Soto", texto: "Excelente trabajo de campo. ¿Compartirán el dataset de lecturas?", fecha: "12 ago 2026" },
-    { autor: "Gabriela Sánchez Moreno", texto: "Muy útil como referencia para mi proyecto de sensores en salud.", fecha: "11 ago 2026" },
-  ],
-  "DOC-2026-0002": [
-    { autor: "Ricardo Pérez Castillo", texto: "¿El modelo está disponible como código abierto?", fecha: "09 ago 2026" },
-  ],
-};
 
 interface FormDoc {
   titulo: string; resumen: string; tipo: string; otroTipo: string; anio: string;
@@ -86,6 +87,14 @@ function SeccionForm({ titulo, children }: { titulo: string; children: ReactNode
 }
 
 export default function RepositorioPage() {
+  return (
+    <Suspense fallback={<div className="flex h-64 items-center justify-center text-muted-foreground">Cargando...</div>}>
+      <RepositorioPageInner />
+    </Suspense>
+  );
+}
+
+function RepositorioPageInner() {
   const [docs, setDocs] = useState(documentosIniciales);
   const [busqueda, setBusqueda] = useState("");
   const [sheetAbierto, setSheetAbierto] = useState(false);
@@ -97,10 +106,20 @@ export default function RepositorioPage() {
   const [detalleReporte, setDetalleReporte] = useState("");
   const [reportados, setReportados] = useState<string[]>([]);
   const [eliminando, setEliminando] = useState<Documento | null>(null);
+  const [retirando, setRetirando] = useState<Documento | null>(null);
+  const [motivoRetiro, setMotivoRetiro] = useState("");
+  const [detalleRetiro, setDetalleRetiro] = useState("");
+  const { rol } = useRol();
   const [viendo, setViendo] = useState<Documento | null>(null);
   const [foroAbierto, setForoAbierto] = useState<string | null>(null);
   const [comentarios, setComentarios] = useState<Record<string, Comentario[]>>(COMENTARIOS_INICIALES);
   const [textoComentario, setTextoComentario] = useState("");
+  const paramsUrl = useSearchParams();
+  const qUrl = paramsUrl.get("q");
+
+  useEffect(() => {
+    if (qUrl) setBusqueda(qUrl);
+  }, [qUrl]);
 
   const resultados = useMemo(() => {
     const terminos = normalizar(busqueda).split(/\s+/).filter(Boolean);
@@ -173,6 +192,40 @@ export default function RepositorioPage() {
     setSheetAbierto(false);
   };
 
+
+  const confirmarRetiro = () => {
+    if (!retirando || !motivoRetiro) { toast.error("Selecciona un motivo."); return; }
+    if (motivoRetiro === "Otro") {
+      const len = detalleRetiro.trim().length;
+      if (len < 10 || len > 300) { toast.error("Describe el motivo (10 a 300 caracteres)."); return; }
+    }
+    const motivoFinal = motivoRetiro === "Otro" ? detalleRetiro.trim() : motivoRetiro;
+    setDocs((prev) => prev.filter((d) => d.id !== retirando.id));
+    const reportes = JSON.parse(localStorage.getItem("rep-reportes-admin") ?? "[]");
+    reportes.unshift({
+      id: `RET-${Date.now()}`,
+      tipo: "Retiro de publicación",
+      documento: retirando.titulo,
+      afiliado: retirando.afiliado,
+      motivo: motivoFinal,
+      fecha: new Date().toISOString().slice(0, 10),
+    });
+    localStorage.setItem("rep-reportes-admin", JSON.stringify(reportes));
+    const notis = JSON.parse(localStorage.getItem("rep-notificaciones") ?? "[]");
+    notis.unshift({
+      id: `NOT-${Date.now()}`,
+      destinatario: retirando.afiliado,
+      documento: retirando.titulo,
+      motivo: motivoFinal,
+      fecha: new Date().toISOString().slice(0, 10),
+    });
+    localStorage.setItem("rep-notificaciones", JSON.stringify(notis));
+    toast.success(`Publicación retirada y ${retirando.afiliado} notificado del motivo.`);
+    setRetirando(null);
+    setMotivoRetiro("");
+    setDetalleRetiro("");
+  };
+
   const confirmarReporte = () => {
     if (!reportando || !motivoReporte) { toast.error("Selecciona un motivo."); return; }
     if (motivoReporte === "Otro") {
@@ -206,10 +259,7 @@ export default function RepositorioPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-        Entorno de demostración: vista como afiliado ACTIVO. En producción, el acceso
-        requiere autenticación (RF-DOC-008).
-      </div>
+      <AvisoDemo />
 
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
@@ -233,9 +283,38 @@ export default function RepositorioPage() {
 
       <div className="grid gap-4">
         {resultados.map((d) => (
-          <div key={d.id} className="rounded-2xl border bg-card p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
+          <div key={d.id} className="rounded-2xl border bg-card p-5 transition-shadow hover:shadow-lg">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => setViendo(d)}
+                className="group/thumb relative hidden shrink-0 sm:block"
+                aria-label={`Vista previa de ${d.titulo}`}
+              >
+                <div className="relative h-36 w-28 overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm">
+                  <div className="h-2 bg-[#004B87]" />
+                  <div className="p-2">
+                    <p className="line-clamp-3 text-[7px] font-bold leading-snug text-slate-800">{d.titulo}</p>
+                    <p className="mt-1 truncate text-[6px] text-slate-500">{d.autores[0]}</p>
+                    <div className="mt-2 space-y-1">
+                      <div className="h-1 w-11/12 rounded bg-slate-200" />
+                      <div className="h-1 w-full rounded bg-slate-200" />
+                      <div className="h-1 w-10/12 rounded bg-slate-200" />
+                      <div className="h-1 w-full rounded bg-slate-200" />
+                      <div className="h-1 w-9/12 rounded bg-slate-200" />
+                      <div className="h-1 w-11/12 rounded bg-slate-200" />
+                      <div className="h-1 w-7/12 rounded bg-slate-200" />
+                    </div>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 bg-[#004B87] py-0.5 text-center text-[6px] font-semibold text-white">
+                    {d.tipo} · {d.anio}
+                  </div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center rounded-md bg-[#003366]/40 opacity-0 transition-opacity group-hover/thumb:opacity-100">
+                  <Eye className="h-5 w-5 text-white" />
+                </div>
+              </button>
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{d.tipo}</Badge>
                   <span className="text-xs text-muted-foreground">{d.anio}</span>
@@ -249,9 +328,6 @@ export default function RepositorioPage() {
                     <Badge key={c} variant="outline" className="text-[11px]">{c}</Badge>
                   ))}
                 </div>
-              </div>
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#004B87]/10">
-                <FileText className="h-5 w-5 text-[#004B87]" />
               </div>
             </div>
 
@@ -286,6 +362,17 @@ export default function RepositorioPage() {
                 <Flag className="mr-2 h-4 w-4" />
                 {reportados.includes(d.id) ? "Reportado" : "Reportar"}
               </Button>
+              {rol === "admin" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => setRetirando(d)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" /> Retirar publicación
+                </Button>
+              )}
+
               {d.propio && (
                 <>
                   <Button variant="ghost" size="sm" onClick={() => abrirEdicion(d)}>
@@ -426,7 +513,7 @@ export default function RepositorioPage() {
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="grid gap-2">
                   <span className="text-sm font-medium">Tipo de documento</span>
-                  <Select value={form.tipo || undefined} onValueChange={(v) => setForm({ ...form, tipo: v })}>
+                  <Select value={form.tipo || undefined} onValueChange={(v) => { if (v) setForm({ ...form, tipo: v }); }}>
                     <SelectTrigger className="bg-background"><SelectValue placeholder="Selecciona" /></SelectTrigger>
                     <SelectContent>
                       {TIPOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -529,7 +616,7 @@ export default function RepositorioPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
-            <Select value={motivoReporte || undefined} onValueChange={setMotivoReporte}>
+            <Select value={motivoReporte || undefined} onValueChange={(v) => { if (v) setMotivoReporte(v); }}>
               <SelectTrigger><SelectValue placeholder="Motivo del reporte" /></SelectTrigger>
               <SelectContent>
                 {MOTIVOS_REPORTE.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
@@ -546,13 +633,62 @@ export default function RepositorioPage() {
         </DialogContent>
       </Dialog>
 
+
+      {/* Retiro por administracion */}
+      <Dialog open={!!retirando} onOpenChange={(open) => { if (!open) { setRetirando(null); setMotivoRetiro(""); setDetalleRetiro(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Retirar publicación</DialogTitle>
+            <DialogDescription>
+              La publicación se elimina del repositorio y el afiliado autor recibe una notificación con el motivo. Esta acción queda registrada en el historial de administración (RF-DOC-010).
+            </DialogDescription>
+          </DialogHeader>
+          {retirando && (
+            <div className="rounded-lg border bg-muted/30 p-3 text-sm">
+              <p className="font-medium">{retirando.titulo}</p>
+              <p className="text-xs text-muted-foreground">{retirando.afiliado} · {retirando.tipo} · {retirando.anio}</p>
+            </div>
+          )}
+          <div className="grid gap-3">
+            <label className="grid gap-1.5 text-sm">
+              <span className="font-medium">Motivo del retiro</span>
+              <select
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                value={motivoRetiro}
+                onChange={(e) => setMotivoRetiro(e.target.value)}
+              >
+                <option value="">Selecciona un motivo</option>
+                {MOTIVOS_RETIRO.map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </label>
+            {motivoRetiro === "Otro" && (
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-medium">Describe el motivo</span>
+                <Textarea
+                  rows={3}
+                  maxLength={300}
+                  value={detalleRetiro}
+                  onChange={(e) => setDetalleRetiro(e.target.value)}
+                  placeholder="Mínimo 10 caracteres"
+                />
+                <span className="text-xs text-muted-foreground">{detalleRetiro.length} / 300</span>
+              </label>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setRetirando(null); setMotivoRetiro(""); setDetalleRetiro(""); }}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmarRetiro}>Retirar y notificar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Eliminación */}
       <Dialog open={!!eliminando} onOpenChange={(open) => !open && setEliminando(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Eliminar publicación</DialogTitle>
             <DialogDescription>
-              Esta acción es irreversible y retirará el documento del repositorio.
+              {eliminando ? "Esta acción es irreversible y retirará el documento del repositorio." : ""}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -560,6 +696,7 @@ export default function RepositorioPage() {
             <Button
               variant="destructive"
               onClick={() => {
+                if (!eliminando) return;
                 setDocs((prev) => prev.filter((d) => d.id !== eliminando.id));
                 toast.success("Publicación eliminada del repositorio.");
                 setEliminando(null);

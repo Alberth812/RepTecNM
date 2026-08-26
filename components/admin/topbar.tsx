@@ -15,25 +15,20 @@ import {
 import { Sidebar } from "./sidebar";
 
 export function Topbar() {
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-      {/* Menú Móvil */}
+      <div className="mx-auto flex h-full w-full max-w-[1920px] items-center gap-4">
       <Sheet>
-        <SheetTrigger asChild>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background hover:bg-accent hover:text-accent-foreground h-9 w-9 md:hidden"
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Abrir menú</span>
-          </button>
+        <SheetTrigger className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background hover:bg-accent hover:text-accent-foreground h-9 w-9 md:hidden">
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Abrir menú</span>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-64">
           <Sidebar isMobile />
         </SheetContent>
       </Sheet>
 
-      {/* Buscador rápido (Simulado) */}
       <div className="w-full flex-1 md:grow-0 md:max-w-sm">
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -46,22 +41,13 @@ export function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        {/* Notificaciones */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-destructive" />
-          <span className="sr-only">Notificaciones</span>
-        </Button>
 
-        {/* Perfil de Administrador */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/avatars/01.png" alt="@admin" />
-                <AvatarFallback className="bg-primary text-primary-foreground">AG</AvatarFallback>
-              </Avatar>
-            </Button>
+          <DropdownMenuTrigger className="relative h-8 w-8 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src="/avatars/01.png" alt="@admin" />
+              <AvatarFallback className="bg-primary text-primary-foreground">AG</AvatarFallback>
+            </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Admin General</DropdownMenuLabel>
@@ -71,6 +57,7 @@ export function Topbar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+    </div>
     </header>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, BadgeCheck, CalendarClock, Save } from "lucide-react";
 import { toast } from "sonner";
 
@@ -81,12 +81,12 @@ function Escala({ valor, onChange }: { valor: number; onChange: (n: number) => v
   );
 }
 
-function Selector({ valor, onValue, placeholder, opciones, className }: {
-  valor: string; onValue: (v: string) => void; placeholder: string; opciones: string[]; className?: string;
+function Selector({ valor, onValue, placeholder, opciones }: {
+  valor: string; onValue: (v: string) => void; placeholder: string; opciones: string[];
 }) {
   return (
-    <Select value={valor || undefined} onValueChange={onValue}>
-      <SelectTrigger className={className ?? "bg-background"}><SelectValue placeholder={placeholder} /></SelectTrigger>
+    <Select value={valor || undefined} onValueChange={(v) => { if (v) onValue(v); }}>
+      <SelectTrigger className="bg-background"><SelectValue placeholder={placeholder} /></SelectTrigger>
       <SelectContent>
         {opciones.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
       </SelectContent>
@@ -95,15 +95,16 @@ function Selector({ valor, onValue, placeholder, opciones, className }: {
 }
 
 export default function SeguimientoPage() {
-  const [resp, setResp] = useState<Resp>(() => {
-    if (typeof window === "undefined") return RESP_INICIAL;
+  const [resp, setResp] = useState<Resp>(RESP_INICIAL);
+  
+  useEffect(() => {
     try {
       const g = localStorage.getItem("rep-seguimiento");
-      return g ? { ...RESP_INICIAL, ...JSON.parse(g) } : RESP_INICIAL;
+      if (g) setResp({ ...RESP_INICIAL, ...JSON.parse(g) });
     } catch {
-      return RESP_INICIAL;
+      /* sin almacenamiento disponible */
     }
-  });
+  }, []);
   const [seccion, setSeccion] = useState(0);
   const [ultima, setUltima] = useState<string>(() => {
     if (typeof window === "undefined") return "2025-05-10";
@@ -251,7 +252,7 @@ export default function SeguimientoPage() {
                 <Pregunta etiqueta="Sector económico primario">
                   <Selector valor={resp.sector} onValue={(v) => actualizar({ sector: v })} placeholder="Selecciona" opciones={SECTOR} />
                 </Pregunta>
-                <Pregunta etiqueta="Tiempo para conseguir el primer empleo tras el egreso" className="md:col-span-2">
+                <Pregunta etiqueta="Tiempo para conseguir el primer empleo tras el egreso">
                   <Selector valor={resp.tiempoEmpleo} onValue={(v) => actualizar({ tiempoEmpleo: v })} placeholder="Selecciona" opciones={TIEMPO_EMPLEO} />
                 </Pregunta>
               </div>

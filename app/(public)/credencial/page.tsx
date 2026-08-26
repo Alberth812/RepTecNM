@@ -6,6 +6,7 @@ import { Download, GraduationCap, HeartPulse, Lock, Save } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
+import { BadgeEstado } from "@/components/public/badge-estado";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -16,11 +17,8 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-const INSTITUTOS = [
-  "Instituto Tecnológico de Celaya", "Instituto Tecnológico de Mérida",
-  "Instituto Tecnológico de Tijuana", "Instituto Tecnológico de Nuevo León",
-  "Instituto Tecnológico de Oaxaca", "Instituto Tecnológico de Querétaro",
-];
+import { INSTITUTOS_BASE } from "@/lib/mock/institutos";
+const INSTITUTOS = INSTITUTOS_BASE.filter((i) => i.activo).map((i) => i.nombre);
 const TIPOS_SANGUINEOS = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
 const FOLIO = "A1B2C3D4E5F6";
 const NUMERO = "REP-2026-00001";
@@ -68,7 +66,7 @@ function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) 
 
 export default function CredencialPage() {
   const [perfil, setPerfil] = useState<Perfil>(PERFIL_DEFAULT);
-  const [origen, setOrigen] = useState("http://localhost:3000");
+  const [origen, setOrigen] = useState("");
   const [dialogo, setDialogo] = useState(false);
   const [contrasena, setContrasena] = useState("");
   const [verEmergencia, setVerEmergencia] = useState(false);
@@ -111,7 +109,7 @@ export default function CredencialPage() {
             Administra tu información y genera tu credencial digital (RF-CRED-001).
           </p>
         </div>
-        <Badge variant="secondary">ACTIVO</Badge>
+        <BadgeEstado estado="ACTIVO" />
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_420px]">
@@ -128,7 +126,7 @@ export default function CredencialPage() {
             </div>
             <div className="grid gap-2 md:col-span-2">
               <span className="text-sm font-medium">Instituto TecNM</span>
-              <Select value={perfil.instituto} onValueChange={(v) => actualizar({ instituto: v })}>
+              <Select value={perfil.instituto} onValueChange={(v) => { if (v) actualizar({ instituto: v }); }}>
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
                   {INSTITUTOS.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}
@@ -151,7 +149,7 @@ export default function CredencialPage() {
           <Seccion titulo="Información de emergencia">
             <div className="grid gap-2">
               <span className="text-sm font-medium">Tipo sanguíneo</span>
-              <Select value={perfil.tipoSanguineo} onValueChange={(v) => actualizar({ tipoSanguineo: v })}>
+              <Select value={perfil.tipoSanguineo} onValueChange={(v) => { if (v) actualizar({ tipoSanguineo: v }); }}>
                 <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                 <SelectContent>
                   {TIPOS_SANGUINEOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -190,38 +188,46 @@ export default function CredencialPage() {
 
         {/* Credencial en vivo */}
         <div>
-          <div id="credencial-imprimible" className="overflow-hidden rounded-3xl border bg-background shadow-xl">
-            <div className="bg-gradient-to-r from-[#004B87] to-[#0070C0] p-5 text-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-semibold">
-                  <GraduationCap className="h-6 w-6" /> REP TecNM
+          <div id="credencial-imprimible" className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+            <div className="bg-gradient-to-r from-[#003366] via-[#004B87] to-[#0070C0] p-5 text-white">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <img src="/logo.png" alt="REP-TecNM" className="h-10 w-10 rounded-lg bg-white object-cover object-[center_15%] p-0.5" />
+                  <div>
+                    <p className="font-serif text-lg font-bold leading-tight">REP TecNM</p>
+                    <p className="text-[10px] uppercase tracking-widest text-sky-100/90">Red de Egresados de Posgrado</p>
+                  </div>
                 </div>
-                <Badge className="border-white/30 bg-white/15 text-white">ACTIVO</Badge>
+                <span className="rounded-full bg-green-500 px-2.5 py-1 text-[10px] font-bold tracking-wide text-white">ACTIVO</span>
               </div>
-              <p className="mt-1 text-xs text-sky-100/80">Credencial digital de afiliado</p>
             </div>
 
-            <div className="p-5">
+            <div className="p-5 text-slate-900">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-20 w-16 items-center justify-center rounded-lg border bg-[#004B87]/10 text-xl font-bold text-[#004B87]">
+                  <div className="flex h-24 w-20 items-center justify-center rounded-xl border-2 border-[#004B87]/20 bg-slate-100 text-2xl font-bold text-[#004B87]">
                     {iniciales(perfil.nombre || "S N")}
                   </div>
                   <div>
-                    <p className="font-semibold leading-tight">{perfil.nombre}</p>
-                    <p className="mt-1 text-sm font-medium text-primary">{NUMERO}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{perfil.posgrado}</p>
-                    <p className="text-xs text-muted-foreground">{perfil.instituto}</p>
+                    <p className="font-semibold leading-tight text-slate-900">{perfil.nombre}</p>
+                    <p className="mt-1 font-mono text-sm font-bold text-[#004B87]">{NUMERO}</p>
+                    <p className="mt-1 text-xs text-slate-600">{perfil.posgrado}</p>
+                    <p className="text-xs text-slate-600">{perfil.instituto}</p>
                   </div>
                 </div>
-                <div className="rounded-xl border bg-white p-2">
+                <div className="rounded-xl border border-slate-200 bg-white p-2">
                   <QRCodeSVG value={`${origen}/verificar/${FOLIO}`} size={88} />
                 </div>
               </div>
 
-              <div className="mt-4 rounded-lg bg-muted px-3 py-2 text-center">
-                <span className="text-xs text-muted-foreground">Folio de verificación: </span>
-                <span className="font-mono text-xs font-semibold tracking-wider">{FOLIO}</span>
+              <div className="mt-4 rounded-lg bg-slate-100 px-3 py-2 text-center">
+                <span className="text-xs text-slate-600">Folio de verificación: </span>
+                <span className="font-mono text-xs font-semibold tracking-wider text-slate-900">{FOLIO}</span>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[10px] text-slate-600">
+                <span>Vigencia 2026 · Tecnológico Nacional de México</span>
+                <span className="font-mono">reptecnm.mx/verificar</span>
               </div>
 
               {verEmergencia && (

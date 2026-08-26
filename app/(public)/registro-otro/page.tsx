@@ -1,4 +1,5 @@
 "use client";
+import { AvisoDemo } from "@/components/public/aviso-demo";
 
 import { useEffect, useState } from "react";
 import {
@@ -59,11 +60,8 @@ function borrarStorage(clave: string) {
   }
 }
 
-const INSTITUTOS = [
-  "Instituto Tecnológico de Celaya", "Instituto Tecnológico de Mérida",
-  "Instituto Tecnológico de Tijuana", "Instituto Tecnológico de Nuevo León",
-  "Instituto Tecnológico de Oaxaca", "Instituto Tecnológico de Querétaro",
-];
+import { INSTITUTOS_BASE } from "@/lib/mock/institutos";
+const INSTITUTOS = INSTITUTOS_BASE.filter((i) => i.activo).map((i) => i.nombre);
 const SECCIONES = [
   "Datos generales", "Formación académica", "Perfil profesional", "Servicios",
   "Experiencia y proyectos", "Intereses de colaboración", "Visibilidad y documentos",
@@ -120,16 +118,18 @@ export default function RegistroPage() {
   const [espera, setEspera] = useState(0);
   const [seccion, setSeccion] = useState(0);
   const [tagInput, setTagInput] = useState("");
-  const [datos, setDatos] = useState<Datos>(() => {
-    if (typeof window === "undefined") return DATOS_INICIALES;
+  const [datos, setDatos] = useState<Datos>(DATOS_INICIALES);
+  
+  useEffect(() => {
     const g = leerStorage("rep-registro");
-    if (!g) return DATOS_INICIALES;
-    try {
-      return { ...DATOS_INICIALES, ...JSON.parse(g) };
-    } catch {
-      return DATOS_INICIALES;
+    if (g) {
+      try {
+        setDatos({ ...DATOS_INICIALES, ...JSON.parse(g) });
+      } catch {
+        /* datos corruptos, usar iniciales */
+      }
     }
-  });
+  }, []);
 
   useEffect(() => {
     if (espera <= 0) return;
@@ -319,10 +319,7 @@ export default function RegistroPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Ingresa el código de 6 dígitos enviado a <span className="font-medium text-foreground">{correo}</span>.
           </p>
-          <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-            Entorno de demostración: se acepta cualquier código de 6 dígitos.
-            En producción el código se enviará por correo (RNF-009).
-          </div>
+          <AvisoDemo />
           <div className="mt-6 grid gap-4">
             <Input
               value={claveIngresada}
@@ -373,7 +370,7 @@ export default function RegistroPage() {
                 </div>
                 <div className="grid gap-2">
                   <span className="text-sm font-medium">Género (confidencial)</span>
-                  <Select value={datos.genero} onValueChange={(v) => actualizar({ genero: v })}>
+                  <Select value={datos.genero} onValueChange={(v) => { if (v) actualizar({ genero: v }); }}>
                     <SelectTrigger><SelectValue placeholder="Selecciona" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Femenino">Femenino</SelectItem>
@@ -410,6 +407,7 @@ export default function RegistroPage() {
                     <Select
                       value={p.tipo}
                       onValueChange={(v) => {
+                        if (!v) return;
                         const copia = [...datos.posgrados];
                         copia[i] = { ...copia[i], tipo: v };
                         actualizar({ posgrados: copia });
@@ -424,6 +422,7 @@ export default function RegistroPage() {
                     <Select
                       value={p.instituto}
                       onValueChange={(v) => {
+                        if (!v) return;
                         const copia = [...datos.posgrados];
                         copia[i] = { ...copia[i], instituto: v };
                         actualizar({ posgrados: copia });

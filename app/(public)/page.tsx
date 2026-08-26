@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState , useMemo } from "react";
 import Link from "next/link";
 import {
-  ArrowRight, Search, Users, BookOpen, Building2, MapPin, GraduationCap,
-  Star, Quote, QrCode,
+  AlertCircle, ArrowRight, Search, Users, BookOpen, Building2, MapPin, GraduationCap,
+  Star, Quote, QrCode, Target, Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EstadisticasPublicas } from "@/components/public/estadisticas-publicas";
 import { CONTENIDO_DEFAULT, cargarContenido, type ContenidoHome } from "@/lib/mock/cms";
 
 const STATS = [
@@ -27,12 +26,19 @@ export default function HomePage() {
 
   useEffect(() => setContenido(cargarContenido()), []);
 
-  useEffect(() => {
-    const t = setInterval(() => setSlide((s) => (s + 1) % 3), 7000);
-    return () => clearInterval(t);
-  }, []);
+  const slidesOrden = useMemo(
+    () => [...contenido.slides].sort((a, b) => Number(b.prioridad === "alta") - Number(a.prioridad === "alta")),
+    [contenido.slides]
+  );
 
-  const s = contenido.slides[slide];
+  useEffect(() => {
+    const actual = slidesOrden[slide];
+    const dur = actual?.prioridad === "alta" || actual?.tipo === "aviso" ? 8000 : 5000;
+    const t = setTimeout(() => setSlide((x) => (x + 1) % slidesOrden.length), dur);
+    return () => clearTimeout(t);
+  }, [slide, slidesOrden]);
+
+  const s = slidesOrden[slide] || slidesOrden[0];
 
   const redes = [
     { url: contenido.redes.facebook, label: "FB", nombre: "Facebook" },
@@ -57,10 +63,11 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-4 py-24 text-center">
-          <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium tracking-wide backdrop-blur">
+          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium tracking-wide backdrop-blur ${s.tipo === "aviso" || s.prioridad === "alta" ? "border-amber-300 bg-amber-400 text-amber-950 shadow-md" : "border-white/30 bg-card/10"}`}>
+            {s.tipo === "aviso" && <AlertCircle className="h-3 w-3" />}
             {s.etiqueta}
           </span>
-          <h1 className="mt-4 font-serif text-5xl font-bold leading-tight md:text-6xl">
+          <h1 className={`mt-4 font-serif text-5xl font-bold leading-tight md:text-6xl ${s.tipo === "aviso" ? "text-amber-100" : ""}`}>
             {s.titulo}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-sky-100/90">{s.texto}</p>
@@ -73,7 +80,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/catalogo">
-              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-white/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-white/20">
+              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-card/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-card/20">
                 <Search className="mr-2 h-4 w-4" />
                 Buscar profesionales
               </Button>
@@ -81,15 +88,15 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10 flex justify-center gap-2">
-            {contenido.slides.map((_, i) => (
+            {slidesOrden.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setSlide(i)}
                 aria-label={`Ir al slide ${i + 1}`}
                 className={
                   i === slide
-                    ? "h-2 w-8 rounded-full bg-white transition-all"
-                    : "h-2 w-4 rounded-full bg-white/40 transition-all hover:bg-white/60"
+                    ? "h-2 w-8 rounded-full bg-amber-400 shadow-[0_1px_4px_rgba(0,0,0,0.6)] transition-all"
+                    : "h-2 w-4 rounded-full bg-amber-400/50 shadow-[0_1px_4px_rgba(0,0,0,0.6)] transition-all hover:bg-amber-300"
                 }
               />
             ))}
@@ -98,11 +105,12 @@ export default function HomePage() {
       </section>
 
       {/* Franja azul institucional con estadísticas (RF-DASH-007) */}
+      
       <section className="bg-[#27518F] py-10 text-white">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 md:grid-cols-4">
           {STATS.map((st) => (
             <div key={st.etiqueta} className="flex items-center gap-3">
-              <div className="rounded-xl bg-white/10 p-2.5">
+              <div className="rounded-xl bg-card/10 p-2.5">
                 <st.icon className="h-5 w-5" />
               </div>
               <div>
@@ -113,9 +121,6 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* La red en números (RF-DASH-007) */}
-      <EstadisticasPublicas />
 
       {/* Nosotros */}
       <section id="nosotros" className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-20 md:grid-cols-2">
@@ -141,13 +146,87 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Qué hacemos */}
-      <section id="que-hacemos" className="bg-gradient-to-b from-sky-50 to-background py-20">
-        <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="font-serif text-3xl font-bold tracking-tight">Qué hacemos</h2>
-          <p className="mt-6 leading-relaxed text-muted-foreground">{contenido.queHacemosTexto}</p>
+      {/* Misión y visión */}
+      <section className="bg-gradient-to-br from-[#003366] via-[#004B87] to-[#0077c8] py-20 text-white">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center">
+            <h2 className="font-serif text-3xl font-bold tracking-tight">Nuestro rumbo</h2>
+            <p className="mt-3 text-sky-100/80">Misión y visión de la Red de Egresados de Posgrado del TecNM.</p>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-8 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-amber-400 p-2.5 text-amber-950">
+                  <Target className="h-6 w-6" />
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Misión</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-sky-50/90">{contenido.mision}</p>
+            </div>
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-8 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-amber-400 p-2.5 text-amber-950">
+                  <Eye className="h-6 w-6" />
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Visión</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-sky-50/90">{contenido.vision}</p>
+            </div>
+          </div>
         </div>
       </section>
+
+      <section id="afiliacion" className="mx-auto max-w-6xl px-4 py-20">
+        <div className="text-center">
+          <h2 className="font-serif text-3xl font-bold tracking-tight">Afiliación</h2>
+          <p className="mt-3 text-muted-foreground">Conoce los beneficios, requisitos y el proceso para unirte a la red.</p>
+        </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-semibold">Beneficios</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>Credencial digital con verificación por QR.</li>
+              <li>Perfil en el catálogo nacional de profesionales.</li>
+              <li>Mensajería con la comunidad de posgrado.</li>
+              <li>Publicación en el repositorio académico.</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-semibold">Requisitos</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>Grado de posgrado en un instituto TecNM.</li>
+              <li>Comprobante de pago de membresía.</li>
+              <li>Fotografía 3:4 reciente.</li>
+            </ul>
+          </div>
+          <div className="rounded-2xl border bg-card p-6">
+            <h3 className="font-semibold">Proceso</h3>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+              <li>Crea tu cuenta y verifica tu correo.</li>
+              <li>Completa tu expediente y documentación.</li>
+              <li>La directiva revisa y aprueba tu solicitud.</li>
+              <li>Recibe tu credencial digital activa.</li>
+            </ol>
+          </div>
+        </div>
+        <div className="mt-8 text-center">
+          <Link href="/registro">
+            <Button className="bg-amber-400 text-amber-950 hover:bg-amber-300">¿Eres nuevo? Afíliate</Button>
+          </Link>
+        </div>
+      </section>
+
+      <section className="bg-background py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <h2 className="font-serif text-3xl font-bold text-foreground">Qué hacemos</h2>
+          <p className="mt-4 leading-relaxed text-foreground/80">
+            Impulsamos la investigación aplicada, la publicación académica y la vinculación del
+            talento de posgrado con los sectores productivo, social y gubernamental, para que el
+            conocimiento generado en las aulas del TecNM se traduzca en desarrollo para México.
+          </p>
+        </div>
+      </section>
+
 
       {/* Testimonios */}
       <section id="testimonios" className="mx-auto max-w-6xl px-4 py-20">
@@ -195,7 +274,7 @@ export default function HomePage() {
           {redes.length > 0 && (
             <div className="glass-dark mx-auto mt-8 flex w-fit items-center gap-4 rounded-2xl px-6 py-4">
               {redes.map((r) => (
-                <a key={r.nombre} href={r.url} target="_blank" rel="noopener noreferrer" aria-label={r.nombre} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/10 text-xs font-bold transition-colors hover:bg-white/20">
+                <a key={r.nombre} href={r.url} target="_blank" rel="noopener noreferrer" aria-label={r.nombre} className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-card/10 text-xs font-bold transition-colors hover:bg-card/20">
                   {r.label}
                 </a>
               ))}
@@ -203,12 +282,12 @@ export default function HomePage() {
           )}
           <div className="mt-8 flex justify-center gap-3">
             <Link href="/catalogo">
-              <Button size="lg" className="rounded-sm bg-white text-xs uppercase tracking-widest text-[#004B87] hover:bg-sky-100">
+              <Button size="lg" className="rounded-sm bg-card text-xs uppercase tracking-widest text-[#004B87] hover:bg-sky-100">
                 Explorar catálogo
               </Button>
             </Link>
             <Link href="/verificar">
-              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-white/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-white/20">
+              <Button size="lg" variant="outline" className="rounded-sm border-white/40 bg-card/10 text-xs uppercase tracking-widest text-white backdrop-blur hover:bg-card/20">
                 <QrCode className="mr-2 h-4 w-4" />
                 Verificar credencial
               </Button>

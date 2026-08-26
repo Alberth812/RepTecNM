@@ -1,4 +1,6 @@
 export interface Slide {
+  tipo: "normal" | "aviso";
+  prioridad?: "alta" | "normal";
   etiqueta: string;
   titulo: string;
   texto: string;
@@ -17,6 +19,8 @@ export interface Testimonio {
 export interface ContenidoHome {
   slides: Slide[];
   nosotrosTexto: string;
+  mision: string;
+  vision: string;
   nosotrosImagen1: string;
   nosotrosImagen2: string;
   queHacemosTexto: string;
@@ -33,8 +37,11 @@ export interface ContenidoHome {
 }
 
 export const CONTENIDO_DEFAULT: ContenidoHome = {
+  mision: "Consolidar una comunidad de egresados de posgrado del TecNM que promueva la colaboración académica, científica y social, contribuyendo al desarrollo sustentable, la innovación tecnológica y el fortalecimiento institucional, con impacto en los ámbitos local, regional, nacional e internacional.",
+  vision: "Ser una red de referencia nacional e internacional que articule conocimientos, proyectos y liderazgos de los egresados del TecNM, posicionando su incidencia en la transformación productiva, la innovación social, el desarrollo territorial y la consolidación de una sociedad más justa, equitativa y sostenible.",
   slides: [
     {
+      tipo: "normal",
       etiqueta: "Red de Egresados",
       titulo: "Conectamos el talento de posgrado del TecNM",
       texto: "Una comunidad nacional de profesionales que colabora, investiga y transforma al país.",
@@ -43,6 +50,7 @@ export const CONTENIDO_DEFAULT: ContenidoHome = {
       imagen: "",
     },
     {
+      tipo: "normal",
       etiqueta: "Credencial digital",
       titulo: "Tu afiliación, siempre contigo",
       texto: "Credencial con verificación por código QR, disponible en formato digital e imprimible.",
@@ -51,6 +59,7 @@ export const CONTENIDO_DEFAULT: ContenidoHome = {
       imagen: "",
     },
     {
+      tipo: "normal",
       etiqueta: "Vinculación",
       titulo: "Servicios profesionales con respaldo académico",
       texto: "Consultoría, investigación y capacitación para el sector productivo y gubernamental.",
