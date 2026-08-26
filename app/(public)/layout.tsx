@@ -3,6 +3,7 @@ import { GraduationCap, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { BarraSesion } from "@/components/public/barra-sesion";
+import { LogoResponsivo } from "@/components/public/logo-responsivo";
 import { MenuMovilMiembro } from "@/components/public/menu-movil-miembro";
 import { GuardiaPublica } from "@/components/public/guardia-publica";
 import { SoloNoAdmin } from "@/components/public/solo-no-admin";
