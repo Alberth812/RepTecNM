@@ -91,6 +91,39 @@ services:
     networks:
       - backend
 
+  garage-cors-init:
+    image: amazon/aws-cli:2
+    container_name: dev-garage-cors-init
+    depends_on:
+      garage:
+        condition: service_started
+    environment:
+      AWS_ACCESS_KEY_ID: ${GARAGE_DEFAULT_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${GARAGE_DEFAULT_SECRET_KEY}
+      AWS_DEFAULT_REGION: garage
+    volumes:
+      - ./garage/cors-development.json:/cors.json:ro
+    entrypoint: >
+      sh -c "
+        until aws s3api head-bucket
+          --bucket ${GARAGE_DEFAULT_BUCKET}
+          --endpoint-url http://garage:3900;
+        do
+          echo 'Waiting for Garage...';
+          sleep 3;
+        done;
+
+        aws s3api put-bucket-cors
+          --bucket ${GARAGE_DEFAULT_BUCKET}
+          --endpoint-url http://garage:3900
+          --region garage
+          --cors-configuration file:///cors.json;
+
+        echo 'Garage CORS configured';
+      "
+    networks:
+      - backend
+
   mailpit:
     image: axllent/mailpit:v1.31
     container_name: dev-mailpit

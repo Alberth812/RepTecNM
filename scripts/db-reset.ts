@@ -15,6 +15,8 @@ async function reset() {
 
   await client.end();
 
+  //
+
   console.log("✅ Base de datos limpia");
   console.log("Ejecutando migraciones...");
 
