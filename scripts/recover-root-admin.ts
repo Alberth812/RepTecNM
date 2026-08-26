@@ -12,6 +12,7 @@
  * Uso:
  *   npm run recover:root-admin -- "NuevaClaveSegura123!"
  */
+
 import "dotenv/config";
 import { and, eq } from "drizzle-orm";
 import { hashPassword } from "better-auth/crypto";

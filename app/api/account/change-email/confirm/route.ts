@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/auth";
 import { requireAfiliado } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
-import { afiliados } from "@/lib/db/schema";
+import { afiliados } from "@/lib/db/schema/afiliados";
 import { changeEmailConfirmSchema } from "@/lib/validation/schemas";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 

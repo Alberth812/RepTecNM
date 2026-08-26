@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+/*import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../client";
 import {
   afiliados,
@@ -10,7 +10,7 @@ import {
 import { archivos, type NewArchivo } from "../schema/archivo";
 import { NewSolicitud, solicitudes } from "../schema/solicitudes";
 
-/*export async function updateAfiliado(input: {
+export async function updateAfiliado(input: {
   userId: string;
   archivos: {
     fotografia: NewArchivo;

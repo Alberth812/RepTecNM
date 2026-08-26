@@ -100,12 +100,12 @@ export function SessionDashboard() {
               ) : (
                 <User className="h-5 w-5 text-[#004B87]" />
               )}
-              {me.membershipStatus !== "PENDIENTE_APROBACION" ? (
+              {me.membershipStatus !== "PENDIENTE_APROBACION" && me.role === "AFILIADO" ? (
                 <>
                 <p>Continua con tu formulario de registro por favor</p>
                 <p><Link href={"/registro"}>Continuar</Link></p>
                 </>
-              ) : (
+              ) : me.role === "ADMINISTRADOR" ? <p>Eres admin</p> : (
                 <p>Espera a que tu solicitud sea registrada</p>
               )}
             </CardTitle>

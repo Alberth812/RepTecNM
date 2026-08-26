@@ -1,11 +1,6 @@
 import { boolean, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { users } from "./auth-schema";
-
-// RF-AUTH-015: subtipo de administrador.
-export const adminSubtypeEnum = pgEnum("admin_subtype", [
-  "GENERAL",
-  "CONTENIDO",
-]);
+import { adminSubtypeEnum } from "./enums";
 
 /**
  * Perfil de administrador (1:1 con `users`, solo existe cuando

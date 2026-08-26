@@ -5,7 +5,7 @@ import { emailOTP } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/lib/db/client";
-import * as schema from "@/lib/db/schema";
+import * as authSchema from "@/lib/db/schema/auth-schema";
 import { users } from "@/lib/db/schema/auth-schema";
 import { afiliados } from "@/lib/db/schema/afiliados";
 import { AUTH_RULES } from "@/lib/constants";
@@ -29,7 +29,7 @@ export const auth = betterAuth({
 
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema,
+    schema: authSchema,
     // Nuestras tablas usan nombres en plural (users, sessions, accounts,
     // verifications), tal como las generó better-auth para este proyecto.
     usePlural: true,

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Field, TextInput, PrimaryButton, Alert } from "@/components/ui/primitives";
-import { PASSWORD_POLICY_HINT } from "@/lib/password-policy";
+//import { PASSWORD_POLICY_HINT } from "@/lib/password-policy";
 
 export function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
   const [nombreCompleto, setNombreCompleto] = useState("");
@@ -65,7 +65,7 @@ export function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
         />
       </Field>
 
-      <Field label="Contraseña" htmlFor="admin-password" hint={PASSWORD_POLICY_HINT}>
+      {/*<Field label="Contraseña" htmlFor="admin-password" hint={PASSWORD_POLICY_HINT}>
         <TextInput
           id="admin-password"
           type="password"
@@ -74,7 +74,7 @@ export function CreateAdminForm({ onCreated }: { onCreated: () => void }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-      </Field>
+      </Field>*/}
 
       <Field label="Subtipo" htmlFor="subtype">
         <select

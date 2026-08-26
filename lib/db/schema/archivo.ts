@@ -18,7 +18,7 @@ export const archivos = pgTable("archivo", {
   })
     .defaultNow()
     .notNull(),
-});
+}); 
 
 export type Archivo = typeof archivos.$inferSelect;
 export type NewArchivo = typeof archivos.$inferInsert;

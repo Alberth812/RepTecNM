@@ -1,7 +1,8 @@
 import { and, eq, gt, desc, sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { authEvents, authEventTypeEnum } from "@/lib/db/schema/rate-limit";
+import { authEvents } from "@/lib/db/schema/rate-limit";
 import { ApiError } from "@/lib/errors";
+import { authEventTypeEnum } from "../db/schema/enums";
 
 type AuthEventType = (typeof authEventTypeEnum.enumValues)[number];
 

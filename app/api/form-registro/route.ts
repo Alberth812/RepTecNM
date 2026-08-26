@@ -6,7 +6,7 @@ import {
 } from "@/lib/db/solicitudes/queries";
 import { toErrorResponse } from "@/lib/http/responses";
 import { parseRegistroFormData } from "@/lib/registro/formData";
-import { registroServerSchema } from "@/lib/registro/schema";
+import { registroServerSchema } from "@/lib/registro/schema-server";
 import { toSolicitudSnapshot } from "@/lib/registro/solicitud-snapshot";
 import { deleteFile, uploadFile } from "@/lib/storage";
 import { NextResponse } from "next/server";

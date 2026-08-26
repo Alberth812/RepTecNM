@@ -41,7 +41,7 @@ const STEP_COMPONENTS = [
 ];
 
 const LAST_STEP = FORM_STEPS.length - 1;
-const SUBMIT_ENDPOINT = "/api/registro";
+const SUBMIT_ENDPOINT = "/api/form-registro";
 
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
 

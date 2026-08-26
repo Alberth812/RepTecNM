@@ -23,3 +23,4 @@ yarn-error.log*
 current.md
 garage/garage-dev.toml
 garage/garage.toml
+dc.sh

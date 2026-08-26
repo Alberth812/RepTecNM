@@ -15,7 +15,7 @@ services:
     image: node:24-alpine
     container_name: dev-next
     working_dir: /app
-    command: sh -c "corepack enable && pnpm dev --hostname 0.0.0.0"
+    command: sh -c "corepack enable && pnpm next dev --webpack --hostname 0.0.0.0"
     environment:
       NODE_ENV: development
 
@@ -30,7 +30,6 @@ services:
     volumes:
       - ./:/app
       - next_node_modules:/app/node_modules
-      - next_cache:/app/.next
 
     expose:
       - "3000"
@@ -112,7 +111,6 @@ volumes:
   garage_meta:
   garage_data:
   next_node_modules:
-  next_cache:
   portainer_data:
 
 networks:

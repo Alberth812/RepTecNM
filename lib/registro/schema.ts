@@ -28,7 +28,6 @@ import {
   PHOTO_MIN_WIDTH,
   formatBytes,
 } from "./validators";
-import { checkImageDimensionsServer } from "./photo-validator";
 
 const OTRO_ESPECIFIQUE = "Otro (especifique)";
 
@@ -441,12 +440,8 @@ export function buildRegistroSchema(options?: {
 /** Esquema por defecto (sin verificación de dimensiones) */
 export const registroClientSchema = buildRegistroSchema();
 
-export const registroServerSchema = buildRegistroSchema({
-  checkImageDimensions: checkImageDimensionsServer,
-});
-
 export type RegistroFormInput = z.input<typeof registroClientSchema>;
-export type RegistroFormOutput = z.output<typeof registroServerSchema>;
+export type RegistroFormOutput = z.output<typeof registroClientSchema>;
 
 export const registroDefaultValues = {
   apellido_paterno: "",

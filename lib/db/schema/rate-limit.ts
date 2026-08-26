@@ -7,6 +7,7 @@ import {
   uuid,
   index,
 } from "drizzle-orm/pg-core";
+import { authEventTypeEnum } from "./enums";
 
 /**
  * Better Auth trae su propio limitador (ver rateLimit.customRules en
@@ -27,13 +28,6 @@ import {
  * (tipo, dimensión, ventana, máximo) en src/lib/constants.ts, en vez de vivir
  * dispersa en el código.
  */
-export const authEventTypeEnum = pgEnum("auth_event_type", [
-  "EMAIL_VERIFICATION_OTP_SENT", // RF-AUTH-002/003/018/019 (signup y cambio de correo)
-  "PASSWORD_RESET_REQUESTED", // RF-AUTH-011/023
-  "PASSWORD_RESET_COMPLETED", // RF-AUTH-024
-  "SIGNUP_ATTEMPTED", // RF-AUTH-017
-  "LOGIN_FAILED", // RF-AUTH-025/026
-]);
 
 export const authEvents = pgTable(
   "auth_events",
