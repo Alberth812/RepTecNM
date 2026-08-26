@@ -79,20 +79,20 @@ export default function MensajeriaPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-        <div className="grid content-start gap-2 rounded-2xl border bg-card p-3">
+        <div className="grid min-w-0 content-start gap-2 rounded-2xl border bg-card p-3">
           {lista.map((m) => (
             <button
               key={m.id}
               type="button"
               onClick={() => abrir(m)}
-              className={`rounded-xl border p-3 text-left transition-colors ${
+              className={`block w-full min-w-0 rounded-xl border p-3 text-left transition-colors ${
                 abierto?.id === m.id
                   ? "border-[#004B87] bg-[#004B87]/10"
                   : "border-transparent hover:bg-muted"
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <p className="truncate text-sm font-semibold">
+                <p className="min-w-0 truncate text-sm font-semibold">
                   {pestana === "recibidos" ? m.de.nombre : `Para: ${m.para.nombre}`}
                 </p>
                 <span className="shrink-0 text-[11px] text-muted-foreground">{fechaCorta(m.fecha)}</span>
@@ -102,7 +102,7 @@ export default function MensajeriaPage() {
                 {!m.leido && pestana === "recibidos" && (
                   <span className="h-2 w-2 rounded-full bg-[#004B87]" />
                 )}
-                <p className="truncate text-xs text-muted-foreground">{m.cuerpo}</p>
+                <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{m.cuerpo}</p>
               </div>
             </button>
           ))}
@@ -114,7 +114,7 @@ export default function MensajeriaPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border bg-card p-6">
+        <div className="min-w-0 rounded-2xl border bg-card p-6">
           {abierto ? (
             <div className="grid gap-4">
               <div>
