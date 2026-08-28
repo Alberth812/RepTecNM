@@ -7,8 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,backend', cast=Csv())
-
 INSTALLED_APPS = [
+    'cms',
+    'blog',
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes',
     'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles',
     'rest_framework', 'corsheaders', 'storages',
@@ -48,10 +49,39 @@ AWS_S3_VERIFY = False
 AWS_S3_CUSTOM_DOMAIN = 'localhost/media'
 AWS_LOCATION = 'media-files'
 AWS_DEFAULT_ACL = 'public-read'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'  # Comentado para desarrollo
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LANGUAGE_CODE = 'es-mx'
 TIME_ZONE = 'America/Mexico_City'
 USE_I18N = True
 USE_TZ = True
+
+# ==========================================
+# STATIC & MEDIA FILES
+# ==========================================
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media_files'
+
+# ==========================================
+# FORZAR ALMACENAMIENTO LOCAL PARA DESARROLLO
+# ==========================================
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+MEDIA_ROOT = BASE_DIR / "media_files"
+MEDIA_URL = "/media/"
+
+# ==========================================
+# CONFIGURACIÓN DE ARCHIVOS MEDIA (LOCAL)
+# ==========================================
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media_files'

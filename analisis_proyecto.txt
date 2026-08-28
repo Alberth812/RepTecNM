@@ -1,0 +1,1107 @@
+=== ANÁLISIS ESTRUCTURAL DEL PROYECTO ===
+Fecha: Thu 27 Aug 11:55:41 CST 2026
+Directorio: /home/jane/proyectos/reptecnm
+
+1. DEPENDENCIAS PRINCIPALES
+--- Backend (Python) ---
+Django==5.0.6
+djangorestframework==3.15.1
+django-cors-headers==4.3.1
+psycopg2-binary==2.9.9
+minio==7.2.7
+python-decouple==3.8
+Pillow==10.3.0
+django-storages==1.14.3
+boto3==1.34.100
+
+--- Frontend (Node.js - dependencias clave) ---
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "sonner": "^2.0.8",
+
+2. ESTRUCTURA DE ARCHIVOS DE CÓDIGO (Excluyendo caché y dependencias)
+./backend/afiliados/admin.py
+./backend/afiliados/apps.py
+./backend/afiliados/__init__.py
+./backend/afiliados/migrations/0001_initial.py
+./backend/afiliados/migrations/0002_alter_afiliado_id.py
+./backend/afiliados/migrations/__init__.py
+./backend/afiliados/models.py
+./backend/afiliados/serializers.py
+./backend/afiliados/tests.py
+./backend/afiliados/urls.py
+./backend/afiliados/views.py
+./backend/blog/admin.py
+./backend/blog/apps.py
+./backend/blog/__init__.py
+./backend/blog/migrations/0001_initial.py
+./backend/blog/migrations/0002_publicacionblog_color_tarjeta.py
+./backend/blog/migrations/0003_alter_publicacionblog_options_and_more.py
+./backend/blog/migrations/0004_publicacionblog_archivo_pdf_and_more.py
+./backend/blog/migrations/__init__.py
+./backend/blog/models.py
+./backend/blog/serializers.py
+./backend/blog/tests.py
+./backend/blog/urls.py
+./backend/blog/views.py
+./backend/config/asgi.py
+./backend/config/__init__.py
+./backend/config/settings.py
+./backend/config/urls.py
+./backend/config/wsgi.py
+./backend/core/admin.py
+./backend/core/apps.py
+./backend/core/__init__.py
+./backend/core/migrations/0001_initial.py
+./backend/core/migrations/__init__.py
+./backend/core/models.py
+./backend/core/serializers.py
+./backend/core/tests.py
+./backend/core/urls.py
+./backend/core/views.py
+./backend/manage.py
+./backend/media_manager/admin.py
+./backend/media_manager/apps.py
+./backend/media_manager/__init__.py
+./backend/media_manager/migrations/__init__.py
+./backend/media_manager/models.py
+./backend/media_manager/tests.py
+./backend/media_manager/views.py
+./backend/publicaciones/admin.py
+./backend/publicaciones/apps.py
+./backend/publicaciones/__init__.py
+./backend/publicaciones/migrations/0001_initial.py
+./backend/publicaciones/migrations/0002_alter_publicacion_id.py
+./backend/publicaciones/migrations/__init__.py
+./backend/publicaciones/models.py
+./backend/publicaciones/serializers.py
+./backend/publicaciones/tests.py
+./backend/publicaciones/urls.py
+./backend/publicaciones/views.py
+./docker-compose.dev.yml
+./frontend/app/(admin)/admin/blog/page.tsx
+./frontend/app/(admin)/admin/publicaciones/page.tsx
+./frontend/app/(admin)/afiliados/page.tsx
+./frontend/app/(admin)/analitica/page.tsx
+./frontend/app/(admin)/aprobaciones/page.tsx
+./frontend/app/(admin)/cms/page.tsx
+./frontend/app/(admin)/configuracion/page.tsx
+./frontend/app/(admin)/credenciales/page.tsx
+./frontend/app/(admin)/dashboard/page.tsx
+./frontend/app/(admin)/institutos/page.tsx
+./frontend/app/(admin)/layout.tsx
+./frontend/app/(admin)/moderacion/page.tsx
+./frontend/app/(admin)/publicar-blog/page.tsx
+./frontend/app/(admin)/seguimiento-admin/page.tsx
+./frontend/app/error.tsx
+./frontend/app/global-error.tsx
+./frontend/app/layout.tsx
+./frontend/app/not-found.tsx
+./frontend/app/(public)/ajustes/page.tsx
+./frontend/app/(public)/aviso-de-privacidad/page.tsx
+./frontend/app/(public)/blog/page.tsx
+./frontend/app/(public)/catalogo/[id]/page.tsx
+./frontend/app/(public)/catalogo/page.tsx
+./frontend/app/(public)/credencial/page.tsx
+./frontend/app/(public)/layout.tsx
+./frontend/app/(public)/login/page.tsx
+./frontend/app/(public)/mensajeria/page.tsx
+./frontend/app/(public)/notificaciones/page.tsx
+./frontend/app/(public)/page.tsx
+./frontend/app/(public)/registro/page.tsx
+./frontend/app/(public)/repositorio/page.tsx
+./frontend/app/(public)/seguimiento/page.tsx
+./frontend/app/(public)/verificar/[folio]/page.tsx
+./frontend/components/admin/aprobaciones-panel.tsx
+./frontend/components/admin/avatar-sesion.tsx
+./frontend/components/admin/boton-salir.tsx
+./frontend/components/admin/casco-admin.tsx
+./frontend/components/admin/dashboard-charts.tsx
+./frontend/components/admin/editor-avisos.tsx
+./frontend/components/admin/guardia-admin.tsx
+./frontend/components/admin/menu-movil-admin.tsx
+./frontend/components/admin/sidebar.tsx
+./frontend/components/admin/titular-asociacion.tsx
+./frontend/components/admin/topbar.tsx
+./frontend/components.json
+./frontend/components/public/aviso-demo.tsx
+./frontend/components/public/avisos-flotantes.tsx
+./frontend/components/public/badge-estado.tsx
+./frontend/components/public/barra-sesion.tsx
+./frontend/components/public/cambiar-contrasena.tsx
+./frontend/components/public/catalogo-cliente.tsx
+./frontend/components/public/estadisticas-publicas.tsx
+./frontend/components/public/estructura-sesion.tsx
+./frontend/components/public/formulario-mensaje.tsx
+./frontend/components/public/franja-superior.tsx
+./frontend/components/public/guardia-publica.tsx
+./frontend/components/public/logo-responsivo.tsx
+./frontend/components/public/menu-movil-miembro.tsx
+./frontend/components/public/selector-tema.tsx
+./frontend/components/public/sidebar-miembro.tsx
+./frontend/components/public/solo-no-admin.tsx
+./frontend/components/public/solo-visitante.tsx
+./frontend/components/public/theme-switcher.tsx
+./frontend/components/ui/avatar.tsx
+./frontend/components/ui/badge.tsx
+./frontend/components/ui/button.tsx
+./frontend/components/ui/card.tsx
+./frontend/components/ui/checkbox.tsx
+./frontend/components/ui/dialog.tsx
+./frontend/components/ui/dropdown-menu.tsx
+./frontend/components/ui/input.tsx
+./frontend/components/ui/scroll-area.tsx
+./frontend/components/ui/select.tsx
+./frontend/components/ui/separator.tsx
+./frontend/components/ui/sheet.tsx
+./frontend/components/ui/sonner.tsx
+./frontend/components/ui/table.tsx
+./frontend/components/ui/textarea.tsx
+./frontend/components/ui/tooltip.tsx
+./frontend/lib/avisos.ts
+./frontend/lib/mensajes.ts
+./frontend/lib/mock/afiliados.ts
+./frontend/lib/mock/aprobaciones.ts
+./frontend/lib/mock/catalogo.ts
+./frontend/lib/mock/cms.ts
+./frontend/lib/mock/comentarios.ts
+./frontend/lib/mock/credencial.ts
+./frontend/lib/mock/dashboard.ts
+./frontend/lib/mock/institutos.ts
+./frontend/lib/mock/mensajeria.ts
+./frontend/lib/mock/notificaciones.ts
+./frontend/lib/mock/reportes.ts
+./frontend/lib/mock/repositorio.ts
+./frontend/lib/mock/usuarios.ts
+./frontend/lib/mock/verificacion.ts
+./frontend/lib/notificaciones.ts
+./frontend/lib/use-rol.ts
+./frontend/lib/use-theme.ts
+./frontend/lib/utils.ts
+./frontend/lib/validaciones.ts
+./frontend/next.config.ts
+./frontend/next-env.d.ts
+./frontend/package.json
+./frontend/package-lock.json
+./frontend/pnpm-lock.yaml
+./frontend/pnpm-workspace.yaml
+./frontend/tsconfig.json
+./nginx/default.conf
+
+3. LÓGICA CRÍTICA DEL BACKEND
+--- Modelo de Blog ---
+from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
+
+class PublicacionBlog(models.Model):
+    TIPO_CHOICES = [
+        ('evento', 'Evento'),
+        ('reunion', 'Reunión'),
+        ('curiosidad', 'Curiosidad'),
+        ('noticia', 'Noticia'),
+        ('otro', 'Otro'),
+    ]
+    
+    ESTADO_CHOICES = [
+        ('borrador', 'Borrador'),
+        ('publicado', 'Publicado'),
+    ]
+    
+    # Información básica
+    titulo = models.CharField(max_length=200)
+    subtitulo = models.CharField(max_length=300, blank=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='noticia')
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='borrador')
+    es_destacada = models.BooleanField(default=False)
+    
+    # Contenido
+    contenido = models.TextField()
+    imagen_principal = models.ImageField(upload_to='blog/imagenes/', blank=True, null=True)
+    archivo_pdf = models.FileField(upload_to='blog/documentos/', blank=True, null=True)
+    
+    # Links externos
+    link_youtube = models.URLField(blank=True)
+    link_facebook = models.URLField(blank=True)
+    link_drive = models.URLField(blank=True)
+    link_personalizado = models.URLField(blank=True)
+    texto_boton_link = models.CharField(max_length=50, default="Ver más")
+    
+    # Metadatos
+    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    fecha_publicacion = models.DateTimeField(default=timezone.now)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    # Orden
+    orden_destacado = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-es_destacada', '-fecha_publicacion', 'orden_destacado']
+        verbose_name = 'Publicación de Blog'
+        verbose_name_plural = 'Publicaciones de Blog'
+    
+    def __str__(self):
+        return self.titulo
+    
+    def get_links(self):
+        links = []
+        if self.link_youtube:
+            links.append({'url': self.link_youtube, 'tipo': 'YouTube'})
+        if self.link_facebook:
+            links.append({'url': self.link_facebook, 'tipo': 'Facebook'})
+        if self.link_drive:
+            links.append({'url': self.link_drive, 'tipo': 'Drive'})
+        if self.link_personalizado:
+            links.append({'url': self.link_personalizado, 'tipo': 'Enlace'})
+        return links
+
+--- Serializer de Blog ---
+from rest_framework import serializers
+from .models import PublicacionBlog
+
+class PublicacionBlogSerializer(serializers.ModelSerializer):
+    links = serializers.SerializerMethodField()
+    imagen_url = serializers.SerializerMethodField()
+    archivo_pdf_url = serializers.SerializerMethodField()
+    autor_nombre = serializers.CharField(source='autor.get_full_name', read_only=True)
+    
+    class Meta:
+        model = PublicacionBlog
+        fields = [
+            'id', 'titulo', 'subtitulo', 'tipo', 'estado', 'es_destacada',
+            'contenido', 'imagen_url', 'archivo_pdf_url', 'links', 
+            'texto_boton_link', 'autor', 'autor_nombre', 
+            'fecha_publicacion', 'fecha_creacion', 'orden_destacado'
+        ]
+        read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
+    
+    def get_imagen_url(self, obj):
+        if not obj.imagen_principal:
+            return None
+        request = self.context.get('request')
+        if request and hasattr(obj.imagen_principal, 'url'):
+            return request.build_absolute_uri(obj.imagen_principal.url)
+        return None
+    
+    def get_archivo_pdf_url(self, obj):
+        if not obj.archivo_pdf:
+            return None
+        request = self.context.get('request')
+        if request and hasattr(obj.archivo_pdf, 'url'):
+            return request.build_absolute_uri(obj.archivo_pdf.url)
+        return None
+    
+    def get_links(self, obj):
+        links = []
+        if obj.link_youtube:
+            links.append({'url': obj.link_youtube, 'tipo': 'YouTube'})
+        if obj.link_facebook:
+            links.append({'url': obj.link_facebook, 'tipo': 'Facebook'})
+        if obj.link_drive:
+            links.append({'url': obj.link_drive, 'tipo': 'Drive'})
+        if obj.link_personalizado:
+            links.append({'url': obj.link_personalizado, 'tipo': 'Enlace'})
+        return links
+
+--- Configuración de Almacenamiento (final de settings.py) ---
+# ==========================================
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media_files'
+
+# ==========================================
+# FORZAR ALMACENAMIENTO LOCAL PARA DESARROLLO
+# ==========================================
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+MEDIA_ROOT = BASE_DIR / "media_files"
+MEDIA_URL = "/media/"
+
+4. LÓGICA CRÍTICA DEL FRONTEND
+--- Formulario de Publicación (Ruta original) ---
+"use client";
+
+import { useState } from "react";
+import { Upload, Video, Globe, FileText, Link as LinkIcon, Save, CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+
+const getCookie = (name: string) => {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+};
+
+const initialFormData = {
+  titulo: "",
+  subtitulo: "",
+  tipo: "noticia",
+  contenido: "",
+  imagen: null as File | null,
+  link_youtube: "",
+  link_facebook: "",
+  link_drive: "",
+  link_personalizado: "",
+  texto_boton_link: "Ver más",
+  estado: "borrador",
+};
+
+export default function PublicarBlogPage() {
+  const [loading, setLoading] = useState(false);
+  const [imagenPreview, setImagenPreview] = useState<string>("");
+  const [formData, setFormData] = useState(initialFormData);
+  const [publicadoExitosamente, setPublicadoExitosamente] = useState(false);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, imagen: file });
+      const reader = new FileReader();
+      reader.onloadend = () => setImagenPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setImagenPreview("");
+    setPublicadoExitosamente(false);
+  };
+
+  const handleSubmit = async (estado: string) => {
+    if (!formData.titulo || !formData.contenido) {
+      toast.error("El título y el contenido son obligatorios");
+      return;
+    }
+
+    setLoading(true);
+    setPublicadoExitosamente(false);
+    
+    const data = new FormData();
+    data.append("titulo", formData.titulo);
+    data.append("subtitulo", formData.subtitulo);
+    data.append("tipo", formData.tipo);
+    data.append("contenido", formData.contenido);
+    data.append("estado", estado);
+    
+    // Es crucial que la clave sea exactamente "imagen_principal" como espera el modelo
+    if (formData.imagen) {
+      data.append("imagen_principal", formData.imagen);
+    }
+    
+    data.append("link_youtube", formData.link_youtube);
+    data.append("link_facebook", formData.link_facebook);
+    data.append("link_drive", formData.link_drive);
+    data.append("link_personalizado", formData.link_personalizado);
+    data.append("texto_boton_link", formData.texto_boton_link);
+    data.append("orden_destacado", "0");
+
+    const csrftoken = getCookie('csrftoken');
+
+    try {
+      const response = await fetch("/api/blog/publicaciones/", {
+        method: "POST",
+        body: data,
+        credentials: "include",
+        headers: {
+          'X-CSRFToken': csrftoken || '',
+          // NO agregar 'Content-Type': 'multipart/form-data' aquí, el navegador lo hace automáticamente con el boundary
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error del servidor:", response.status, errorText);
+        throw new Error(`Error al publicar: ${response.status}`);
+      }
+
+      resetForm();
+      toast.success(estado === "publicado" ? "Publicación creada exitosamente" : "Borrador guardado");
+      setPublicadoExitosamente(true);
+      setTimeout(() => setPublicadoExitosamente(false), 4000);
+      
+    } catch (error) {
+      toast.error("Error al guardar. Revisa la consola (F12) para más detalles.");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      {publicadoExitosamente && (
+        <div className="fixed top-4 right-4 z-50 bg-green-50 border-2 border-green-300 rounded-lg p-4 shadow-lg flex items-center gap-3 animate-in slide-in-from-top">
+          <CheckCircle2 className="h-6 w-6 text-green-600" />
+          <div>
+            <p className="font-semibold text-green-900">¡Publicación creada!</p>
+            <p className="text-sm text-green-700">Puedes crear otra publicación</p>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Publicar en Blog</h1>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={() => handleSubmit("borrador")} disabled={loading}>
+            <Save className="mr-2 h-4 w-4" /> Guardar borrador
+          </Button>
+          <Button onClick={() => handleSubmit("publicado")} disabled={loading} className="bg-[#004B87] hover:bg-[#003562]">
+            {loading ? "Publicando..." : "Publicar"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="md:col-span-2 space-y-6">
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Título *</label>
+                <Input value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} placeholder="Título de la publicación" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Subtítulo</label>
+                <Input value={formData.subtitulo} onChange={(e) => setFormData({ ...formData, subtitulo: e.target.value })} placeholder="Subtítulo descriptivo" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Contenido *</label>
+                <Textarea value={formData.contenido} onChange={(e) => setFormData({ ...formData, contenido: e.target.value })} placeholder="Escribe el contenido..." rows={10} />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <h3 className="font-semibold mb-4">Links externos (opcionales)</h3>
+              <div className="space-y-3">
+                <div className="flex gap-3">
+                  <Video className="h-5 w-5 text-red-600 mt-2" />
+                  <Input value={formData.link_youtube} onChange={(e) => setFormData({ ...formData, link_youtube: e.target.value })} placeholder="Link a video de YouTube" />
+                </div>
+                <div className="flex gap-3">
+                  <Globe className="h-5 w-5 text-blue-600 mt-2" />
+                  <Input value={formData.link_facebook} onChange={(e) => setFormData({ ...formData, link_facebook: e.target.value })} placeholder="Link a publicación de Facebook" />
+                </div>
+                <div className="flex gap-3">
+                  <FileText className="h-5 w-5 text-green-600 mt-2" />
+                  <Input value={formData.link_drive} onChange={(e) => setFormData({ ...formData, link_drive: e.target.value })} placeholder="Link a archivo de Google Drive" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Texto del botón</label>
+                  <Input value={formData.texto_boton_link} onChange={(e) => setFormData({ ...formData, texto_boton_link: e.target.value })} placeholder="Ej: Ver más, Acceder al archivo..." />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-6">
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Tipo de publicación</label>
+                <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="evento">Evento</SelectItem>
+                    <SelectItem value="reunion">Reunión</SelectItem>
+                    <SelectItem value="curiosidad">Curiosidad</SelectItem>
+                    <SelectItem value="noticia">Noticia</SelectItem>
+                    <SelectItem value="otro">Otro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Imagen principal</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  {imagenPreview ? (
+                    <div className="space-y-2">
+                      <img src={imagenPreview} alt="Preview" className="max-h-48 mx-auto rounded" />
+                      <Button variant="outline" size="sm" onClick={() => { setImagenPreview(""); setFormData({ ...formData, imagen: null }); }}>
+                        Quitar imagen
+                      </Button>
+                    </div>
+                  ) : (
+                    <label className="cursor-pointer">
+                      <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <span className="text-sm text-gray-600">Haz clic para subir imagen</span>
+                      <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                    </label>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+--- Vista Unificada de Admin (si existe) ---
+"use client";
+
+import { useState, useEffect } from "react";
+import { 
+  Upload, Video, Globe, FileText, Save, CheckCircle2, 
+  Pencil, Trash2, Eye, File, X
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+
+interface Publicacion {
+  id: number;
+  titulo: string;
+  subtitulo: string;
+  tipo: string;
+  estado: string;
+  contenido: string;
+  imagen_url: string | null;
+  archivo_pdf_url: string | null;
+  link_youtube: string;
+  link_facebook: string;
+  link_drive: string;
+  link_personalizado: string;
+  texto_boton_link: string;
+  autor_nombre: string;
+  fecha_publicacion: string;
+  fecha_creacion: string;
+}
+
+type Vista = 'crear' | 'listar' | 'editar';
+
+export default function AdminBlogPage() {
+  const [vista, setVista] = useState<Vista>('listar');
+  const [publicaciones, setPublicaciones] = useState<Publicacion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [publicacionEditando, setPublicacionEditando] = useState<Publicacion | null>(null);
+  
+  // Formulario
+  const [formData, setFormData] = useState({
+    titulo: "",
+    subtitulo: "",
+    tipo: "noticia",
+    estado: "borrador",
+    contenido: "",
+    imagen: null as File | null,
+    archivo_pdf: null as File | null,
+    link_youtube: "",
+    link_facebook: "",
+    link_drive: "",
+    link_personalizado: "",
+    texto_boton_link: "Ver más",
+  });
+  
+  const [imagenPreview, setImagenPreview] = useState<string>("");
+  const [pdfActual, setPdfActual] = useState<string>("");
+
+  useEffect(() => {
+    if (vista === 'listar') {
+      cargarPublicaciones();
+    }
+  }, [vista]);
+
+  const cargarPublicaciones = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/blog/publicaciones/");
+      if (!response.ok) throw new Error("Error al cargar");
+      const data = await response.json();
+      setPublicaciones(data);
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("No se pudieron cargar las publicaciones");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData({ ...formData, imagen: file });
+      const reader = new FileReader();
+      reader.onloadend = () => setImagenPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      setFormData({ ...formData, archivo_pdf: file });
+      setPdfActual(URL.createObjectURL(file));
+    } else {
+      toast.error("Solo se permiten archivos PDF");
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      titulo: "",
+      subtitulo: "",
+      tipo: "noticia",
+      estado: "borrador",
+      contenido: "",
+      imagen: null,
+      archivo_pdf: null,
+      link_youtube: "",
+      link_facebook: "",
+      link_drive: "",
+      link_personalizado: "",
+      texto_boton_link: "Ver más",
+    });
+    setImagenPreview("");
+    setPdfActual("");
+    setPublicacionEditando(null);
+  };
+
+  const handleSubmit = async (estado: string) => {
+    if (!formData.titulo || !formData.contenido) {
+      toast.error("El título y el contenido son obligatorios");
+      return;
+    }
+
+    setLoading(true);
+    const data = new FormData();
+    data.append("titulo", formData.titulo);
+    data.append("subtitulo", formData.subtitulo);
+    data.append("tipo", formData.tipo);
+    data.append("estado", estado);
+    data.append("contenido", formData.contenido);
+    
+    if (formData.imagen) data.append("imagen_principal", formData.imagen);
+    if (formData.archivo_pdf) data.append("archivo_pdf", formData.archivo_pdf);
+    
+    data.append("link_youtube", formData.link_youtube);
+    data.append("link_facebook", formData.link_facebook);
+    data.append("link_drive", formData.link_drive);
+    data.append("link_personalizado", formData.link_personalizado);
+    data.append("texto_boton_link", formData.texto_boton_link);
+
+    try {
+      const url = publicacionEditando 
+        ? `/api/blog/publicaciones/${publicacionEditando.id}/`
+        : "/api/blog/publicaciones/";
+      
+      const method = publicacionEditando ? "PUT" : "POST";
+      
+      const response = await fetch(url, {
+        method,
+        body: data,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error:", response.status, errorText);
+        throw new Error(`Error ${response.status}`);
+      }
+
+      toast.success(publicacionEditando ? "Publicación actualizada" : "Publicación creada");
+      resetForm();
+      setVista('listar');
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al guardar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const editarPublicacion = async (pub: Publicacion) => {
+    setPublicacionEditando(pub);
+    setFormData({
+      titulo: pub.titulo,
+      subtitulo: pub.subtitulo,
+      tipo: pub.tipo,
+      estado: pub.estado,
+      contenido: pub.contenido,
+      imagen: null,
+      archivo_pdf: null,
+      link_youtube: pub.link_youtube || "",
+      link_facebook: pub.link_facebook || "",
+      link_drive: pub.link_drive || "",
+      link_personalizado: pub.link_personalizado || "",
+      texto_boton_link: pub.texto_boton_link || "Ver más",
+    });
+    if (pub.imagen_url) setImagenPreview(pub.imagen_url);
+    if (pub.archivo_pdf_url) setPdfActual(pub.archivo_pdf_url);
+    setVista('editar');
+  };
+
+  const eliminarPublicacion = async (id: number, titulo: string) => {
+    if (!confirm(`¿Eliminar "${titulo}"?`)) return;
+    
+    try {
+      const response = await fetch(`/api/blog/publicaciones/${id}/`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      if (!response.ok) throw new Error("Error al eliminar");
+      
+      toast.success("Publicación eliminada");
+      cargarPublicaciones();
+    } catch (error) {
+      toast.error("No se pudo eliminar");
+    }
+  };
+
+  const cancelarEdicion = () => {
+    resetForm();
+    setVista('listar');
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Header con tabs */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Gestión del Blog</h1>
+        <div className="flex gap-2">
+          <Button
+            variant={vista === 'listar' ? 'default' : 'outline'}
+            onClick={() => { resetForm(); setVista('listar'); }}
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            Ver Publicaciones
+          </Button>
+          <Button
+            variant={vista === 'crear' ? 'default' : 'outline'}
+            onClick={() => { resetForm(); setVista('crear'); }}
+            className="bg-[#004B87] hover:bg-[#003562]"
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Nueva Publicación
+          </Button>
+        </div>
+      </div>
+
+      {/* VISTA: CREAR/EDITAR */}
+      {(vista === 'crear' || vista === 'editar') && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold">
+              {vista === 'crear' ? 'Crear Nueva Publicación' : 'Editar Publicación'}
+            </h2>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={cancelarEdicion}>
+                <X className="mr-2 h-4 w-4" />
+                Cancelar
+              </Button>
+              <Button 
+                onClick={() => handleSubmit("borrador")} 
+                disabled={loading}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Guardar Borrador
+              </Button>
+              <Button 
+                onClick={() => handleSubmit("publicado")} 
+                disabled={loading}
+                className="bg-[#004B87] hover:bg-[#003562]"
+              >
+                {loading ? "Guardando..." : "Publicar"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="md:col-span-2 space-y-6">
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Título *</label>
+                    <Input 
+                      value={formData.titulo} 
+                      onChange={(e) => setFormData({ ...formData, titulo: e.target.value })} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Subtítulo</label>
+                    <Input 
+                      value={formData.subtitulo} 
+                      onChange={(e) => setFormData({ ...formData, subtitulo: e.target.value })} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Contenido *</label>
+                    <Textarea 
+                      value={formData.contenido} 
+                      onChange={(e) => setFormData({ ...formData, contenido: e.target.value })} 
+                      rows={10} 
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  <h3 className="font-semibold mb-4">Archivos y Links</h3>
+                  
+                  {/* PDF */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">Archivo PDF (opcional)</label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                      {pdfActual ? (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <File className="h-5 w-5 text-red-600" />
+                            <span className="text-sm">PDF cargado</span>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => { setPdfActual(""); setFormData({...formData, archivo_pdf: null}); }}
+                          >
+                            Quitar
+                          </Button>
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer block text-center">
+                          <File className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                          <span className="text-sm text-gray-600">Click para subir PDF</span>
+                          <input 
+                            type="file" 
+                            accept="application/pdf" 
+                            onChange={handlePdfChange} 
+                            className="hidden" 
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Links */}
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <Video className="h-5 w-5 text-red-600 mt-2" />
+                      <Input 
+                        value={formData.link_youtube} 
+                        onChange={(e) => setFormData({ ...formData, link_youtube: e.target.value })} 
+                        placeholder="Link a YouTube" 
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <Globe className="h-5 w-5 text-blue-600 mt-2" />
+                      <Input 
+                        value={formData.link_facebook} 
+                        onChange={(e) => setFormData({ ...formData, link_facebook: e.target.value })} 
+                        placeholder="Link a Facebook" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 mt-4">Texto del botón</label>
+                      <Input 
+                        value={formData.texto_boton_link} 
+                        onChange={(e) => setFormData({ ...formData, texto_boton_link: e.target.value })} 
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Tipo</label>
+                    <Select 
+                      value={formData.tipo} 
+                      onValueChange={(value) => setFormData({ ...formData, tipo: value })}
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="evento">Evento</SelectItem>
+                        <SelectItem value="reunion">Reunión</SelectItem>
+                        <SelectItem value="curiosidad">Curiosidad</SelectItem>
+                        <SelectItem value="noticia">Noticia</SelectItem>
+                        <SelectItem value="otro">Otro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Estado</label>
+                    <Select 
+                      value={formData.estado} 
+                      onValueChange={(value) => setFormData({ ...formData, estado: value })}
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="borrador">Borrador</SelectItem>
+                        <SelectItem value="publicado">Publicado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Imagen principal</label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                      {imagenPreview ? (
+                        <div className="space-y-2">
+                          <img src={imagenPreview} alt="Preview" className="max-h-48 mx-auto rounded" />
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => { setImagenPreview(""); setFormData({ ...formData, imagen: null }); }}
+                          >
+                            Quitar imagen
+                          </Button>
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer">
+                          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                          <span className="text-sm text-gray-600">Subir imagen</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handleImageChange} 
+                            className="hidden" 
+                          />
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VISTA: LISTAR */}
+      {vista === 'listar' && (
+        <div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-[#004B87] border-t-transparent"></div>
+            </div>
+          ) : publicaciones.length === 0 ? (
+            <div className="text-center py-20 bg-muted/50 rounded-lg">
+              <p className="text-muted-foreground">No hay publicaciones</p>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {publicaciones.map((pub) => (
+                <Card key={pub.id} className="p-4">
+                  <div className="flex items-start gap-4">
+                    {pub.imagen_url ? (
+                      <img src={pub.imagen_url} alt={pub.titulo} className="w-24 h-24 object-cover rounded" />
+                    ) : (
+                      <div className="w-24 h-24 bg-muted rounded flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">Sin imagen</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="font-semibold text-lg">{pub.titulo}</h3>
+                          <p className="text-sm text-muted-foreground">{pub.subtitulo}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            pub.estado === 'publicado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {pub.estado}
+                          </span>
+                          <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            {pub.tipo}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <span>{pub.autor_nombre || "Admin"} • {new Date(pub.fecha_creacion).toLocaleDateString('es-MX')}</span>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" onClick={() => editarPublicacion(pub)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => eliminarPublicacion(pub.id, pub.titulo)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+5. INFRAESTRUCTURA
+--- Nginx Config ---
+server {
+    listen 80;
+    server_name localhost;
+    client_max_body_size 20M;
+
+    location /admin/ {
+        proxy_pass http://backend:8000/admin/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:8000/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # ESTA ES LA LÍNEA CLAVE:
+    location /media/ {
+        proxy_pass http://backend:8000/media/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    
+    location / {
+        proxy_pass http://frontend:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}
+
+=========================================
