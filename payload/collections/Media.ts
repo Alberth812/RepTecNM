@@ -1,15 +1,30 @@
-// payload/collections/Media.ts
 import type { CollectionConfig } from "payload";
 
 export const Media: CollectionConfig = {
   slug: "media",
-  upload: true, // habilita subida de archivos; con el plugin s3Storage se sube a Garage
-  admin: { useAsTitle: "filename" },
   access: {
-    read: () => true, // asunción: media es de lectura pública, como en cualquier blog
+    // Lectura pública: el frontend necesita poder resolver las imágenes
+    // (vía la API de Payload o directamente desde S3).
+    read: () => true,
+    // Escritura solo para editores autenticados vía la Better Auth strategy
+    // (req.user solo existe si betterAuthStrategy.authenticate devolvió un usuario).
     create: ({ req }) => Boolean(req.user),
     update: ({ req }) => Boolean(req.user),
     delete: ({ req }) => Boolean(req.user),
   },
-  fields: [{ name: "alt", type: "text" }],
+  upload: {
+    // No tocamos el storage: el plugin s3Storage ya configurado en payload.config.ts
+    // con collections: { media: true } se engancha solo porque esta collection
+    // tiene `upload` habilitado. Esto SOLO restringe el picker/validación de archivos.
+    mimeTypes: ["image/*"],
+  },
+  fields: [
+    {
+      name: "alt",
+      type: "text",
+      admin: {
+        description: "Texto alternativo (accesibilidad / SEO).",
+      },
+    },
+  ],
 };

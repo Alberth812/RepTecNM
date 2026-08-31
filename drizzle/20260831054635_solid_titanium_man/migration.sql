@@ -23,6 +23,7 @@ CREATE TABLE "afiliados" (
 	"genero" text,
 	"membership_status" "membership_status" DEFAULT 'NO_INICIADA'::"membership_status" NOT NULL,
 	"last_email_change_at" timestamp with time zone,
+	"folio" varchar(15) UNIQUE,
 	"telefono_celular" varchar(10),
 	"telefono_casa" varchar(10),
 	"correo_electronico" text UNIQUE,
@@ -131,6 +132,11 @@ CREATE TABLE "verifications" (
 	"expires_at" timestamp with time zone NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "folios_anuales" (
+	"anio" integer PRIMARY KEY,
+	"ultimo_numero" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "auth_events" (

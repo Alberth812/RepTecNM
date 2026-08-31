@@ -26,6 +26,7 @@ services:
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+      DATABASE_URI: mongodb://mongodb:27017/app
 
       S3_INTERNAL_ENDPOINT: http://garage:3900
       S3_PUBLIC_ENDPOINT: http://s3.localhost:3000
@@ -53,6 +54,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mongodb:
+        condition: service_started
       garage:
         condition: service_started
       garage-init:
@@ -185,6 +188,20 @@ services:
       - backend
     restart: "no"
 
+  mongodb:
+    image: mongo:8
+    container_name: dev-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: app
+    volumes:
+      - mongodb_data:/data/db
+    expose:
+      - "27017"
+    networks:
+      - backend
+
+
   mailpit:
     image: axllent/mailpit:v1.31
     container_name: dev-mailpit
@@ -209,6 +226,7 @@ services:
 
 volumes:
   postgres_data:
+  mongodb_data:
   garage_meta:
   garage_data:
   next_node_modules:

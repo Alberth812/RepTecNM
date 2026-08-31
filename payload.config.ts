@@ -3,9 +3,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 import { buildConfig } from "payload";
-import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
+import { mongooseAdapter } from "@payloadcms/db-mongodb";
 
 import { CmsAdmins } from "./payload/collections/CmsAdmins";
 import { Posts } from "./payload/collections/Posts";
@@ -35,10 +35,10 @@ export default buildConfig({
   // No usamos GraphQL en esta primera prueba: menos superficie, menos rutas.
   graphQL: { disable: true },
 
-  db: postgresAdapter({
-    pool: { connectionString: process.env.DATABASE_URL },
-    push: false, // nunca "db push" automático — ver sección de migraciones
-    migrationDir: path.resolve(dirname, "payload-migrations"),
+  db: mongooseAdapter({
+    // Mongoose-specific arguments go here.
+    // URL is required.
+    url: process.env.DATABASE_URI!,
   }),
 
   plugins: [

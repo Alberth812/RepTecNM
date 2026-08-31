@@ -25,4 +25,5 @@ garage/garage-dev.toml
 garage/garage.dev.toml
 garage/garage.toml
 dc.sh
+dc
 dev.sh
