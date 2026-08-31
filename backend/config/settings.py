@@ -8,6 +8,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,backend', cast=Csv())
 INSTALLED_APPS = [
+    'autenticacion',
+    'users',
     'cms',
     'blog',
     'django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes',
@@ -41,47 +43,56 @@ DATABASES = {
 CORS_ALLOWED_ORIGINS = ["http://localhost", "http://127.0.0.1", "http://frontend:3000"]
 
 # Configuración MinIO
-AWS_ACCESS_KEY_ID = config('MINIO_ACCESS_KEY', default='minioadmin')
-AWS_SECRET_ACCESS_KEY = config('MINIO_SECRET_KEY', default='minioadmin123')
-AWS_STORAGE_BUCKET_NAME = config('MINIO_BUCKET', default='media-files')
-AWS_S3_ENDPOINT_URL = config('MINIO_ENDPOINT', default='http://minio:9000')
-AWS_S3_VERIFY = False
-AWS_S3_CUSTOM_DOMAIN = 'localhost/media'
-AWS_LOCATION = 'media-files'
-AWS_DEFAULT_ACL = 'public-read'
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'  # Comentado para desarrollo
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LANGUAGE_CODE = 'es-mx'
-TIME_ZONE = 'America/Mexico_City'
-USE_I18N = True
-USE_TZ = True
 
 # ==========================================
-# STATIC & MEDIA FILES
+# CONFIGURACIÓN DE ARCHIVOS MEDIA Y STATIC
 # ==========================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media_files'
+if DEBUG:
+    # DESARROLLO LOCAL: Usar sistema de archivos local (sin MinIO)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media_files'
+else:
+    # PRODUCCIÓN: Usar MinIO / S3
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    AWS_ACCESS_KEY_ID = config('MINIO_ACCESS_KEY', default='minioadmin')
+    AWS_SECRET_ACCESS_KEY = config('MINIO_SECRET_KEY', default='minioadmin123')
+    AWS_STORAGE_BUCKET_NAME = config('MINIO_BUCKET', default='media-files')
+    AWS_S3_ENDPOINT_URL = config('MINIO_ENDPOINT', default='http://minio:9000')
+    AWS_S3_VERIFY = False
+    AWS_S3_CUSTOM_DOMAIN = config('MINIO_CUSTOM_DOMAIN', default='')
+    AWS_LOCATION = 'media-files'
+    AWS_DEFAULT_ACL = 'public-read'
 
-# ==========================================
-# FORZAR ALMACENAMIENTO LOCAL PARA DESARROLLO
-# ==========================================
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
+# Asegurar que el directorio local exista en desarrollo
+if DEBUG:
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuración para APIs REST - Eximir CSRF para peticiones autenticadas
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
 }
-MEDIA_ROOT = BASE_DIR / "media_files"
-MEDIA_URL = "/media/"
-
-# ==========================================
-# CONFIGURACIÓN DE ARCHIVOS MEDIA (LOCAL)
-# ==========================================
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media_files'
