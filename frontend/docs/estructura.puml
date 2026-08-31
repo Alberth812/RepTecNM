@@ -1,0 +1,43 @@
+@startmindmap
+skinparam backgroundColor transparent
+* RepTecNM
+** app
+*** (public)
+**** page.tsx - Inicio
+**** catalogo
+**** repositorio
+**** credencial
+**** verificar
+**** mensajeria
+**** seguimiento
+**** registro
+**** login
+**** aviso-de-privacidad
+*** (admin)
+**** dashboard
+**** aprobaciones
+**** cms
+**** reportes
+**** afiliados
+**** moderacion
+**** institutos
+*** not-found.tsx - 404
+*** error.tsx
+*** global-error.tsx
+*** layout.tsx
+*** globals.css
+** components
+*** admin
+*** public
+*** ui
+** lib
+*** mock
+*** validaciones.ts
+*** utils.ts
+** public
+*** docs
+** configuracion
+*** next.config.ts
+*** tsconfig.json
+*** package.json
+@endmindmap
