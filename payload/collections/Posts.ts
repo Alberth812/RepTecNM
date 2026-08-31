@@ -14,7 +14,7 @@ export const Posts: CollectionConfig = {
     // sobreescribe/mergea sobre esa. Con esto solo, ya es suficiente.
     livePreview: {
       url: ({ data }) =>
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/posts/${data?.slug ?? ""}`,
+        `${process.env.NEXT_PUBLIC_APP_URL}/posts/${data?.slug ?? ""}`,
     },
   },
   access: {

@@ -10,16 +10,18 @@ type PostCardProps = {
 export function PostCard({ post }: PostCardProps) {
   const hero = typeof post.heroImage === "object" ? post.heroImage : null;
 
+  const imageUrl = hero?.url ? new URL(hero.url).pathname : undefined;
+
   return (
     <Link href={`/posts/${post.slug}`} className="group block">
       <AspectRatio
         ratio={4 / 3}
         className="overflow-hidden rounded-lg bg-muted"
       >
-        {hero?.url ? (
+        {imageUrl ? (
           <Image
-            src={hero.url}
-            alt={hero.alt ?? post.title}
+            src={imageUrl}
+            alt={hero?.alt ?? post.title}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"

@@ -17,6 +17,15 @@ import type {
 
 type NodeTypes = DefaultNodeTypes | SerializedBlockNode<MediaBlockProps>;
 
+function getMediaUrl(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    // Already a relative URL.
+    return url;
+  }
+}
+
 function isPopulatedMedia(value: unknown): value is Media {
   return typeof value === "object" && value !== null && "url" in value;
 }
@@ -30,13 +39,15 @@ const converters: JSXConvertersFunction<NodeTypes> = ({
     const media = node.value;
     if (!isPopulatedMedia(media) || !media.url) return null;
 
+    const imageUrl = getMediaUrl(media.url);
+
     return (
       <AspectRatio
         ratio={16 / 9}
         className="my-8 overflow-hidden rounded-lg bg-muted"
       >
         <Image
-          src={media.url}
+          src={imageUrl}
           alt={media.alt ?? ""}
           fill
           className="object-cover"
@@ -50,13 +61,15 @@ const converters: JSXConvertersFunction<NodeTypes> = ({
       const media = node.fields.media;
       if (!isPopulatedMedia(media) || !media.url) return null;
 
+      const imageUrl = getMediaUrl(media.url);
+
       return (
         <AspectRatio
           ratio={16 / 9}
           className="my-8 overflow-hidden rounded-lg bg-muted"
         >
           <Image
-            src={media.url}
+            src={imageUrl}
             alt={media.alt ?? ""}
             fill
             className="object-cover"

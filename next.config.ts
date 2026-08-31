@@ -8,6 +8,21 @@ const nextConfig: NextConfig = {
     /*"http://s3.localhost:3000",*/
   ],
   devIndicators: false,
+  images: {
+    localPatterns: [
+      {
+        pathname: "/cms-api/media/**",
+      },
+    ],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/cms-api/media/**",
+      },
+    ],
+  },
   /* config options here */
 };
 

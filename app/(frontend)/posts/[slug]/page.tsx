@@ -5,6 +5,14 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { getPayloadClient } from "@/lib/payload/getPayloadClient";
 import { PostRichText } from "@/components/posts/post-rich-text";
 
+function getMediaUrl(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return url;
+  }
+}
+
 async function getPost(slug: string) {
   const payload = await getPayloadClient();
 
@@ -12,7 +20,7 @@ async function getPost(slug: string) {
     collection: "posts",
     where: { slug: { equals: slug } },
     limit: 1,
-    depth: 2, // resuelve heroImage y también los uploads dentro de "content" (MediaBlock)
+    depth: 2,
   });
 
   return docs[0] ?? null;
@@ -25,7 +33,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
-  return { title: post?.title ?? "Post no encontrado" };
+
+  return {
+    title: post?.title ?? "Post no encontrado",
+  };
 }
 
 export default async function PostPage({
@@ -39,9 +50,12 @@ export default async function PostPage({
   if (!post) notFound();
 
   const hero = typeof post.heroImage === "object" ? post.heroImage : null;
+
   const publishedDate = new Intl.DateTimeFormat("es", {
     dateStyle: "long",
   }).format(new Date(post.publishedAt));
+
+  const heroUrl = hero?.url ? getMediaUrl(hero.url) : null;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-16">
@@ -49,17 +63,18 @@ export default async function PostPage({
         <h1 className="text-4xl font-medium leading-tight text-foreground">
           {post.title}
         </h1>
+
         <p className="mt-3 text-sm text-muted-foreground">{publishedDate}</p>
       </header>
 
-      {hero?.url ? (
+      {heroUrl ? (
         <AspectRatio
           ratio={16 / 9}
           className="mb-10 overflow-hidden rounded-lg bg-muted"
         >
           <Image
-            src={hero.url}
-            alt={hero.alt ?? post.title}
+            src={heroUrl}
+            alt={hero?.alt ?? post.title}
             fill
             sizes="(min-width: 768px) 768px, 100vw"
             priority
