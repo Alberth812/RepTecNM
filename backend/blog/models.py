@@ -14,49 +14,39 @@ class PublicacionBlog(models.Model):
         ('borrador', 'Borrador'),
         ('publicado', 'Publicado'),
     ]
-
-    folio = models.CharField(max_length=20, unique=True, blank=True, null=True, editable=False)
     
     titulo = models.CharField(max_length=200)
-    subtitulo = models.CharField(max_length=300, blank=True, null=True)
+    subtitulo = models.CharField(max_length=300, blank=True)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='noticia')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='borrador')
-    contenido = models.TextField(blank=True, null=True)
     
-    # Imagen y archivo
-    imagen_principal = models.ImageField(upload_to='blog/imagenes/', null=True, blank=True)
+    contenido = models.TextField()
+    imagen_principal = models.ImageField(upload_to='blog/imagenes/', blank=True, null=True)
+    archivo_pdf = models.FileField(upload_to='blog/documentos/', blank=True, null=True)
     
-    # Un solo link con botón personalizable
-    link_destacado = models.URLField(max_length=500, blank=True, null=True, help_text="Link externo destacado")
-    texto_boton_link = models.CharField(max_length=100, default="Ver más", blank=True, null=True, help_text="Texto del botón")
+    link_youtube = models.URLField(blank=True)
+    link_facebook = models.URLField(blank=True)
+    link_drive = models.URLField(blank=True)
+    link_personalizado = models.URLField(blank=True)
+    texto_boton_link = models.CharField(max_length=50, default="Ver más")
     
-    # Metadatos
-    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    fecha_publicacion = models.DateTimeField(null=True, blank=True)
+    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    fecha_publicacion = models.DateTimeField(default=timezone.now)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-fecha_publicacion', '-fecha_creacion']
+        ordering = ['-fecha_publicacion']
+        verbose_name = 'Publicación de Blog'
+        verbose_name_plural = 'Publicaciones de Blog'
 
     def __str__(self):
-        return f"{self.folio or 'Sin Folio'} - {self.titulo}"
+        return self.titulo
 
-    def save(self, *args, **kwargs):
-        # Generar folio automático si es nueva publicación
-        if not self.folio:
-            year = timezone.now().year
-            ultimo = PublicacionBlog.objects.filter(folio__startswith=f'BLOG-{year}-').order_by('-id').first()
-            if ultimo and ultimo.folio:
-                try:
-                    secuencia = int(ultimo.folio.split('-')[-1]) + 1
-                except (ValueError, IndexError):
-                    secuencia = 1
-            else:
-                secuencia = 1
-            self.folio = f'BLOG-{year}-{secuencia:04d}'
-        
-        # Asignar fecha de publicación si se cambia a "publicado"
-        if self.estado == 'publicado' and not self.fecha_publicacion:
-            self.fecha_publicacion = timezone.now()
-            
-        super().save(*args, **kwargs)
+    def get_links(self):
+        links = []
+        if self.link_youtube: links.append({'url': self.link_youtube, 'tipo': 'YouTube'})
+        if self.link_facebook: links.append({'url': self.link_facebook, 'tipo': 'Facebook'})
+        if self.link_drive: links.append({'url': self.link_drive, 'tipo': 'Drive'})
+        if self.link_personalizado: links.append({'url': self.link_personalizado, 'tipo': 'Enlace'})
+        return links

@@ -1,76 +1,62 @@
-import logging
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate, login
+import json
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.middleware.csrf import get_token
+from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils.decorators import method_decorator
+from django.http import JsonResponse
 
-logger = logging.getLogger(__name__)
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({"detail": "CSRF cookie set"})
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class LoginView(APIView):
-    # Permitir GET explícitamente para que el frontend obtenga el token CSRF
-    def get(self, request):
-        return Response({'csrfToken': get_token(request)}, status=status.HTTP_200_OK)
-    
-    def post(self, request):
-        identifier = request.data.get('username') or request.data.get('email')
-        password = request.data.get('password')
+@require_POST
+def login_view(request):
+    try:
+        data = json.loads(request.body)
+        identifier = data.get('username')
+        password = data.get('password')
         
-        logger.info(f"🔍 Intento de login con identifier: '{identifier}'")
-        
-        if not identifier or not password:
-            return Response(
-                {'detail': 'Correo y contraseña son obligatorios'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Intentar autenticar primero con el identificador tal cual (por si es username)
         user = authenticate(request, username=identifier, password=password)
         
-        # Si falla, intentar buscar por email y autenticar con su username real
-        if user is None:
+        if user is None and '@' in identifier:
             try:
                 user_obj = User.objects.get(email__iexact=identifier)
-                logger.info(f"✅ Usuario encontrado por email: {user_obj.username}")
                 user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
-                logger.warning(f"❌ No existe usuario con email: {identifier}")
-                user = None
-        
+                pass
+            except User.MultipleObjectsReturned:
+                return JsonResponse({"success": False, "error": "Múltiples cuentas con este correo."}, status=400)
+
         if user is not None:
             login(request, user)
-            logger.info(f"🎉 Login exitoso para: {user.username}")
-            return Response({
-                'message': 'Autenticación exitosa',
-                'user': {
-                    'username': user.username,
-                    'email': user.email,
-                    'is_admin': user.is_superuser or user.is_staff
-                }
-            }, status=status.HTTP_200_OK)
-        
-        logger.warning(f"❌ Credenciales inválidas para: {identifier}")
-        return Response(
-            {'detail': 'Credenciales inválidas. Verifica tu correo y contraseña.'}, 
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-
-class LogoutView(APIView):
-    def post(self, request):
-        from django.contrib.auth import logout
-        logout(request)
-        return Response({'message': 'Sesión cerrada'}, status=status.HTTP_200_OK)
-
-class MeView(APIView):
-    def get(self, request):
-        if request.user.is_authenticated:
-            return Response({
-                'username': request.user.username,
-                'email': request.user.email,
-                'is_admin': request.user.is_superuser or request.user.is_staff
+            rol = 'admin' if user.is_staff or user.is_superuser else 'afiliado'
+            return JsonResponse({
+                "success": True,
+                "rol": rol,
+                "nombre": user.get_full_name() or user.username,
+                "email": user.email
             })
-        return Response({'detail': 'No autenticado'}, status=status.HTTP_401_UNAUTHORIZED)
+        return JsonResponse({"success": False, "error": "Credenciales inválidas"}, status=401)
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Datos inválidos"}, status=400)
+
+@require_POST
+def logout_view(request):
+    """Cierra la sesión y limpia la cookie de forma segura."""
+    logout(request)
+    response = JsonResponse({"success": True})
+    # Forzar la eliminación de la cookie de sesión en el navegador
+    response.delete_cookie('sessionid', path='/')
+    return response
+
+def me_view(request):
+    if request.user.is_authenticated:
+        user = request.user
+        rol = 'admin' if user.is_staff or user.is_superuser else 'afiliado'
+        return JsonResponse({
+            "authenticated": True,
+            "rol": rol,
+            "nombre": user.get_full_name() or user.username,
+            "email": user.email
+        })
+    return JsonResponse({"authenticated": False}, status=401)

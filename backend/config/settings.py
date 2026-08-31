@@ -44,55 +44,22 @@ CORS_ALLOWED_ORIGINS = ["http://localhost", "http://127.0.0.1", "http://frontend
 
 # Configuración MinIO
 
+
 # ==========================================
-# CONFIGURACIÓN DE ARCHIVOS MEDIA Y STATIC
+# SEGURIDAD Y COOKIES (Desarrollo/Producción)
+# ==========================================
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
+CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 'true'
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# ==========================================
+# STATIC & MEDIA FILES
 # ==========================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-if DEBUG:
-    # DESARROLLO LOCAL: Usar sistema de archivos local (sin MinIO)
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media_files'
-else:
-    # PRODUCCIÓN: Usar MinIO / S3
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-        },
-        "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        },
-    }
-    AWS_ACCESS_KEY_ID = config('MINIO_ACCESS_KEY', default='minioadmin')
-    AWS_SECRET_ACCESS_KEY = config('MINIO_SECRET_KEY', default='minioadmin123')
-    AWS_STORAGE_BUCKET_NAME = config('MINIO_BUCKET', default='media-files')
-    AWS_S3_ENDPOINT_URL = config('MINIO_ENDPOINT', default='http://minio:9000')
-    AWS_S3_VERIFY = False
-    AWS_S3_CUSTOM_DOMAIN = config('MINIO_CUSTOM_DOMAIN', default='')
-    AWS_LOCATION = 'media-files'
-    AWS_DEFAULT_ACL = 'public-read'
-
-# Asegurar que el directorio local exista en desarrollo
-if DEBUG:
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media_files'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Configuración para APIs REST - Eximir CSRF para peticiones autenticadas
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ],
-}
