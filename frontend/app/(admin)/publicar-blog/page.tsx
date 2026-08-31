@@ -35,7 +35,7 @@ interface Publicacion {
   estado: string;
   contenido: string;
   imagen_url: string | null;
-  link_destacado: string;
+  link_personalizado: string;
   texto_boton_link: string;
   fecha_publicacion: string;
 }
@@ -58,7 +58,7 @@ export default function GestionBlogPage() {
     tipo: "noticia",
     estado: "borrador",
     contenido: "",
-    link_destacado: "",
+    link_personalizado: "",
     texto_boton_link: "Ver más"});
   const [imagenFile, setImagenFile] = useState<File | null>(null);
 
@@ -96,7 +96,7 @@ export default function GestionBlogPage() {
       tipo: pub.tipo,
       estado: pub.estado,
       contenido: pub.contenido,
-      link_destacado: pub.link_destacado || "",
+      link_personalizado: pub.link_personalizado || "",
       texto_boton_link: pub.texto_boton_link || "Ver más"});
     setImagenPreview(pub.imagen_url || "");
     setImagenFile(null);
@@ -112,7 +112,7 @@ export default function GestionBlogPage() {
       tipo: "noticia",
       estado: "borrador",
       contenido: "",
-      link_destacado: "",
+      link_personalizado: "",
       texto_boton_link: "Ver más"});
     setImagenPreview("");
     setImagenFile(null);
@@ -152,7 +152,7 @@ export default function GestionBlogPage() {
     data.append("tipo", formData.tipo);
     data.append("estado", estadoFinal);
     data.append("contenido", formData.contenido);
-    data.append("link_destacado", formData.link_destacado);
+    data.append("link_personalizado", formData.link_personalizado);
     data.append("texto_boton_link", formData.texto_boton_link);
     
     if (imagenFile) {
@@ -360,8 +360,8 @@ export default function GestionBlogPage() {
                 <Label>URL del enlace</Label>
                 <Input 
                   placeholder="https://youtube.com/..., https://drive.google.com/..., etc." 
-                  value={formData.link_destacado}
-                  onChange={(e) => setFormData({ ...formData, link_destacado: e.target.value })}
+                  value={formData.link_personalizado}
+                  onChange={(e) => setFormData({ ...formData, link_personalizado: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
