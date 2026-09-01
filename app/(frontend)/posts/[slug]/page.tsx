@@ -1,5 +1,5 @@
 import { LivePreviewListener } from "@/components/live-preview/refresh-route-on-save";
-import { PostRichText } from "@/components/posts/post-rich-text";
+import { RichText } from "@/components/posts/rich-text";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { queryPostBySlug } from "@/payload/queries/posts";
 import type { Metadata } from "next";
@@ -89,7 +89,7 @@ export default async function PostPage({
         </AspectRatio>
       ) : null}
 
-      <PostRichText content={post.content} />
+      <RichText content={post.content} />
     </article>
   );
 }

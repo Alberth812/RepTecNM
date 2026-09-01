@@ -1,3 +1,4 @@
+// payload/collections/Avisos.ts
 import type { CollectionConfig } from "payload";
 import { slugField } from "payload";
 import {
@@ -23,53 +24,30 @@ import { MediaBlock } from "./blocks/MediaBlock";
 import { generatePreviewPath } from "../utilities/generatePreviewPath";
 import { authenticatedOrPublished } from "../utilities/authenticatedOrPublished";
 
-const MEXICO_TIME_ZONE = "America/Mexico_City";
-
-function getMexicoToday(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: MEXICO_TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-}
-
-export const Notices: CollectionConfig = {
-  slug: "notices",
-
+export const Avisos: CollectionConfig = {
+  slug: "avisos",
   admin: {
     useAsTitle: "title",
-
-    defaultColumns: [
-      "title",
-      "isImportant",
-      "publishedAt",
-      "expirationDate",
-      "slug",
-    ],
-
+    defaultColumns: ["title", "important", "expiresAt", "publishedAt", "slug"],
     livePreview: {
       url: ({ data }) =>
         generatePreviewPath({
-          collection: "notices",
+          collection: "avisos",
           slug: typeof data?.slug === "string" ? data.slug : "",
         }),
     },
-
     preview: (data) =>
       generatePreviewPath({
-        collection: "notices",
+        collection: "avisos",
         slug: typeof data?.slug === "string" ? data.slug : "",
       }),
   },
-
   access: {
     read: authenticatedOrPublished,
     create: ({ req }) => Boolean(req.user),
     update: ({ req }) => Boolean(req.user),
     delete: ({ req }) => Boolean(req.user),
   },
-
   fields: [
     {
       name: "title",
@@ -79,89 +57,6 @@ export const Notices: CollectionConfig = {
         es: "Título",
       },
     },
-
-    {
-      name: "isImportant",
-      type: "checkbox",
-      defaultValue: false,
-      label: {
-        es: "Es importante",
-      },
-      admin: {
-        description:
-          "Los avisos importantes y vigentes se mostrarán automáticamente en la página principal.",
-      },
-    },
-
-    {
-      name: "expirationDate",
-      type: "date",
-      label: {
-        es: "Fecha de expiración",
-      },
-      admin: {
-        position: "sidebar",
-
-        date: {
-          pickerAppearance: "dayOnly",
-        },
-
-        condition: (_, siblingData) => Boolean(siblingData?.isImportant),
-
-        description:
-          "Debe ser posterior a hoy y como máximo 365 días después de hoy.",
-      },
-
-      validate: (value: unknown, { siblingData, req }) => {
-        // Casteamos siblingData para que TypeScript reconozca la propiedad
-        const sibling = siblingData as { isImportant?: boolean };
-        const isImportant = Boolean(sibling?.isImportant);
-
-        // Si no es importante, la fecha no es necesaria.
-        if (!isImportant) {
-          return true;
-        }
-
-        if (!value) {
-          return req.t
-            ? req.t("validation:required")
-            : "La fecha de expiración es obligatoria cuando el aviso es importante.";
-        }
-
-        const expirationDate = new Date(value as string);
-
-        if (Number.isNaN(expirationDate.getTime())) {
-          return "La fecha de expiración proporcionada no es válida.";
-        }
-
-        const today = getMexicoToday();
-
-        const expirationDateOnly = new Intl.DateTimeFormat("en-CA", {
-          timeZone: MEXICO_TIME_ZONE,
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(expirationDate);
-
-        if (expirationDateOnly <= today) {
-          return "La fecha de expiración debe ser posterior al día de hoy.";
-        }
-
-        const todayDate = new Date(`${today}T00:00:00Z`);
-
-        const maxDate = new Date(todayDate);
-        maxDate.setUTCDate(maxDate.getUTCDate() + 365);
-
-        const maxDateOnly = maxDate.toISOString().slice(0, 10);
-
-        if (expirationDateOnly > maxDateOnly) {
-          return "La fecha de expiración no puede superar 365 días a partir de hoy.";
-        }
-
-        return true;
-      },
-    },
-
     {
       name: "content",
       type: "richText",
@@ -180,11 +75,9 @@ export const Notices: CollectionConfig = {
           LinkFeature(),
           BlockquoteFeature(),
           HorizontalRuleFeature(),
-
           BlocksFeature({
             blocks: [MediaBlock],
           }),
-
           InlineToolbarFeature(),
           FixedToolbarFeature(),
         ],
@@ -193,23 +86,122 @@ export const Notices: CollectionConfig = {
         es: "Contenido",
       },
     },
+    {
+      name: "important",
+      type: "checkbox",
+      defaultValue: false,
+      index: true,
+      label: {
+        es: "Es importante",
+      },
+      admin: {
+        position: "sidebar",
+        description:
+          "Si está activado, este aviso se mostrará en un modal en la landing mientras no haya expirado.",
+      },
+    },
+    {
+      name: "expiresAt",
+      type: "date",
+      index: true,
+      label: {
+        es: "Fecha de expiración",
+      },
+      admin: {
+        position: "sidebar",
+        date: {
+          pickerAppearance: "dayOnly",
+        },
+        // Solo se muestra en el admin cuando "important" está activado.
+        condition: (_, siblingData) => Boolean(siblingData?.important),
+        description:
+          "Obligatoria cuando 'Es importante' está activado. Debe ser entre mañana y 365 días a partir de hoy.",
+      },
+      // Requerido condicionalmente: no usamos `required: true` a nivel de
+      // campo porque solo debe exigirse cuando `important` es true.
+      validate: (value: unknown, { siblingData }) => {
+        const isImportant = Boolean(
+          (siblingData as { important?: boolean } | undefined)?.important,
+        );
 
+        if (!isImportant) {
+          return true;
+        }
+
+        if (!value) {
+          return "La fecha de expiración es obligatoria cuando 'Es importante' está activado.";
+        }
+
+        const expiresAt = new Date(value as string);
+
+        if (Number.isNaN(expiresAt.getTime())) {
+          return "La fecha proporcionada no es válida.";
+        }
+
+        const now = new Date();
+
+        // Límite inferior: inicio de "mañana" en UTC (estrictamente
+        // posterior a hoy).
+        const startOfTomorrowUTC = new Date(
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() + 1,
+            0,
+            0,
+            0,
+            0,
+          ),
+        );
+
+        // Límite superior: final del día, 365 días a partir de hoy.
+        const maxDateUTC = new Date(
+          Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() + 365,
+            23,
+            59,
+            59,
+            999,
+          ),
+        );
+
+        if (expiresAt.getTime() < startOfTomorrowUTC.getTime()) {
+          return "La fecha de expiración debe ser posterior al día de hoy.";
+        }
+
+        if (expiresAt.getTime() > maxDateUTC.getTime()) {
+          return "La fecha de expiración no puede ser mayor a 365 días a partir de hoy.";
+        }
+
+        return true;
+      },
+      hooks: {
+        beforeChange: [
+          ({ siblingData, value }) => {
+            // Si no es importante, no tiene sentido guardar una fecha de
+            // expiración obsoleta: la limpiamos.
+            if (!siblingData?.important) {
+              return null;
+            }
+            return value;
+          },
+        ],
+      },
+    },
     {
       name: "publishedAt",
       type: "date",
       required: true,
       defaultValue: () => new Date(),
-
       admin: {
         position: "sidebar",
-
         date: {
           pickerAppearance: "dayOnly",
         },
-
         description: "No puede ser una fecha futura.",
       },
-
       validate: (value: unknown, { req }) => {
         if (!value) {
           return req.t
@@ -224,7 +216,6 @@ export const Notices: CollectionConfig = {
         }
 
         const now = new Date();
-
         const endOfTodayUTC = new Date(
           Date.UTC(
             now.getUTCFullYear(),
@@ -243,35 +234,19 @@ export const Notices: CollectionConfig = {
 
         return true;
       },
-
       hooks: {
         beforeChange: [
           ({ siblingData, value }) => {
             if (siblingData._status === "published" && !value) {
               return new Date();
             }
-
             return value;
           },
         ],
       },
     },
-
     slugField(),
   ],
-
-  hooks: {
-    beforeChange: [
-      ({ data }) => {
-        if (!data?.isImportant) {
-          data.expirationDate = null;
-        }
-
-        return data;
-      },
-    ],
-  },
-
   versions: {
     drafts: {
       autosave: {

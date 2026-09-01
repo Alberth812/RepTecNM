@@ -10,8 +10,8 @@ import {
   TestimoniosSection,
 } from "@/components/home/home-sections";
 
-import { ImportantNoticesModal } from "@/components/avisos/important-notices-modal";
-import { queryActiveImportantNotices } from "@/payload/queries/avisos";
+import { queryAvisosImportantesActivos } from "@/payload/queries/avisos";
+import { AvisosModal } from "@/components/avisos/avisos-modal";
 
 // Regenera la página cada 60s (ISR) en vez de pegarle a la base de datos en
 // cada request. Súbelo, bájalo o quítalo (usa `export const dynamic =
@@ -20,14 +20,15 @@ import { queryActiveImportantNotices } from "@/payload/queries/avisos";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [home, importantNotices] = await Promise.all([
+  const [home, avisos] = await Promise.all([
     getHomeContent(),
-    queryActiveImportantNotices(),
+    queryAvisosImportantesActivos()
   ]);
 
   return (
     <div>
-      <ImportantNoticesModal notices={importantNotices} />
+       <AvisosModal avisos={avisos} />
+
       <HeroCarousel slides={home.hero.slides} />
       <StatsSection />
       <NosotrosSection {...home.nosotros} />

@@ -70,7 +70,7 @@ export interface Config {
     'cms-admins': CmsAdmin;
     posts: Post;
     media: Media;
-    notices: Notice;
+    avisos: Aviso;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -81,7 +81,7 @@ export interface Config {
     'cms-admins': CmsAdminsSelect<false> | CmsAdminsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    notices: NoticesSelect<false> | NoticesSelect<true>;
+    avisos: AvisosSelect<false> | AvisosSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -259,19 +259,11 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "notices".
+ * via the `definition` "avisos".
  */
-export interface Notice {
+export interface Aviso {
   id: string;
   title: string;
-  /**
-   * Los avisos importantes y vigentes se mostrarán automáticamente en la página principal.
-   */
-  isImportant?: boolean | null;
-  /**
-   * Debe ser posterior a hoy y como máximo 365 días después de hoy.
-   */
-  expirationDate?: string | null;
   content: {
     root: {
       type: string;
@@ -287,6 +279,14 @@ export interface Notice {
     };
     [k: string]: unknown;
   };
+  /**
+   * Si está activado, este aviso se mostrará en un modal en la landing mientras no haya expirado.
+   */
+  important?: boolean | null;
+  /**
+   * Obligatoria cuando 'Es importante' está activado. Debe ser entre mañana y 365 días a partir de hoy.
+   */
+  expiresAt?: string | null;
   /**
    * No puede ser una fecha futura.
    */
@@ -337,8 +337,8 @@ export interface PayloadLockedDocument {
         value: string | Media;
       } | null)
     | ({
-        relationTo: 'notices';
-        value: string | Notice;
+        relationTo: 'avisos';
+        value: string | Aviso;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -502,13 +502,13 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "notices_select".
+ * via the `definition` "avisos_select".
  */
-export interface NoticesSelect<T extends boolean = true> {
+export interface AvisosSelect<T extends boolean = true> {
   title?: T;
-  isImportant?: T;
-  expirationDate?: T;
   content?: T;
+  important?: T;
+  expiresAt?: T;
   publishedAt?: T;
   generateSlug?: T;
   slug?: T;

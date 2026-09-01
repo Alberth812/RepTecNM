@@ -13,7 +13,7 @@ import { Media } from "./payload/collections/Media";
 
 import { es } from "@payloadcms/translations/languages/es";
 import Home from "./payload/globals/home";
-import { Notices } from "./payload/collections/Notices";
+import { Avisos } from "./payload/collections/Avisos";
 
 //const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,7 +23,7 @@ export default buildConfig({
 
   editor: lexicalEditor(),
 
-  collections: [CmsAdmins, Posts, Media, Notices],
+  collections: [CmsAdmins, Posts, Media, Avisos],
 
   globals: [Home],
 

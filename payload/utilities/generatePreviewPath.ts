@@ -3,7 +3,7 @@ import type { CollectionSlug } from "payload";
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: "/posts",
-  //aqui iria avisos
+  avisos: "/avisos",
 };
 
 type Args = {
