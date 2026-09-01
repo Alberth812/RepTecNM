@@ -46,97 +46,103 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
         return representation
 
     def to_internal_value(self, data):
-        mutable_data = data.copy() if hasattr(data, 'copy') else data
+        if hasattr(data, 'copy'):
+            mutable_data = data.copy()
+        else:
+            mutable_data = dict(data)
         
         slides_data = []
         if 'slides' in mutable_data:
             slides_json = mutable_data.pop('slides')
-            
             if isinstance(slides_json, str):
                 try:
-                    slides_data = json.loads(slides_json)
+                    parsed = json.loads(slides_json)
+                    slides_data = parsed if isinstance(parsed, list) else [parsed]
                 except json.JSONDecodeError:
                     slides_data = []
             elif isinstance(slides_json, list):
-                if len(slides_json) > 0 and isinstance(slides_json[0], str):
-                    try:
-                        slides_data = json.loads(slides_json[0])
-                    except json.JSONDecodeError:
-                        slides_data = []
-                else:
-                    slides_data = slides_json
-            else:
-                slides_data = []
-        
-        slide_images = {}
-        for key in list(mutable_data.keys()):
-            if key.startswith('slide_') and key.endswith('_imagen'):
-                slide_index = int(key.split('_')[1])
-                raw_value = mutable_data.pop(key)
-                print(f"🔍 DEBUG RAW: {key} type = {type(raw_value)}, value = {raw_value}")
-                
-                # Si es una lista, extraer el primer elemento (protección contra errores del frontend)
-                if isinstance(raw_value, list) and len(raw_value) > 0:
-                    slide_images[slide_index] = raw_value[0]
-                    print(f"⚠️ DEBUG: Era una lista, se tomó el primer elemento: {type(slide_images[slide_index])}")
-                else:
-                    slide_images[slide_index] = raw_value
-        
-        for index, imagen in slide_images.items():
-            if index < len(slides_data) and isinstance(slides_data[index], dict):
-                # Verificar que sea un archivo válido o una cadena antes de asignar
-                if hasattr(imagen, 'name') or isinstance(imagen, str) or imagen is None:
-                    slides_data[index]['imagen'] = imagen
-                    print(f"✅ DEBUG: Asignada imagen válida a slide {index}")
-                else:
-                    print(f"❌ DEBUG ERROR: Imagen no válida para slide {index}, tipo: {type(imagen)}")
-                    slides_data[index]['imagen'] = None # Fallback seguro
+                for item in slides_json:
+                    if isinstance(item, str):
+                        try:
+                            slides_data.append(json.loads(item))
+                        except json.JSONDecodeError:
+                            pass
+                    elif isinstance(item, dict):
+                        slides_data.append(item)
         
         avisos_data = []
         if 'avisos' in mutable_data:
             avisos_json = mutable_data.pop('avisos')
             if isinstance(avisos_json, str):
                 try:
-                    avisos_data = json.loads(avisos_json)
+                    parsed = json.loads(avisos_json)
+                    avisos_data = parsed if isinstance(parsed, list) else [parsed]
                 except json.JSONDecodeError:
                     avisos_data = []
             elif isinstance(avisos_json, list):
-                if len(avisos_json) > 0 and isinstance(avisos_json[0], str):
-                    try:
-                        avisos_data = json.loads(avisos_json[0])
-                    except json.JSONDecodeError:
-                        avisos_data = []
-                else:
-                    avisos_data = avisos_json
-
+                avisos_data = avisos_json
+                
         testimonios_data = []
         if 'testimonios' in mutable_data:
             testimonios_json = mutable_data.pop('testimonios')
             if isinstance(testimonios_json, str):
                 try:
-                    testimonios_data = json.loads(testimonios_json)
+                    parsed = json.loads(testimonios_json)
+                    testimonios_data = parsed if isinstance(parsed, list) else [parsed]
                 except json.JSONDecodeError:
                     testimonios_data = []
             elif isinstance(testimonios_json, list):
-                if len(testimonios_json) > 0 and isinstance(testimonios_json[0], str):
-                    try:
-                        testimonios_data = json.loads(testimonios_json[0])
-                    except json.JSONDecodeError:
-                        testimonios_data = []
-                else:
-                    testimonios_data = testimonios_json
-        
+                testimonios_data = testimonios_json
+
         self._slides_data = slides_data
-        self._testimonios_data = testimonios_data
         self._avisos_data = avisos_data
+        self._testimonios_data = testimonios_data
         
         return super().to_internal_value(mutable_data)
-    
+
     def update(self, instance, validated_data):
-        slides_data = self._slides_data
+        slides_data = getattr(self, '_slides_data', [])
+        avisos_data = getattr(self, '_avisos_data', [])
+        testimonios_data = getattr(self, '_testimonios_data', [])
         
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+            
+        instance.avisos = avisos_data
+        if hasattr(instance, 'testimonios'):
+            instance.testimonios = testimonios_data
+        instance.save()
+        
+        instance.slides.all().delete()
+        for index, item in enumerate(slides_data):
+            if isinstance(item, dict):
+                slide_data = item.copy()
+                slide_data.pop('ctaLabel', None)
+                slide_data.pop('ctaHref', None)
+                
+                slide_data['contenido'] = instance
+                slide_data['orden'] = index
+                try:
+                    Slide.objects.create(**slide_data)
+                    print(f"✅ DEBUG: Slide {index} creado exitosamente")
+                except Exception as e:
+                    print(f"❌ DEBUG ERROR creando slide {index}: {e}")
+            else:
+                print(f"⚠️ DEBUG: Slide {index} no es un diccionario, se omite. Tipo: {type(item)}")
+        
+        return instance
+
+    def update(self, instance, validated_data):
+        slides_data = getattr(self, '_slides_data', [])
+        avisos_data = getattr(self, '_avisos_data', [])
+        testimonios_data = getattr(self, '_testimonios_data', [])
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+            
+        instance.avisos = avisos_data
+        if hasattr(instance, 'testimonios'):
+            instance.testimonios = testimonios_data
         instance.save()
         
         # Actualizar slides: eliminar todos y recrear
@@ -153,13 +159,5 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
                     print(f"✅ DEBUG: Slide {index} creado exitosamente")
                 except Exception as e:
                     print(f"❌ DEBUG ERROR creando slide {index}: {e}")
-        
-        # Actualizar testimonios: eliminar todos y recrear
-        instance.testimonios.all().delete()
-        for index, test_data in enumerate(self._testimonios_data):
-            if isinstance(test_data, dict):
-                test_data['contenido'] = instance
-                test_data['orden'] = index
-                Testimonio.objects.create(**test_data)
         
         return instance

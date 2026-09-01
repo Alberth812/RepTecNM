@@ -1,19 +1,22 @@
 # frontend/Dockerfile
 FROM node:20-alpine
 
+# Habilitar corepack para usar pnpm nativamente en Node 20
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
 WORKDIR /app
 
-# Copiar archivos de dependencias
-COPY package.json package-lock.json* ./
+# Copiar solo los archivos de dependencias de pnpm primero (para aprovechar la caché de Docker)
+COPY package.json pnpm-lock.yaml ./
 
-# Instalar dependencias
-RUN npm install
+# Instalar dependencias con pnpm
+RUN pnpm install --frozen-lockfile
 
-# Copiar el resto del código
+# Copiar el resto del código del proyecto
 COPY . .
 
 # Exponer el puerto de Next.js
 EXPOSE 3000
 
 # Comando para iniciar el servidor de desarrollo
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]

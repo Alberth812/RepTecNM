@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -24,9 +25,7 @@ export default function RootLayout({
             __html: `
               try {
                 const theme = localStorage.getItem('vite-ui-theme');
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
-                } else {
+                // Forzar tema claro por defecto
                   document.documentElement.classList.remove('dark');
                 }
               } catch (_) {}
@@ -38,7 +37,8 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" disableTransitionOnChange>
           {children}
         </ThemeProvider>
-      </body>
+            <Toaster richColors position="top-center" />
+    </body>
     </html>
   );
 }

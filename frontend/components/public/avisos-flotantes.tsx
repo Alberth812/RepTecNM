@@ -26,6 +26,7 @@ export function AvisosFlotantes() {
         const res = await fetch("/api/cms/contenido-inicio/publico/");
         if (res.ok) {
           const data = await res.json();
+          console.log('📢 Avisos crudos del CMS:', data.avisos);
           // Leer qué avisos ya cerró el usuario en este navegador
           const cerradosLocal = JSON.parse(localStorage.getItem("rep-avisos-cerrados") || "[]");
           setCerrados(cerradosLocal);

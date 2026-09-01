@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Menu } from "lucide-react";
 
-import { Sidebar } from "@/components/admin/sidebar";
+import { SidebarAdmin as Sidebar } from "@/components/admin/sidebar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 

@@ -1,49 +1,80 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 export type Rol = "visitante" | "afiliado" | "admin";
-
-interface UserData {
-  rol: Rol;
-  nombre: string;
-  email: string;
-}
 
 export function useRol() {
   const [rol, setRol] = useState<Rol>("visitante");
   const [nombre, setNombre] = useState<string>("");
   const [listo, setListo] = useState(false);
 
-  useEffect(() => {
-    const verificarSesion = async () => {
-      try {
-        const res = await fetch("/api/auth/me/", {
-          credentials: "include", // Envía las cookies de sesión
-          cache: "no-store",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setRol(data.rol);
-          setNombre(data.nombre);
-        } else {
-          setRol("visitante");
-          setNombre("");
-        }
-      } catch (error) {
-        console.error("Error verificando sesión:", error);
+  const verificarSesion = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/me/", {
+        credentials: "include",
+        cache: "no-store", // Importante: evita que el navegador cacheé la respuesta de sesión
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const nuevoRol = data.rol as Rol;
+        setRol(nuevoRol);
+        setNombre(data.nombre);
+        localStorage.setItem("rep-rol", nuevoRol);
+        localStorage.setItem("rep-usuario", data.nombre);
+      } else {
         setRol("visitante");
-      } finally {
-        setListo(true);
+        setNombre("");
+        localStorage.removeItem("rep-rol");
+        localStorage.removeItem("rep-usuario");
+      }
+    } catch (error) {
+      console.error("Error verificando sesión:", error);
+      setRol("visitante");
+      setNombre("");
+    } finally {
+      setListo(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    verificarSesion();
+
+    // Escuchar cambios de sesión en OTRAS pestañas (solo si se cierra sesión)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "rep-rol" && e.newValue === null) {
+        setRol("visitante");
+        setNombre("");
       }
     };
 
-    verificarSesion();
-  }, []);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [verificarSesion]);
 
-  const cambiar = (nuevoRol: Rol) => {
-    setRol(nuevoRol);
+  const cerrarSesion = async () => {
+    try {
+      const csrfToken = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("csrftoken="))
+        ?.split("=")[1];
+
+      await fetch("/api/auth/logout/", {
+        method: "POST",
+        credentials: "include",
+        headers: { "X-CSRFToken": csrfToken || "" },
+      });
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    } finally {
+      // Notificar a otras pestañas que se cerró sesión
+      localStorage.removeItem("rep-rol");
+      localStorage.removeItem("rep-usuario");
+      setRol("visitante");
+      setNombre("");
+      window.location.href = "/";
+    }
   };
 
-  return { rol, nombre, cambiar, listo };
+  return { rol, nombre, listo, cerrarSesion };
 }

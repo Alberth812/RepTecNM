@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { GuardiaAdmin } from "@/components/admin/guardia-admin";
 import { Topbar } from "@/components/admin/topbar";
-import { Sidebar } from "@/components/admin/sidebar";
+import { SidebarAdmin as Sidebar } from "@/components/admin/sidebar";
 import { MenuMovilAdmin } from "@/components/admin/menu-movil-admin";
 
 function AdminLayoutInterno({

@@ -3,7 +3,7 @@
 import { type ReactNode } from "react";
 import { Search } from "lucide-react";
 
-import { Sidebar } from "@/components/admin/sidebar";
+import { SidebarAdmin as Sidebar } from "@/components/admin/sidebar";
 import { AvatarSesion } from "@/components/admin/avatar-sesion";
 
 export function CascoAdmin({ children }: { children: ReactNode }) {

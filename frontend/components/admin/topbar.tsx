@@ -3,7 +3,7 @@
 import { Bell, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Sidebar } from "./sidebar";
+import { SidebarAdmin as Sidebar } from "./sidebar";
 
 export function Topbar() {
 
