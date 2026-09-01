@@ -17,6 +17,7 @@ class ContenidoInicio(models.Model):
     afiliacion_beneficios = models.TextField(blank=True, help_text="Beneficios de la afiliación (un beneficio por línea)")
     afiliacion_requisitos = models.TextField(blank=True, help_text="Requisitos de afiliación (un requisito por línea)")
     afiliacion_proceso = models.TextField(blank=True, help_text="Pasos del proceso de afiliación (un paso por línea)")
+    avisos = models.JSONField(default=list, blank=True, help_text="Lista de avisos/anuncios flotantes")
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
     class Meta:

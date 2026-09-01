@@ -49,6 +49,7 @@ export default function CmsPage() {
   const [imagen2File, setImagen2File] = useState<File | null>(null);
   const [imagen1Preview, setImagen1Preview] = useState<string>("");
   const [imagen2Preview, setImagen2Preview] = useState<string>("");
+  const [avisos, setAvisos] = useState<Array<{titulo: string, contenido: string, tipo: string}>>(c.avisos || []);
   const [slideImages, setSlideImages] = useState<{[key: number]: {file: File | null, preview: string}}>({});
 
   // Auto-logout al cerrar la página
@@ -185,6 +186,21 @@ export default function CmsPage() {
     setSlide(index, { imagen: "" });
   };
 
+  
+  const agregarAviso = () => {
+    setAvisos([...avisos, { titulo: "", contenido: "", tipo: "info" }]);
+  };
+
+  const eliminarAviso = (index: number) => {
+    setAvisos(avisos.filter((_, i) => i !== index));
+  };
+
+  const actualizarAviso = (index: number, campo: string, valor: string) => {
+    const nuevosAvisos = [...avisos];
+    nuevosAvisos[index] = { ...nuevosAvisos[index], [campo]: valor };
+    setAvisos(nuevosAvisos);
+  };
+
   const handleImagen1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -274,6 +290,7 @@ export default function CmsPage() {
         return slideData;
       });
 
+      formData.append("avisos", JSON.stringify(avisos));
       formData.append("slides", JSON.stringify(slidesParaJSON));
       formData.append("testimonios", JSON.stringify(c.testimonios.map(t => ({ ...t, autor_nombre: t.nombre, autor_cargo: t.cargo }))));
       
@@ -614,6 +631,54 @@ export default function CmsPage() {
               <Textarea placeholder="Texto del testimonio" value={t.texto} onChange={(e) => setTest(i, { texto: e.target.value })} rows={2} />
             </div>
           ))}
+        </div>
+      </section>
+
+      
+      {/* AVISOS FLOTANTES */}
+      <section className="rounded-xl border bg-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Avisos Flotantes</h2>
+          <Button variant="outline" size="sm" onClick={agregarAviso}>
+            <Plus className="mr-2 h-4 w-4" /> Agregar aviso
+          </Button>
+        </div>
+        <div className="space-y-4">
+          {avisos.map((aviso, i) => (
+            <div key={i} className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">Aviso {i + 1}</h3>
+                <Button variant="ghost" size="icon" onClick={() => eliminarAviso(i)} className="text-destructive">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Título</Label>
+                  <Input value={aviso.titulo} onChange={(e) => actualizarAviso(i, "titulo", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tipo</Label>
+                  <Select value={aviso.tipo} onValueChange={(v) => actualizarAviso(i, "tipo", v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="info">Informativo</SelectItem>
+                      <SelectItem value="aviso">Aviso Importante</SelectItem>
+                      <SelectItem value="urgente">Urgente</SelectItem>
+                      <SelectItem value="convocatoria">Convocatoria</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Contenido</Label>
+                  <Textarea value={aviso.contenido} onChange={(e) => actualizarAviso(i, "contenido", e.target.value)} rows={3} />
+                </div>
+              </div>
+            </div>
+          ))}
+          {avisos.length === 0 && (
+            <p className="text-center text-muted-foreground text-sm py-4">No hay avisos configurados</p>
+          )}
         </div>
       </section>
 
