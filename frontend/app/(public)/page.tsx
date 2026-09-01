@@ -24,6 +24,7 @@ function parsearLista(texto: string) {
 }
 
 export default function HomePage() {
+  const limpiar = (val: any) => (val === "undefined" || !val) ? "" : String(val);
   const [contenido, setContenido] = useState<ContenidoHome>(CONTENIDO_DEFAULT);
   const [slide, setSlide] = useState(0);
   const [cargando, setCargando] = useState(true);
@@ -44,6 +45,13 @@ export default function HomePage() {
             afiliacion_beneficios: data.afiliacion_beneficios || CONTENIDO_DEFAULT.afiliacion_beneficios,
             afiliacion_requisitos: data.afiliacion_requisitos || CONTENIDO_DEFAULT.afiliacion_requisitos,
             afiliacion_proceso: data.afiliacion_proceso || CONTENIDO_DEFAULT.afiliacion_proceso,
+            contactoTitulo: data.contacto_titulo || data.contactoTitulo || "",
+            contactoTexto: data.contacto_texto || data.contactoTexto || "",
+            contactoEmail: data.contacto_email || data.contactoEmail || "",
+            contactoTelefono: data.contacto_telefono || data.contactoTelefono || "",
+            contactoDireccion: data.contacto_direccion || data.contactoDireccion || "",
+            mision: data.mision || "",
+            vision: data.vision || "",
             redes: {
               facebook: data.facebook_url || data.redes?.facebook || "",
               twitter: data.twitter_url || data.redes?.twitter || "",
@@ -185,6 +193,40 @@ export default function HomePage() {
           )}
         </div>
       </section>
+      {/* MISIÓN Y VISIÓN */}
+      <section className="bg-gradient-to-br from-[#003366] via-[#004B87] to-[#0077c8] py-20 text-white">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center">
+            <h2 className="font-serif text-3xl font-bold tracking-tight">Nuestro rumbo</h2>
+            <p className="mt-3 text-sky-100/80">Misión y visión de la Red de Egresados de Posgrado del TecNM.</p>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-8 backdrop-blur-md transition-all hover:bg-white/15">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-amber-400 p-2.5 text-amber-950">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Misión</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-sky-50/90">
+                {contenido.mision || "Consolidar una comunidad de egresados de posgrado del TecNM que promueva la colaboración académica, científica y social."}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-8 backdrop-blur-md transition-all hover:bg-white/15">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-amber-400 p-2.5 text-amber-950">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <h3 className="font-serif text-2xl font-bold">Visión</h3>
+              </div>
+              <p className="mt-4 leading-relaxed text-sky-50/90">
+                {contenido.vision || "Ser una red de referencia nacional e internacional que articule conocimientos, proyectos y liderazgos de los egresados del TecNM."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* ===== QUÉ HACEMOS ===== */}
       <section id="que-hacemos" className="py-12 sm:py-16 md:py-20 bg-muted/40">
@@ -275,9 +317,9 @@ export default function HomePage() {
             <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted-foreground">{contenido.contactoTexto || "Estamos para ayudarte en tu proceso de afiliación."}</p>
           </div>
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-3 mb-8">
-            {contenido.contactoEmail && <Card><CardContent className="p-6 text-center"><Mail className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Correo</h3><p className="text-sm text-muted-foreground break-all">{contenido.contactoEmail}</p></CardContent></Card>}
-            {contenido.contactoTelefono && <Card><CardContent className="p-6 text-center"><Phone className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Teléfono</h3><p className="text-sm text-muted-foreground">{contenido.contactoTelefono}</p></CardContent></Card>}
-            {contenido.contactoDireccion && <Card><CardContent className="p-6 text-center"><MapPinIcon className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Ubicación</h3><p className="text-sm text-muted-foreground">{contenido.contactoDireccion}</p></CardContent></Card>}
+            {limpiar(contenido.contactoEmail) && <Card><CardContent className="p-6 text-center"><Mail className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Correo</h3><p className="text-sm text-muted-foreground break-all">{limpiar(contenido.contactoEmail)}</p></CardContent></Card>}
+            {limpiar(contenido.contactoTelefono) && <Card><CardContent className="p-6 text-center"><Phone className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Teléfono</h3><p className="text-sm text-muted-foreground">{limpiar(contenido.contactoTelefono)}</p></CardContent></Card>}
+            {limpiar(contenido.contactoDireccion) && <Card><CardContent className="p-6 text-center"><MapPinIcon className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Ubicación</h3><p className="text-sm text-muted-foreground">{limpiar(contenido.contactoDireccion)}</p></CardContent></Card>}
           </div>
           <div className="flex justify-center gap-4">
             {contenido.redes?.facebook && <Link href={contenido.redes.facebook} target="_blank" className="p-2 rounded-full bg-muted hover:bg-[#004B87] hover:text-white transition-colors"><span className="text-[10px] font-bold leading-none">FB</span></Link>}

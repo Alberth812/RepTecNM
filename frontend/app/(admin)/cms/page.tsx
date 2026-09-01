@@ -258,13 +258,26 @@ export default function CmsPage() {
       formData.append("tiktok_url", c.redes.tiktok);
       formData.append("contacto_titulo", c.contactoTitulo);
       formData.append("contacto_texto", c.contactoTexto);
-      formData.append("contacto_email", c.contactoEmail);
-      formData.append("contacto_telefono", c.contactoTelefono);
-      formData.append("contacto_direccion", c.contactoDireccion);
+      formData.append("contacto_email", c.contactoEmail || "");
+      formData.append("contacto_telefono", c.contactoTelefono || "");
+      formData.append("contacto_direccion", c.contactoDireccion || "");
       
-      formData.append("slides", JSON.stringify(c.slides.map(s => ({ ...s, boton_texto: s.ctaLabel, boton_url: s.ctaHref }))));
+      // 1. Procesar slides: separar imágenes del JSON para enviarlas como archivos
+      const slidesParaJSON = c.slides.map((s, index) => {
+        const slideData = { ...s, boton_texto: s.ctaLabel, boton_url: s.ctaHref };
+        // Si hay una imagen nueva en este slide, la agregamos al FormData como archivo
+        if (slideImages[index]?.file) {
+          formData.append(`slide_${index}_imagen`, slideImages[index].file);
+          // Quitamos la cadena base64 del JSON para que el backend no falle al validar
+          slideData.imagen = null; 
+        }
+        return slideData;
+      });
+
+      formData.append("slides", JSON.stringify(slidesParaJSON));
       formData.append("testimonios", JSON.stringify(c.testimonios.map(t => ({ ...t, autor_nombre: t.nombre, autor_cargo: t.cargo }))));
       
+      // 2. Imágenes de la sección Nosotros
       if (imagen1File) {
         formData.append("nosotros_imagen_1", imagen1File);
       }
@@ -482,7 +495,7 @@ export default function CmsPage() {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Texto descriptivo</Label>
-            <Textarea value={c.nosotrosTexto} onChange={(e) => setC({ ...c, nosotrosTexto: e.target.value })} rows={5} />
+            <Textarea value={c.nosotrosTexto || ""} onChange={(e) => setC({ ...c, nosotrosTexto: e.target.value })} rows={5} />
             <Contador len={c.nosotrosTexto.length} min={150} max={1500} />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -550,12 +563,39 @@ export default function CmsPage() {
         </div>
       </section>
 
+      {/* MISIÓN Y VISIÓN */}
+      <section className="rounded-xl border bg-card p-6">
+        <h2 className="mb-4 text-lg font-semibold">Misión y Visión</h2>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Misión</Label>
+            <Textarea 
+              value={c.mision || ""} 
+              onChange={(e) => setC({ ...c, mision: e.target.value })} 
+              rows={4} 
+              placeholder="Describe la misión de la asociación..."
+            />
+            <Contador len={(c.mision || "").length} min={50} max={1000} />
+          </div>
+          <div className="space-y-2">
+            <Label>Visión</Label>
+            <Textarea 
+              value={c.vision || ""} 
+              onChange={(e) => setC({ ...c, vision: e.target.value })} 
+              rows={4} 
+              placeholder="Describe la visión de la asociación..."
+            />
+            <Contador len={(c.vision || "").length} min={50} max={1000} />
+          </div>
+        </div>
+      </section>
+
       {/* QUÉ HACEMOS */}
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Sección Qué Hacemos</h2>
         <div className="space-y-2">
           <Label>Texto descriptivo</Label>
-          <Textarea value={c.queHacemosTexto} onChange={(e) => setC({ ...c, queHacemosTexto: e.target.value })} rows={5} />
+          <Textarea value={c.queHacemosTexto || ""} onChange={(e) => setC({ ...c, queHacemosTexto: e.target.value })} rows={5} />
           <Contador len={c.queHacemosTexto.length} min={150} max={1500} />
         </div>
       </section>
@@ -581,19 +621,19 @@ export default function CmsPage() {
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Contacto y Redes Sociales</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2"><Label>Título de contacto</Label><Input value={c.contactoTitulo} onChange={(e) => setC({ ...c, contactoTitulo: e.target.value })} /></div>
-          <div className="space-y-2 md:col-span-2"><Label>Texto de contacto</Label><Textarea value={c.contactoTexto} onChange={(e) => setC({ ...c, contactoTexto: e.target.value })} /></div>
-          <div className="space-y-2"><Label className="flex items-center gap-2"><Mail className="h-4 w-4" /> Correo</Label><Input value={c.contactoEmail} onChange={(e) => setC({ ...c, contactoEmail: e.target.value })} /></div>
-          <div className="space-y-2"><Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Teléfono</Label><Input value={c.contactoTelefono} onChange={(e) => setC({ ...c, contactoTelefono: e.target.value })} /></div>
-          <div className="space-y-2 md:col-span-2"><Label className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Dirección</Label><Input value={c.contactoDireccion} onChange={(e) => setC({ ...c, contactoDireccion: e.target.value })} /></div>
+          <div className="space-y-2"><Label>Título de contacto</Label><Input value={c.contactoTitulo || ""} onChange={(e) => setC({ ...c, contactoTitulo: e.target.value })} /></div>
+          <div className="space-y-2 md:col-span-2"><Label>Texto de contacto</Label><Textarea value={c.contactoTexto || ""} onChange={(e) => setC({ ...c, contactoTexto: e.target.value })} /></div>
+          <div className="space-y-2"><Label className="flex items-center gap-2"><Mail className="h-4 w-4" /> Correo</Label><Input value={c.contactoEmail || ""} onChange={(e) => setC({ ...c, contactoEmail: e.target.value })} /></div>
+          <div className="space-y-2"><Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Teléfono</Label><Input value={c.contactoTelefono || ""} onChange={(e) => setC({ ...c, contactoTelefono: e.target.value })} /></div>
+          <div className="space-y-2 md:col-span-2"><Label className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Dirección</Label><Input value={c.contactoDireccion || ""} onChange={(e) => setC({ ...c, contactoDireccion: e.target.value })} /></div>
           
           <div className="space-y-2 md:col-span-2"><Label className="font-semibold mt-2 block">Redes Sociales (URLs)</Label></div>
-          <div className="space-y-2"><Label>Facebook</Label><Input value={c.redes.facebook} onChange={(e) => setC({ ...c, redes: { ...c.redes, facebook: e.target.value } })} /></div>
-          <div className="space-y-2"><Label>Instagram</Label><Input value={c.redes.instagram} onChange={(e) => setC({ ...c, redes: { ...c.redes, instagram: e.target.value } })} /></div>
-          <div className="space-y-2"><Label>LinkedIn</Label><Input value={c.redes.linkedin} onChange={(e) => setC({ ...c, redes: { ...c.redes, linkedin: e.target.value } })} /></div>
-          <div className="space-y-2"><Label>Twitter / X</Label><Input value={c.redes.twitter} onChange={(e) => setC({ ...c, redes: { ...c.redes, twitter: e.target.value } })} /></div>
-          <div className="space-y-2"><Label>YouTube</Label><Input value={c.redes.youtube} onChange={(e) => setC({ ...c, redes: { ...c.redes, youtube: e.target.value } })} /></div>
-          <div className="space-y-2"><Label>TikTok</Label><Input value={c.redes.tiktok} onChange={(e) => setC({ ...c, redes: { ...c.redes, tiktok: e.target.value } })} /></div>
+          <div className="space-y-2"><Label>Facebook</Label><Input value={c.redes?.facebook || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, facebook: e.target.value } })} /></div>
+          <div className="space-y-2"><Label>Instagram</Label><Input value={c.redes?.instagram || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, instagram: e.target.value } })} /></div>
+          <div className="space-y-2"><Label>LinkedIn</Label><Input value={c.redes?.linkedin || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, linkedin: e.target.value } })} /></div>
+          <div className="space-y-2"><Label>Twitter / X</Label><Input value={c.redes?.twitter || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, twitter: e.target.value } })} /></div>
+          <div className="space-y-2"><Label>YouTube</Label><Input value={c.redes?.youtube || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, youtube: e.target.value } })} /></div>
+          <div className="space-y-2"><Label>TikTok</Label><Input value={c.redes?.tiktok || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, tiktok: e.target.value } })} /></div>
         </div>
       </section>
     </div>

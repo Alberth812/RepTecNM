@@ -16,11 +16,9 @@ class TestimonioSerializer(serializers.ModelSerializer):
         fields = ['id', 'orden', 'texto', 'autor_nombre', 'autor_cargo']
 
 class ContenidoInicioSerializer(serializers.ModelSerializer):
-    # Campos de imagen de "Nosotros"
     nosotros_imagen_1 = serializers.ImageField(required=False, allow_null=True, allow_empty_file=True)
     nosotros_imagen_2 = serializers.ImageField(required=False, allow_null=True, allow_empty_file=True)
     
-    # Campos de solo lectura para mostrar los slides y testimonios actuales
     slides = SlideSerializer(many=True, read_only=True)
     testimonios = TestimonioSerializer(many=True, read_only=True)
     
@@ -46,37 +44,52 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
         return representation
 
     def to_internal_value(self, data):
-        """
-        Convierte los datos entrantes, manejando:
-        - JSON strings de slides y testimonios
-        - Archivos de imagen de slides (slide_0_imagen, slide_1_imagen, etc.)
-        """
         mutable_data = data.copy() if hasattr(data, 'copy') else data
         
-        # Extraer y parsear JSON de slides
         slides_data = []
         if 'slides' in mutable_data:
             slides_json = mutable_data.pop('slides')
+            
             if isinstance(slides_json, str):
                 try:
                     slides_data = json.loads(slides_json)
                 except json.JSONDecodeError:
                     slides_data = []
+            elif isinstance(slides_json, list):
+                if len(slides_json) > 0 and isinstance(slides_json[0], str):
+                    try:
+                        slides_data = json.loads(slides_json[0])
+                    except json.JSONDecodeError:
+                        slides_data = []
+                else:
+                    slides_data = slides_json
+            else:
+                slides_data = []
         
-        # Extraer archivos de imagen de slides del FormData
-        # El frontend envía: slide_0_imagen, slide_1_imagen, etc.
         slide_images = {}
         for key in list(mutable_data.keys()):
             if key.startswith('slide_') and key.endswith('_imagen'):
                 slide_index = int(key.split('_')[1])
-                slide_images[slide_index] = mutable_data.pop(key)
+                raw_value = mutable_data.pop(key)
+                print(f"🔍 DEBUG RAW: {key} type = {type(raw_value)}, value = {raw_value}")
+                
+                # Si es una lista, extraer el primer elemento (protección contra errores del frontend)
+                if isinstance(raw_value, list) and len(raw_value) > 0:
+                    slide_images[slide_index] = raw_value[0]
+                    print(f"⚠️ DEBUG: Era una lista, se tomó el primer elemento: {type(slide_images[slide_index])}")
+                else:
+                    slide_images[slide_index] = raw_value
         
-        # Asignar las imágenes a los slides correspondientes
         for index, imagen in slide_images.items():
-            if index < len(slides_data):
-                slides_data[index]['imagen'] = imagen
+            if index < len(slides_data) and isinstance(slides_data[index], dict):
+                # Verificar que sea un archivo válido o una cadena antes de asignar
+                if hasattr(imagen, 'name') or isinstance(imagen, str) or imagen is None:
+                    slides_data[index]['imagen'] = imagen
+                    print(f"✅ DEBUG: Asignada imagen válida a slide {index}")
+                else:
+                    print(f"❌ DEBUG ERROR: Imagen no válida para slide {index}, tipo: {type(imagen)}")
+                    slides_data[index]['imagen'] = None # Fallback seguro
         
-        # Extraer y parsear JSON de testimonios
         testimonios_data = []
         if 'testimonios' in mutable_data:
             testimonios_json = mutable_data.pop('testimonios')
@@ -85,39 +98,23 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
                     testimonios_data = json.loads(testimonios_json)
                 except json.JSONDecodeError:
                     testimonios_data = []
+            elif isinstance(testimonios_json, list):
+                if len(testimonios_json) > 0 and isinstance(testimonios_json[0], str):
+                    try:
+                        testimonios_data = json.loads(testimonios_json[0])
+                    except json.JSONDecodeError:
+                        testimonios_data = []
+                else:
+                    testimonios_data = testimonios_json
         
-        # Guardar los datos procesados para usarlos en create/update
         self._slides_data = slides_data
         self._testimonios_data = testimonios_data
         
         return super().to_internal_value(mutable_data)
     
-    def create(self, validated_data):
-        slides_data = self._slides_data
-        testimonios_data = self._testimonios_data
-        
-        # Crear el contenido principal
-        contenido = ContenidoInicio.objects.create(**validated_data)
-        
-        # Crear los slides
-        for index, slide_data in enumerate(slides_data):
-            slide_data['contenido'] = contenido
-            slide_data['orden'] = index
-            Slide.objects.create(**slide_data)
-        
-        # Crear los testimonios
-        for index, test_data in enumerate(testimonios_data):
-            test_data['contenido'] = contenido
-            test_data['orden'] = index
-            Testimonio.objects.create(**test_data)
-        
-        return contenido
-    
     def update(self, instance, validated_data):
         slides_data = self._slides_data
-        testimonios_data = self._testimonios_data
         
-        # Actualizar campos del contenido principal
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -125,15 +122,24 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
         # Actualizar slides: eliminar todos y recrear
         instance.slides.all().delete()
         for index, slide_data in enumerate(slides_data):
-            slide_data['contenido'] = instance
-            slide_data['orden'] = index
-            Slide.objects.create(**slide_data)
+            if isinstance(slide_data, dict):
+                slide_data.pop('ctaLabel', None)
+                slide_data.pop('ctaHref', None)
+                
+                slide_data['contenido'] = instance
+                slide_data['orden'] = index
+                try:
+                    Slide.objects.create(**slide_data)
+                    print(f"✅ DEBUG: Slide {index} creado exitosamente")
+                except Exception as e:
+                    print(f"❌ DEBUG ERROR creando slide {index}: {e}")
         
         # Actualizar testimonios: eliminar todos y recrear
         instance.testimonios.all().delete()
-        for index, test_data in enumerate(testimonios_data):
-            test_data['contenido'] = instance
-            test_data['orden'] = index
-            Testimonio.objects.create(**test_data)
+        for index, test_data in enumerate(self._testimonios_data):
+            if isinstance(test_data, dict):
+                test_data['contenido'] = instance
+                test_data['orden'] = index
+                Testimonio.objects.create(**test_data)
         
         return instance
