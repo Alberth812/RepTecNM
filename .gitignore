@@ -7,41 +7,69 @@
 !.env.example
 
 # ==========================================
-# NODE.JS / NEXT.JS
+# NODE.JS / NEXT.JS (Frontend)
 # ==========================================
 node_modules/
 .pnpm-store/
 .next/
 out/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
 
 # ==========================================
-# PYTHON / DJANGO
+# PYTHON / DJANGO (Backend)
 # ==========================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 venv/
+env/
 ENV/
 db.sqlite3
-media_files/
-staticfiles/
+db.sqlite3-journal
+backend/venv/
 
 # ==========================================
-# DOCKER / GENERAL
+# DOCKER Y SISTEMA
 # ==========================================
-.docker/
 *.log
+.docker/
 .DS_Store
 Thumbs.db
+.directory
+
+# ==========================================
+# IDE
+# ==========================================
 .vscode/
 .idea/
 *.swp
 *.swo
-.directory
+
+# ==========================================
+# COBERTURA Y DEBUG
+# ==========================================
+coverage/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*

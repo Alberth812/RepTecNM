@@ -1,3 +1,5 @@
+import base64
+import uuid
 import json
 from rest_framework import serializers
 from .models import ContenidoInicio, Slide, Testimonio
@@ -90,6 +92,23 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
                     print(f"❌ DEBUG ERROR: Imagen no válida para slide {index}, tipo: {type(imagen)}")
                     slides_data[index]['imagen'] = None # Fallback seguro
         
+        avisos_data = []
+        if 'avisos' in mutable_data:
+            avisos_json = mutable_data.pop('avisos')
+            if isinstance(avisos_json, str):
+                try:
+                    avisos_data = json.loads(avisos_json)
+                except json.JSONDecodeError:
+                    avisos_data = []
+            elif isinstance(avisos_json, list):
+                if len(avisos_json) > 0 and isinstance(avisos_json[0], str):
+                    try:
+                        avisos_data = json.loads(avisos_json[0])
+                    except json.JSONDecodeError:
+                        avisos_data = []
+                else:
+                    avisos_data = avisos_json
+
         testimonios_data = []
         if 'testimonios' in mutable_data:
             testimonios_json = mutable_data.pop('testimonios')
@@ -109,6 +128,7 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
         
         self._slides_data = slides_data
         self._testimonios_data = testimonios_data
+        self._avisos_data = avisos_data
         
         return super().to_internal_value(mutable_data)
     
