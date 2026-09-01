@@ -244,6 +244,8 @@ export default function CmsPage() {
 
       const formData = new FormData();
       formData.append("nosotros_texto", c.nosotrosTexto);
+      formData.append("mision", c.mision || "");
+      formData.append("vision", c.vision || "");
       formData.append("que_hacemos_texto", c.queHacemosTexto);
       formData.append("afiliacion_beneficios", c.afiliacion_beneficios || "");
       formData.append("afiliacion_requisitos", c.afiliacion_requisitos || "");
@@ -308,6 +310,66 @@ export default function CmsPage() {
           <Button onClick={guardar} disabled={loading}><Save className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Guardar cambios"}</Button>
         </div>
       </div>
+
+
+      {/* MISIÓN Y VISIÓN */}
+      <section className="rounded-xl border bg-card p-6">
+        <h2 className="text-lg font-semibold mb-4">Misión y Visión</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Misión</Label>
+            <textarea
+              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Nuestra misión es..."
+              value={c.mision || ""}
+              onChange={(e) => setC({ ...c, mision: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Visión</Label>
+            <textarea
+              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              placeholder="Nuestra visión es..."
+              value={c.vision || ""}
+              onChange={(e) => setC({ ...c, vision: e.target.value })}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* AFILIACIÓN: BENEFICIOS, REQUISITOS Y PROCESO */}
+      <section className="rounded-xl border bg-card p-6">
+        <h2 className="text-lg font-semibold mb-4">Afiliación (Un elemento por línea)</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="space-y-2">
+            <Label>Beneficios</Label>
+            <textarea
+              className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              placeholder="- Beneficio 1&#10;- Beneficio 2"
+              value={c.afiliacion_beneficios || ""}
+              onChange={(e) => setC({ ...c, afiliacion_beneficios: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Requisitos</Label>
+            <textarea
+              className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              placeholder="- Requisito 1&#10;- Requisito 2"
+              value={c.afiliacion_requisitos || ""}
+              onChange={(e) => setC({ ...c, afiliacion_requisitos: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Proceso (Ej: 1 | Llena el formulario)</Label>
+            <textarea
+              className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              placeholder="1 | Paso 1&#10;2 | Paso 2"
+              value={c.afiliacion_proceso || ""}
+              onChange={(e) => setC({ ...c, afiliacion_proceso: e.target.value })}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* SLIDES DINÁMICOS CON SUBIDA DE IMÁGENES */}
       <section className="rounded-xl border bg-card p-6">

@@ -29,6 +29,22 @@ class ContenidoInicioSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['fecha_actualizacion']
     
+
+    def to_representation(self, instance):
+        """Formatea los datos para que el frontend los reciba en la estructura esperada."""
+        representation = super().to_representation(instance)
+        
+        # Convertir textos multilínea a listas (arrays)
+        representation['beneficios'] = [line.strip() for line in instance.afiliacion_beneficios.split('\n') if line.strip()] if instance.afiliacion_beneficios else []
+        representation['requisitos'] = [line.strip() for line in instance.afiliacion_requisitos.split('\n') if line.strip()] if instance.afiliacion_requisitos else []
+        representation['proceso'] = [line.strip() for line in instance.afiliacion_proceso.split('\n') if line.strip()] if instance.afiliacion_proceso else []
+        
+        # Asegurar que mision y vision estén presentes (ya deberían estarlo por fields='__all__')
+        representation['mision'] = instance.mision or ""
+        representation['vision'] = instance.vision or ""
+        
+        return representation
+
     def to_internal_value(self, data):
         """
         Convierte los datos entrantes, manejando:
