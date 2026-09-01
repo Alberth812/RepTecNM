@@ -88,14 +88,14 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('es' | 'en') | ('es' | 'en')[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'es' | 'es'[];
   globals: {
     home: Home;
   };
   globalsSelect: {
     home: HomeSelect<false> | HomeSelect<true>;
   };
-  locale: 'es' | 'en';
+  locale: 'es';
   widgets: {
     collections: CollectionsWidget;
   };

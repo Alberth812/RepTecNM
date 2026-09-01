@@ -27,7 +27,7 @@ export default buildConfig({
   globals: [Home],
 
   localization: {
-    locales: ["es", "en"],
+    locales: ["es"],
     defaultLocale: "es",
   },
 
