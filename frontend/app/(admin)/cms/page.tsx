@@ -49,7 +49,59 @@ export default function CmsPage() {
   const [imagen2File, setImagen2File] = useState<File | null>(null);
   const [imagen1Preview, setImagen1Preview] = useState<string>("");
   const [imagen2Preview, setImagen2Preview] = useState<string>("");
-  const [avisos, setAvisos] = useState<Array<{titulo: string, contenido: string, tipo: string}>>(c.avisos || []);
+  const [avisos, setAvisos] = useState<Array<{
+    titulo: string; contenido: string; tipo: string; 
+    fecha_activacion: string; fecha_expiracion: string;
+    imagen_base64: string | null; imagen_url: string | null;
+}>>(c.avisos || []);
+  
+  // Estados para listas dinámicas de afiliación
+  const [beneficios, setBeneficios] = useState<string[]>(
+    (c.afiliacion_beneficios || "").split("\n").filter((l) => l.trim() !== "")
+  );
+  const [requisitos, setRequisitos] = useState<string[]>(
+    (c.afiliacion_requisitos || "").split("\n").filter((l) => l.trim() !== "")
+  );
+  const [proceso, setProceso] = useState<string[]>(
+    (c.afiliacion_proceso || "").split("\n").filter((l) => l.trim() !== "")
+  );
+
+  // Funciones para manejar beneficios
+  const agregarBeneficio = () => {
+    if (beneficios.length >= 10) { toast.error("Máximo 10 beneficios"); return; }
+    setBeneficios([...beneficios, ""]);
+  };
+  const eliminarBeneficio = (i: number) => setBeneficios(beneficios.filter((_, x) => x !== i));
+  const actualizarBeneficio = (i: number, val: string) => {
+    const nuevos = [...beneficios];
+    nuevos[i] = val;
+    setBeneficios(nuevos);
+  };
+
+  // Funciones para manejar requisitos
+  const agregarRequisito = () => {
+    if (requisitos.length >= 10) { toast.error("Máximo 10 requisitos"); return; }
+    setRequisitos([...requisitos, ""]);
+  };
+  const eliminarRequisito = (i: number) => setRequisitos(requisitos.filter((_, x) => x !== i));
+  const actualizarRequisito = (i: number, val: string) => {
+    const nuevos = [...requisitos];
+    nuevos[i] = val;
+    setRequisitos(nuevos);
+  };
+
+  // Funciones para manejar proceso
+  const agregarPaso = () => {
+    if (proceso.length >= 10) { toast.error("Máximo 10 pasos"); return; }
+    setProceso([...proceso, ""]);
+  };
+  const eliminarPaso = (i: number) => setProceso(proceso.filter((_, x) => x !== i));
+  const actualizarPaso = (i: number, val: string) => {
+    const nuevos = [...proceso];
+    nuevos[i] = val;
+    setProceso(nuevos);
+  };
+
   const [slideImages, setSlideImages] = useState<{[key: number]: {file: File | null, preview: string}}>({});
 
   // Auto-logout al cerrar la página
@@ -91,6 +143,10 @@ export default function CmsPage() {
             afiliacion_beneficios: data.afiliacion_beneficios || CONTENIDO_DEFAULT.afiliacion_beneficios,
             afiliacion_requisitos: data.afiliacion_requisitos || CONTENIDO_DEFAULT.afiliacion_requisitos,
             afiliacion_proceso: data.afiliacion_proceso || CONTENIDO_DEFAULT.afiliacion_proceso,
+            // Inicializar listas dinámicas de afiliación
+            _beneficios_list: (data.afiliacion_beneficios || "").split("\n").filter((l: string) => l.trim() !== ""),
+            _requisitos_list: (data.afiliacion_requisitos || "").split("\n").filter((l: string) => l.trim() !== ""),
+            _proceso_list: (data.afiliacion_proceso || "").split("\n").filter((l: string) => l.trim() !== ""),
             contactoTitulo: data.contacto_titulo || data.contactoTitulo || "",
             contactoTexto: data.contacto_texto || data.contactoTexto || "",
             contactoEmail: data.contacto_email || data.contactoEmail || "",
@@ -121,11 +177,20 @@ export default function CmsPage() {
         console.error("Error cargando CMS", error);
       } finally {
         setCargado(true);
-        setAvisos(data.avisos || []);
       }
     };
     cargarDatos();
   }, []);
+
+
+  // Sincronizar listas dinámicas después de cargar datos
+  useEffect(() => {
+    if (cargado) {
+      setBeneficios((c as any)._beneficios_list || []);
+      setRequisitos((c as any)._requisitos_list || []);
+      setProceso((c as any)._proceso_list || []);
+    }
+  }, [cargado]);
 
   const setSlide = (i: number, cambios: Partial<Slide>) =>
     setC((prev) => ({ ...prev, slides: prev.slides.map((sl, x) => (x === i ? { ...sl, ...cambios } : sl)) }));
@@ -196,8 +261,35 @@ export default function CmsPage() {
   };
 
   
+
+  const handleAvisoImagen = (index: number, file: File | null) => {
+    if (!file) {
+      const nuevos = [...avisos];
+      nuevos[index].imagen_base64 = null;
+      nuevos[index].imagen_url = null;
+      setAvisos(nuevos);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const nuevos = [...avisos];
+      nuevos[index].imagen_base64 = reader.result as string;
+      setAvisos(nuevos);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const agregarAviso = () => {
-    setAvisos([...avisos, { titulo: "", contenido: "", tipo: "info" }]);
+    const hoy = new Date().toISOString().split('T')[0];
+    const proximoMes = new Date();
+    proximoMes.setMonth(proximoMes.getMonth() + 1);
+    setAvisos([...avisos, { 
+      titulo: "", contenido: "", tipo: "info",
+      fecha_activacion: hoy,
+      fecha_expiracion: proximoMes.toISOString().split('T')[0],
+      imagen_base64: null,
+      imagen_url: null
+    }]);
   };
 
   const eliminarAviso = (index: number) => {
@@ -272,9 +364,9 @@ export default function CmsPage() {
       formData.append("mision", c.mision || "");
       formData.append("vision", c.vision || "");
       formData.append("que_hacemos_texto", c.queHacemosTexto);
-      formData.append("afiliacion_beneficios", c.afiliacion_beneficios || "");
-      formData.append("afiliacion_requisitos", c.afiliacion_requisitos || "");
-      formData.append("afiliacion_proceso", c.afiliacion_proceso || "");
+      formData.append("afiliacion_beneficios", beneficios.filter(b => b.trim()).join("\n"));
+      formData.append("afiliacion_requisitos", requisitos.filter(r => r.trim()).join("\n"));
+      formData.append("afiliacion_proceso", proceso.filter(p => p.trim()).join("\n"));
       formData.append("facebook_url", c.redes.facebook);
       formData.append("twitter_url", c.redes.twitter);
       formData.append("instagram_url", c.redes.instagram);
@@ -339,78 +431,22 @@ export default function CmsPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 p-6">
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Editor de Página de Inicio</h1>
           <p className="text-sm text-muted-foreground">Modifica el contenido que ven los visitantes en la página principal.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setC(CONTENIDO_DEFAULT)}><RotateCcw className="mr-2 h-4 w-4" /> Restablecer</Button>
-          <Button onClick={guardar} disabled={loading}><Save className="mr-2 h-4 w-4" /> {loading ? "Guardando..." : "Guardar cambios"}</Button>
+          <Button variant="outline" onClick={() => { if (confirm("¿Restablecer todos los campos a sus valores por defecto?")) setC(CONTENIDO_DEFAULT); }}>
+            <RotateCcw className="mr-2 h-4 w-4" /> Restablecer
+          </Button>
+          <Button onClick={guardar} disabled={loading}>
+            <Save className="mr-2 h-4 w-4" /> {loading ? "Publicando..." : "Publicar cambios"}
+          </Button>
         </div>
       </div>
-
-
-      {/* MISIÓN Y VISIÓN */}
-      <section className="rounded-xl border bg-card p-6">
-        <h2 className="text-lg font-semibold mb-4">Misión y Visión</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label>Misión</Label>
-            <textarea
-              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Nuestra misión es..."
-              value={c.mision || ""}
-              onChange={(e) => setC({ ...c, mision: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Visión</Label>
-            <textarea
-              className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              placeholder="Nuestra visión es..."
-              value={c.vision || ""}
-              onChange={(e) => setC({ ...c, vision: e.target.value })}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* AFILIACIÓN: BENEFICIOS, REQUISITOS Y PROCESO */}
-      <section className="rounded-xl border bg-card p-6">
-        <h2 className="text-lg font-semibold mb-4">Afiliación (Un elemento por línea)</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label>Beneficios</Label>
-            <textarea
-              className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              placeholder="- Beneficio 1&#10;- Beneficio 2"
-              value={c.afiliacion_beneficios || ""}
-              onChange={(e) => setC({ ...c, afiliacion_beneficios: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Requisitos</Label>
-            <textarea
-              className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              placeholder="- Requisito 1&#10;- Requisito 2"
-              value={c.afiliacion_requisitos || ""}
-              onChange={(e) => setC({ ...c, afiliacion_requisitos: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Proceso (Ej: 1 | Llena el formulario)</Label>
-            <textarea
-              className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              placeholder="1 | Paso 1&#10;2 | Paso 2"
-              value={c.afiliacion_proceso || ""}
-              onChange={(e) => setC({ ...c, afiliacion_proceso: e.target.value })}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* SLIDES DINÁMICOS CON SUBIDA DE IMÁGENES */}
+{/* SLIDES DINÁMICOS CON SUBIDA DE IMÁGENES */}
       <section className="rounded-xl border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Slider Principal ({c.slides.length}/5 slides)</h2>
@@ -515,7 +551,34 @@ export default function CmsPage() {
         </div>
       </section>
 
-      {/* NOSOTROS CON SUBIDA DE ARCHIVOS */}
+{/* MISIÓN Y VISIÓN */}
+      <section className="rounded-xl border bg-card p-6">
+        <h2 className="mb-4 text-lg font-semibold">Misión y Visión</h2>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Misión</Label>
+            <Textarea 
+              value={c.mision || ""} 
+              onChange={(e) => setC({ ...c, mision: e.target.value })} 
+              rows={4} 
+              placeholder="Describe la misión de la asociación..."
+            />
+            <Contador len={(c.mision || "").length} min={50} max={1000} />
+          </div>
+          <div className="space-y-2">
+            <Label>Visión</Label>
+            <Textarea 
+              value={c.vision || ""} 
+              onChange={(e) => setC({ ...c, vision: e.target.value })} 
+              rows={4} 
+              placeholder="Describe la visión de la asociación..."
+            />
+            <Contador len={(c.vision || "").length} min={50} max={1000} />
+          </div>
+        </div>
+      </section>
+
+{/* NOSOTROS CON SUBIDA DE ARCHIVOS */}
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Sección Nosotros</h2>
         <div className="space-y-4">
@@ -589,34 +652,7 @@ export default function CmsPage() {
         </div>
       </section>
 
-      {/* MISIÓN Y VISIÓN */}
-      <section className="rounded-xl border bg-card p-6">
-        <h2 className="mb-4 text-lg font-semibold">Misión y Visión</h2>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Misión</Label>
-            <Textarea 
-              value={c.mision || ""} 
-              onChange={(e) => setC({ ...c, mision: e.target.value })} 
-              rows={4} 
-              placeholder="Describe la misión de la asociación..."
-            />
-            <Contador len={(c.mision || "").length} min={50} max={1000} />
-          </div>
-          <div className="space-y-2">
-            <Label>Visión</Label>
-            <Textarea 
-              value={c.vision || ""} 
-              onChange={(e) => setC({ ...c, vision: e.target.value })} 
-              rows={4} 
-              placeholder="Describe la visión de la asociación..."
-            />
-            <Contador len={(c.vision || "").length} min={50} max={1000} />
-          </div>
-        </div>
-      </section>
-
-      {/* QUÉ HACEMOS */}
+{/* QUÉ HACEMOS */}
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Sección Qué Hacemos</h2>
         <div className="space-y-2">
@@ -626,7 +662,102 @@ export default function CmsPage() {
         </div>
       </section>
 
-      {/* TESTIMONIOS */}
+{/* AFILIACIÓN: BENEFICIOS, REQUISITOS Y PROCESO */}
+      <section className="rounded-xl border bg-card p-6">
+        <h2 className="text-lg font-semibold mb-2">Afiliación</h2>
+        <p className="text-sm text-muted-foreground mb-6">Agrega los beneficios, requisitos y pasos del proceso de afiliación. Máximo 10 elementos por sección.</p>
+        
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* BENEFICIOS */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-sm">Beneficios ({beneficios.length}/10)</h3>
+              <Button variant="outline" size="sm" onClick={agregarBeneficio} disabled={beneficios.length >= 10}>
+                <Plus className="h-3 w-3 mr-1" /> Agregar
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {beneficios.map((b, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-muted-foreground w-6">{i + 1}.</span>
+                  <Input
+                    value={b}
+                    onChange={(e) => actualizarBeneficio(i, e.target.value)}
+                    placeholder={`Beneficio ${i + 1}`}
+                    className="flex-1"
+                  />
+                  <Button variant="ghost" size="icon" onClick={() => eliminarBeneficio(i)} className="text-destructive h-7 w-7">
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+              {beneficios.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-4">Sin beneficios agregados</p>
+              )}
+            </div>
+          </div>
+
+          {/* REQUISITOS */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-sm">Requisitos ({requisitos.length}/10)</h3>
+              <Button variant="outline" size="sm" onClick={agregarRequisito} disabled={requisitos.length >= 10}>
+                <Plus className="h-3 w-3 mr-1" /> Agregar
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {requisitos.map((r, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-muted-foreground w-6">{i + 1}.</span>
+                  <Input
+                    value={r}
+                    onChange={(e) => actualizarRequisito(i, e.target.value)}
+                    placeholder={`Requisito ${i + 1}`}
+                    className="flex-1"
+                  />
+                  <Button variant="ghost" size="icon" onClick={() => eliminarRequisito(i)} className="text-destructive h-7 w-7">
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+              {requisitos.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-4">Sin requisitos agregados</p>
+              )}
+            </div>
+          </div>
+
+          {/* PROCESO */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-sm">Proceso ({proceso.length}/10)</h3>
+              <Button variant="outline" size="sm" onClick={agregarPaso} disabled={proceso.length >= 10}>
+                <Plus className="h-3 w-3 mr-1" /> Agregar
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {proceso.map((p, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-xs font-mono text-muted-foreground w-6">{String(i + 1).padStart(2, '0')}</span>
+                  <Input
+                    value={p}
+                    onChange={(e) => actualizarPaso(i, e.target.value)}
+                    placeholder={`Paso ${i + 1}`}
+                    className="flex-1"
+                  />
+                  <Button variant="ghost" size="icon" onClick={() => eliminarPaso(i)} className="text-destructive h-7 w-7">
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+              {proceso.length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-4">Sin pasos agregados</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+{/* TESTIMONIOS */}
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Testimonios</h2>
         <div className="space-y-4">
@@ -643,8 +774,7 @@ export default function CmsPage() {
         </div>
       </section>
 
-      
-      {/* AVISOS FLOTANTES */}
+{/* AVISOS FLOTANTES */}
       <section className="rounded-xl border bg-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Avisos Flotantes</h2>
@@ -652,19 +782,22 @@ export default function CmsPage() {
             <Plus className="mr-2 h-4 w-4" /> Agregar aviso
           </Button>
         </div>
-        <div className="space-y-4">
+        <p className="text-sm text-muted-foreground mb-4">
+          Los avisos aparecerán como notificaciones flotantes en la página principal cada vez que el usuario entre, siempre que la fecha actual esté dentro del rango de activación.
+        </p>
+        <div className="space-y-6">
           {avisos.map((aviso, i) => (
-            <div key={i} className="rounded-lg border bg-muted/30 p-4 space-y-3">
+            <div key={i} className="rounded-lg border bg-muted/30 p-4 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-medium">Aviso {i + 1}</h3>
                 <Button variant="ghost" size="icon" onClick={() => eliminarAviso(i)} className="text-destructive">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Título</Label>
-                  <Input value={aviso.titulo} onChange={(e) => actualizarAviso(i, "titulo", e.target.value)} />
+                  <Input value={aviso.titulo} onChange={(e) => actualizarAviso(i, "titulo", e.target.value)} placeholder="Ej: Convocatoria 2026" />
                 </div>
                 <div className="space-y-2">
                   <Label>Tipo</Label>
@@ -678,9 +811,29 @@ export default function CmsPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label>Fecha de Activación</Label>
+                  <Input type="date" value={aviso.fecha_activacion} onChange={(e) => actualizarAviso(i, "fecha_activacion", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Fecha de Expiración</Label>
+                  <Input type="date" value={aviso.fecha_expiracion} onChange={(e) => actualizarAviso(i, "fecha_expiracion", e.target.value)} />
+                </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label>Contenido</Label>
-                  <Textarea value={aviso.contenido} onChange={(e) => actualizarAviso(i, "contenido", e.target.value)} rows={3} />
+                  <Textarea value={aviso.contenido} onChange={(e) => actualizarAviso(i, "contenido", e.target.value)} rows={3} placeholder="Detalles del aviso..." />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Imagen del Aviso (Opcional)</Label>
+                  <Input type="file" accept="image/*" onChange={(e) => handleAvisoImagen(i, e.target.files?.[0] || null)} />
+                  {aviso.imagen_base64 && (
+                    <div className="mt-2">
+                      <img src={aviso.imagen_base64} alt="Vista previa" className="max-h-32 rounded-md border object-contain" />
+                      <Button variant="link" size="sm" className="text-xs text-destructive h-auto p-0" onClick={() => handleAvisoImagen(i, null)}>
+                        Quitar imagen
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -691,7 +844,7 @@ export default function CmsPage() {
         </div>
       </section>
 
-      {/* CONTACTO Y REDES */}
+{/* CONTACTO Y REDES */}
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Contacto y Redes Sociales</h2>
         <div className="grid gap-4 md:grid-cols-2">
@@ -710,6 +863,7 @@ export default function CmsPage() {
           <div className="space-y-2"><Label>TikTok</Label><Input value={c.redes?.tiktok || ""} onChange={(e) => setC({ ...c, redes: { ...c.redes, tiktok: e.target.value } })} /></div>
         </div>
       </section>
+
     </div>
   );
 }

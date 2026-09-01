@@ -57,14 +57,7 @@ export function BarraSesion() {
 
       {rol === "visitante" && (
         <div className="flex items-center gap-2">
-          <Link href="/registro">
-            <Button size="sm" className="bg-amber-400 text-amber-950 hover:bg-amber-300 hidden sm:flex">
-              ¿Eres nuevo? Afíliate
-            </Button>
-            <Button size="icon" variant="outline" className="sm:hidden" aria-label="Afiliarse">
-              <UserPlus className="h-4 w-4" />
-            </Button>
-          </Link>
+          {/* TEMP: Registro deshabilitado hasta conectar backend */}
           <Link href="/login">
             <Button size="sm" className="hidden sm:flex">
               Iniciar sesión

@@ -41,7 +41,7 @@ export function NavResponsivo() {
           </Button>
           <Link href="/registro">
             <Button variant="outline" size="sm" className="text-xs">
-              ¿Eres nuevo? Afíliate
+              {/* TEMP */} Próximamente
             </Button>
           </Link>
           <Link href="/login">
@@ -101,7 +101,7 @@ export function NavResponsivo() {
           <div className="pt-3 border-t space-y-2">
             <Link href="/registro" onClick={() => setMenuOpen(false)}>
               <Button variant="outline" className="w-full text-sm">
-                ¿Eres nuevo? Afíliate
+                {/* TEMP */} Próximamente
               </Button>
             </Link>
             <Link href="/login" onClick={() => setMenuOpen(false)}>

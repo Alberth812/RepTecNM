@@ -110,7 +110,7 @@ export function MenuMovilMiembro() {
           <div className="mt-6 grid gap-2 border-t pt-4">
             <Link href="/registro" onClick={() => setAbierto(false)}>
               <Button variant="outline" className="w-full justify-start gap-2">
-                <UserPlus className="h-4 w-4" /> ¿Eres nuevo? Afíliate
+                <UserPlus className="h-4 w-4" /> {/* TEMP */} Próximamente
               </Button>
             </Link>
             <Link href="/login" onClick={() => setAbierto(false)}>

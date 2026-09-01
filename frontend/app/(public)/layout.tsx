@@ -20,7 +20,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <div className="mx-auto flex h-9 max-w-6xl items-center justify-between px-4 text-[11px]">
             <p className="truncate italic">Investigación con propósito, conocimiento con impacto.</p>
             <nav className="flex shrink-0 items-center gap-3 sm:gap-4">
-              <Link href="/catalogo" className="hidden font-semibold tracking-wide hover:text-white sm:block">CATÁLOGO</Link>
+              <span className="cursor-not-allowed opacity-50" className="hidden font-semibold tracking-wide hover:text-white sm:block">CATÁLOGO</span>
               <Link href="/blog" className="hidden font-semibold tracking-wide hover:text-white sm:block">BLOG</Link>
               <Link href="/repositorio" className="hidden font-semibold tracking-wide hover:text-white md:block">REPOSITORIO</Link>
               <Link href="/mensajeria" className="hidden font-semibold tracking-wide hover:text-white md:block">MENSAJERÍA</Link>
@@ -40,18 +40,18 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
                 <Link href="/" className="hover:text-primary">Inicio</Link>
                 <Link href="/#nosotros" className="hover:text-primary">Nosotros</Link>
                 <Link href="/#que-hacemos" className="hover:text-primary">Servicios</Link>
-                <Link href="/#afiliacion" className="hover:text-primary">Afiliación</Link>
+                {/* TEMP: Afiliación deshabilitada */}
                 <Link href="/blog" className="hover:text-primary">Blog</Link>
                 <Link href="/#contacto" className="hover:text-primary">Contacto</Link>
               </nav>
             </SoloVisitante>
 
             <div className="flex items-center gap-2">
-              <Link href="/catalogo" aria-label="Buscar en el catálogo" className="hidden sm:block">
+              <span className="cursor-not-allowed opacity-50" aria-label="Buscar en el catálogo" className="hidden sm:block">
                 <Button variant="ghost" size="icon">
                   <Search className="h-4 w-4" />
                 </Button>
-              </Link>
+              </span>
               <BarraSesion />
               <MenuMovilMiembro />
             </div>
