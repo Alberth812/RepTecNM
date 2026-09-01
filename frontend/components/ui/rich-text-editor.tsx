@@ -86,9 +86,15 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
           size="sm"
           className={cn("h-8 w-8 p-0", editor.isActive("link") && "bg-muted text-[#004B87]")}
           onClick={() => {
-            const url = window.prompt("URL del enlace:");
+            const url = window.prompt("URL del enlace:", "https://");
             if (url) {
-              editor.chain().focus().setLink({ href: url }).run();
+              // Si no hay texto seleccionado, insertamos la palabra "Enlace" con el link
+              if (editor.state.selection.empty) {
+                editor.chain().focus().insertContent(`<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#004B87] underline">Enlace</a>`).run();
+              } else {
+                // Si hay texto seleccionado, le aplicamos el link a esa selección
+                editor.chain().focus().setLink({ href: url }).run();
+              }
             }
           }}
           title="Insertar enlace"
