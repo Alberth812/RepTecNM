@@ -91,6 +91,14 @@ export default function CmsPage() {
             afiliacion_beneficios: data.afiliacion_beneficios || CONTENIDO_DEFAULT.afiliacion_beneficios,
             afiliacion_requisitos: data.afiliacion_requisitos || CONTENIDO_DEFAULT.afiliacion_requisitos,
             afiliacion_proceso: data.afiliacion_proceso || CONTENIDO_DEFAULT.afiliacion_proceso,
+            contactoTitulo: data.contacto_titulo || data.contactoTitulo || "",
+            contactoTexto: data.contacto_texto || data.contactoTexto || "",
+            contactoEmail: data.contacto_email || data.contactoEmail || "",
+            contactoTelefono: data.contacto_telefono || data.contactoTelefono || "",
+            contactoDireccion: data.contacto_direccion || data.contactoDireccion || "",
+            mision: data.mision || "",
+            vision: data.vision || "",
+            avisos: data.avisos || [],
             redes: {
               facebook: data.facebook_url || data.redes?.facebook || "",
               twitter: data.twitter_url || data.redes?.twitter || "",
@@ -113,6 +121,7 @@ export default function CmsPage() {
         console.error("Error cargando CMS", error);
       } finally {
         setCargado(true);
+        setAvisos(data.avisos || []);
       }
     };
     cargarDatos();
