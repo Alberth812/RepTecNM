@@ -16,6 +16,7 @@ import {
   BlockquoteFeature,
   HorizontalRuleFeature,
   InlineToolbarFeature,
+  FixedToolbarFeature,
 } from "@payloadcms/richtext-lexical";
 
 import { MediaBlock } from "./blocks/MediaBlock";
@@ -91,6 +92,7 @@ export const Posts: CollectionConfig = {
             blocks: [MediaBlock],
           }),
           InlineToolbarFeature(),
+          FixedToolbarFeature(),
         ],
       }),
       label: {

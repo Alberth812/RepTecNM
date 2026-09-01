@@ -43,6 +43,7 @@ services:
 
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
       PAYLOAD_SERVER_URL: ${PAYLOAD_SERVER_URL}
+      PAYLOAD_PREVIEW_SECRET: ${PAYLOAD_PREVIEW_SECRET}
 
     volumes:
       - ./:/app

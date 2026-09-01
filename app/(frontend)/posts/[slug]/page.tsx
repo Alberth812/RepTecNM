@@ -1,12 +1,11 @@
+import { LivePreviewListener } from "@/components/live-preview/refresh-route-on-save";
+import { PostRichText } from "@/components/posts/post-rich-text";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { queryPostBySlug } from "@/payload/queries/posts";
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { getPayloadClient } from "@/lib/payload/getPayloadClient";
-import { PostRichText } from "@/components/posts/post-rich-text";
-import { draftMode } from "next/headers";
-import { LivePreviewListener } from "@/components/live-preview/refresh-route-on-save";
-import { queryPostBySlug } from "@/payload/queries/posts";
 
 type Args = {
   params: Promise<{

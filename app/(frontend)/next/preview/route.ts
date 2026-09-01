@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const slug = searchParams.get("slug");
   const previewSecret = searchParams.get("previewSecret");
 
-  if (previewSecret !== process.env.PREVIEW_SECRET) {
+  if (previewSecret !== process.env.PAYLOAD_PREVIEW_SECRET) {
     return new Response("Secreto de preview inválido.", { status: 403 });
   }
 

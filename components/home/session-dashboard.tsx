@@ -198,6 +198,17 @@ export function SessionDashboard() {
 
                   <ArrowRight className="h-4 w-4 shrink-0" />
                 </Link>
+
+                <Link
+                  href="/cms"
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <ClipboardList className="h-4 w-4 shrink-0" />
+
+                  <span>Gestionar contenido</span>
+
+                  <ArrowRight className="h-4 w-4 shrink-0" />
+                </Link>
               </section>
             </>
           ) : (

@@ -3,7 +3,7 @@ import type { CollectionSlug } from "payload";
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: "/posts",
-  // avisos: "/avisos", // cuando la añadas
+  //aqui iria avisos
 };
 
 type Args = {
@@ -16,7 +16,7 @@ export function generatePreviewPath({ collection, slug }: Args) {
     slug,
     collection,
     path: `${collectionPrefixMap[collection]}/${slug}`,
-    previewSecret: process.env.PREVIEW_SECRET ?? "",
+    previewSecret: process.env.PAYLOAD_PREVIEW_SECRET ?? "",
   });
 
   return `${process.env.NEXT_PUBLIC_APP_URL}/next/preview?${encodedParams.toString()}`;
