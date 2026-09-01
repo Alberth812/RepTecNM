@@ -4,6 +4,15 @@ import { notFound } from "next/navigation";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { getPayloadClient } from "@/lib/payload/getPayloadClient";
 import { PostRichText } from "@/components/posts/post-rich-text";
+import { draftMode } from "next/headers";
+import { LivePreviewListener } from "@/components/live-preview/refresh-route-on-save";
+import { queryPostBySlug } from "@/payload/queries/posts";
+
+type Args = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
 
 function getMediaUrl(url: string): string {
   try {
@@ -13,29 +22,20 @@ function getMediaUrl(url: string): string {
   }
 }
 
-async function getPost(slug: string) {
-  const payload = await getPayloadClient();
-
-  const { docs } = await payload.find({
-    collection: "posts",
-    where: { slug: { equals: slug } },
-    limit: 1,
-    depth: 2,
-  });
-
-  return docs[0] ?? null;
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const decodedSlug = decodeURIComponent(slug);
+
+  const post = await queryPostBySlug(decodedSlug);
+
+  if (!post) {
+    return {
+      title: "Post no encontrado",
+    };
+  }
 
   return {
-    title: post?.title ?? "Post no encontrado",
+    title: post.title,
   };
 }
 
@@ -45,9 +45,14 @@ export default async function PostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const decodedSlug = decodeURIComponent(slug);
 
-  if (!post) notFound();
+  const { isEnabled: draft } = await draftMode();
+  const post = await queryPostBySlug(decodedSlug);
+
+  if (!post) {
+    notFound();
+  }
 
   const hero = typeof post.heroImage === "object" ? post.heroImage : null;
 
@@ -59,6 +64,8 @@ export default async function PostPage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-16">
+      {draft ? <LivePreviewListener /> : null}
+
       <header className="mb-10">
         <h1 className="text-4xl font-medium leading-tight text-foreground">
           {post.title}

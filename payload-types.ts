@@ -88,10 +88,14 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
-  locale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('es' | 'en') | ('es' | 'en')[];
+  globals: {
+    home: Home;
+  };
+  globalsSelect: {
+    home: HomeSelect<false> | HomeSelect<true>;
+  };
+  locale: 'es' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -125,11 +129,9 @@ export interface CmsAdminAuthOperations {
  */
 export interface CmsAdmin {
   id: string;
-  betterAuthUserId: string;
+  user_id: string;
   email: string;
   name?: string | null;
-  subtype: 'GENERAL' | 'CONTENIDO';
-  isRoot?: boolean | null;
   updatedAt: string;
   createdAt: string;
   collection: 'cms-admins';
@@ -142,7 +144,7 @@ export interface Post {
   id: string;
   title: string;
   /**
-   * Imagen principal del post. Solo se permiten imágenes (restringido a nivel de la collection "media").
+   * Imagen principal del post mostrada como imagen de fondo.
    */
   heroImage: string | Media;
   content: {
@@ -171,6 +173,7 @@ export interface Post {
   slug: string;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -193,6 +196,64 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    square?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    small?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    medium?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    large?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    xlarge?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -277,11 +338,9 @@ export interface PayloadMigration {
  * via the `definition` "cms-admins_select".
  */
 export interface CmsAdminsSelect<T extends boolean = true> {
-  betterAuthUserId?: T;
+  user_id?: T;
   email?: T;
   name?: T;
-  subtype?: T;
-  isRoot?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -298,6 +357,7 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -316,6 +376,80 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        square?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        small?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        medium?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        xlarge?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -356,6 +490,300 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Contenido editorial de la página principal. Este Global controla textos, imágenes y enlaces; no controla layout, estilos Tailwind ni componentes React.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: string;
+  /**
+   * Slides del carousel principal de la home. El orden de la lista define el orden de aparición; arrastra para reordenar.
+   */
+  hero?: {
+    /**
+     * Cada slide se muestra en el orden en que aparece aquí. Arrastra el ícono de la izquierda para reordenar.
+     */
+    slides?:
+      | {
+          /**
+           * Desmárcalo para ocultar temporalmente este slide sin eliminarlo.
+           */
+          activo?: boolean | null;
+          etiqueta: string;
+          titulo: string;
+          texto: string;
+          imagen?: (string | null) | Media;
+          /**
+           * Milisegundos que el slide permanece visible antes de avanzar (recomendado 3000–8000).
+           */
+          duracion: number;
+          /**
+           * Botón obligatorio.
+           */
+          ctaPrincipal: {
+            /**
+             * Texto visible del botón, ej. "Explorar catálogo".
+             */
+            label: string;
+            /**
+             * Ruta interna (ej. "/catalogo") o URL externa "https://...". No se permiten esquemas inseguros como "javascript:".
+             */
+            href: string;
+          };
+          /**
+           * Botón opcional. Si se deja vacío, el frontend no lo muestra.
+           */
+          ctaSecundario?: {
+            /**
+             * Texto visible del botón, ej. "Explorar catálogo".
+             */
+            label?: string | null;
+            /**
+             * Ruta interna (ej. "/catalogo") o URL externa "https://...". No se permiten esquemas inseguros como "javascript:".
+             */
+            href?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Sección "Nosotros" de la home.
+   */
+  nosotros: {
+    titulo: string;
+    texto: string;
+    imagen1?: (string | null) | Media;
+    imagen2?: (string | null) | Media;
+  };
+  /**
+   * Sección "Misión" de la home.
+   */
+  mision: {
+    titulo: string;
+    texto: string;
+  };
+  /**
+   * Sección "Visión" de la home.
+   */
+  vision: {
+    titulo: string;
+    texto: string;
+  };
+  /**
+   * Sección "Afiliación": beneficios, requisitos y proceso.
+   */
+  afiliacion: {
+    titulo: string;
+    descripcion: string;
+    /**
+     * Bloques de contenido (ej. Beneficios, Requisitos, Proceso). Arrastra para reordenar; agrega o elimina según necesites.
+     */
+    secciones?:
+      | {
+          titulo: string;
+          /**
+           * Elementos (bullets) de esta sección. Arrastra para reordenar.
+           */
+          items?:
+            | {
+                texto: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Botón principal de la sección de afiliación. Obligatorio.
+     */
+    cta: {
+      /**
+       * Texto visible del botón, ej. "Explorar catálogo".
+       */
+      label: string;
+      /**
+       * Ruta interna (ej. "/catalogo") o URL externa "https://...". No se permiten esquemas inseguros como "javascript:".
+       */
+      href: string;
+    };
+  };
+  /**
+   * Sección "Qué hacemos" de la home.
+   */
+  queHacemos: {
+    titulo: string;
+    texto: string;
+  };
+  /**
+   * Sección opcional: puede dejarse completamente vacía. Arrastra para reordenar los testimonios.
+   */
+  testimonios?:
+    | {
+        /**
+         * Desmárcalo para ocultar temporalmente este testimonio sin eliminarlo.
+         */
+        activo?: boolean | null;
+        nombre: string;
+        texto: string;
+        /**
+         * Calificación de 1 a 5.
+         */
+        puntaje: number;
+        foto?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Sección "Contacto" de la home.
+   */
+  contacto: {
+    titulo: string;
+    texto: string;
+    /**
+     * Todas son opcionales. Deja vacío el campo de la red que no uses.
+     */
+    redes?: {
+      /**
+       * URL completa de Facebook (https://...). Déjalo vacío si no se usa.
+       */
+      facebook?: string | null;
+      /**
+       * URL completa de Instagram (https://...). Déjalo vacío si no se usa.
+       */
+      instagram?: string | null;
+      /**
+       * URL completa de LinkedIn (https://...). Déjalo vacío si no se usa.
+       */
+      linkedin?: string | null;
+      /**
+       * URL completa de YouTube (https://...). Déjalo vacío si no se usa.
+       */
+      youtube?: string | null;
+      /**
+       * URL completa de TikTok (https://...). Déjalo vacío si no se usa.
+       */
+      tiktok?: string | null;
+    };
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        slides?:
+          | T
+          | {
+              activo?: T;
+              etiqueta?: T;
+              titulo?: T;
+              texto?: T;
+              imagen?: T;
+              duracion?: T;
+              ctaPrincipal?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              ctaSecundario?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+            };
+      };
+  nosotros?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        imagen1?: T;
+        imagen2?: T;
+      };
+  mision?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+      };
+  vision?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+      };
+  afiliacion?:
+    | T
+    | {
+        titulo?: T;
+        descripcion?: T;
+        secciones?:
+          | T
+          | {
+              titulo?: T;
+              items?:
+                | T
+                | {
+                    texto?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  queHacemos?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+      };
+  testimonios?:
+    | T
+    | {
+        activo?: T;
+        nombre?: T;
+        texto?: T;
+        puntaje?: T;
+        foto?: T;
+        id?: T;
+      };
+  contacto?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        redes?:
+          | T
+          | {
+              facebook?: T;
+              instagram?: T;
+              linkedin?: T;
+              youtube?: T;
+              tiktok?: T;
+            };
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

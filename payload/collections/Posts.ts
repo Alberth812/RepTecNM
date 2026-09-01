@@ -1,24 +1,47 @@
 import type { CollectionConfig } from "payload";
 import { slugField } from "payload";
-import { lexicalEditor, BlocksFeature } from "@payloadcms/richtext-lexical";
+import {
+  lexicalEditor,
+  BlocksFeature,
+  BoldFeature,
+  ItalicFeature,
+  UnderlineFeature,
+  HeadingFeature,
+  AlignFeature,
+  IndentFeature,
+  OrderedListFeature,
+  UnorderedListFeature,
+  ChecklistFeature,
+  LinkFeature,
+  BlockquoteFeature,
+  HorizontalRuleFeature,
+  InlineToolbarFeature,
+} from "@payloadcms/richtext-lexical";
 
 import { MediaBlock } from "./blocks/MediaBlock";
+import { generatePreviewPath } from "../utilities/generatePreviewPath";
+import { authenticatedOrPublished } from "../utilities/authenticatedOrPublished";
 
 export const Posts: CollectionConfig = {
   slug: "posts",
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "publishedAt", "slug"],
-    // Live Preview a nivel de collection. Se puede definir también a nivel
-    // raíz (admin.livePreview en payload.config.ts) — la de la collection
-    // sobreescribe/mergea sobre esa. Con esto solo, ya es suficiente.
     livePreview: {
       url: ({ data }) =>
-        `${process.env.NEXT_PUBLIC_APP_URL}/posts/${data?.slug ?? ""}`,
+        generatePreviewPath({
+          collection: "posts",
+          slug: typeof data?.slug === "string" ? data.slug : "",
+        }),
     },
+    preview: (data) =>
+      generatePreviewPath({
+        collection: "posts",
+        slug: typeof data?.slug === "string" ? data.slug : "",
+      }),
   },
   access: {
-    read: () => true,
+    read: authenticatedOrPublished,
     create: ({ req }) => Boolean(req.user),
     update: ({ req }) => Boolean(req.user),
     delete: ({ req }) => Boolean(req.user),
@@ -28,15 +51,20 @@ export const Posts: CollectionConfig = {
       name: "title",
       type: "text",
       required: true,
+      label: {
+        es: "Título",
+      },
     },
     {
       name: "heroImage",
       type: "upload",
       relationTo: "media",
       required: true,
+      label: {
+        es: "Imagen principal",
+      },
       admin: {
-        description:
-          'Imagen principal del post. Solo se permiten imágenes (restringido a nivel de la collection "media").',
+        description: "Imagen principal del post mostrada como imagen de fondo.",
       },
     },
     {
@@ -44,13 +72,30 @@ export const Posts: CollectionConfig = {
       type: "richText",
       required: true,
       editor: lexicalEditor({
-        features: ({ defaultFeatures }) => [
+        features: ({ defaultFeatures, rootFeatures }) => [
           // defaultFeatures ya incluye: headings, listas, links, bold/italic,
           // blockquote, etc. — el "formato normal de Lexical" que pediste.
-          ...defaultFeatures,
-          BlocksFeature({ blocks: [MediaBlock] }),
+          BoldFeature(),
+          ItalicFeature(),
+          UnderlineFeature(),
+          HeadingFeature(),
+          AlignFeature(),
+          IndentFeature(),
+          OrderedListFeature(),
+          UnorderedListFeature(),
+          ChecklistFeature(),
+          LinkFeature(),
+          BlockquoteFeature(),
+          HorizontalRuleFeature(),
+          BlocksFeature({
+            blocks: [MediaBlock],
+          }),
+          InlineToolbarFeature(),
         ],
       }),
+      label: {
+        es: "Contenido",
+      },
     },
     {
       name: "publishedAt",
@@ -99,7 +144,25 @@ export const Posts: CollectionConfig = {
 
         return true;
       },
+      hooks: {
+        beforeChange: [
+          ({ siblingData, value }) => {
+            if (siblingData._status === "published" && !value) {
+              return new Date();
+            }
+            return value;
+          },
+        ],
+      },
     },
     slugField(),
   ],
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 800,
+      },
+    },
+    maxPerDoc: 10,
+  },
 };

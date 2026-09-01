@@ -11,7 +11,10 @@ import { CmsAdmins } from "./payload/collections/CmsAdmins";
 import { Posts } from "./payload/collections/Posts";
 import { Media } from "./payload/collections/Media";
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
+import { es } from "@payloadcms/translations/languages/es";
+import Home from "./payload/globals/home";
+
+//const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET!,
@@ -21,12 +24,26 @@ export default buildConfig({
 
   collections: [CmsAdmins, Posts, Media],
 
+  globals: [Home],
+
+  localization: {
+    locales: ["es", "en"],
+    defaultLocale: "es",
+  },
+
+  i18n: {
+    supportedLanguages: {
+      es,
+    },
+    fallbackLanguage: "es",
+  },
+
   admin: {
     user: CmsAdmins.slug, // evita que Payload cree su propio "users"
   },
 
   // Rutas raíz: por defecto Payload usa /admin y /api.
-  // Las movemos para no chocar con tu REST API actual.
+  // Usamos cms-api para no interferir con la API de backend
   routes: {
     admin: "/cms",
     api: "/cms-api",

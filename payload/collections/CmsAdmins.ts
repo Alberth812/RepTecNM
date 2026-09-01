@@ -20,20 +20,20 @@ export const CmsAdmins: CollectionConfig = {
   },
   fields: [
     {
-      name: "betterAuthUserId",
+      name: "user_id",
       type: "text",
       required: true,
       unique: true,
       index: true,
     },
     { name: "email", type: "text", required: true },
-    { name: "name", type: "text" },
     {
-      name: "subtype",
-      type: "select",
-      options: ["GENERAL", "CONTENIDO"],
-      required: true,
+      name: "name",
+      type: "text",
+      localized: true,
+      label: {
+        es: "Nombre",
+      },
     },
-    { name: "isRoot", type: "checkbox", defaultValue: false },
   ],
 };
