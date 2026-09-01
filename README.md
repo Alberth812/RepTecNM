@@ -1,149 +1,263 @@
+
 # REP TecNM · Red de Egresados de Posgrado
 
-Plataforma web para la Asociación de Egresados de Posgrado del Tecnológico Nacional de México. Prototipo de alta fidelidad validado con directivos.
+Plataforma web para la **Asociación de Egresados de Posgrado del Tecnológico Nacional de México (TecNM)**. Sistema full-stack containerizado que gestiona la comunidad académica, publicaciones, credenciales digitales y contenido dinámico del sitio institucional.
 
-## Objetivo
 
-Conectar el talento de posgrado del TecNM mediante una comunidad nacional de profesionales que colabora, investiga y transforma al país.
 
-## Stack tecnológico
+##  Objetivo
 
-- Next.js 16 (App Router, Turbopack)
-- TypeScript y React 19
-- Tailwind CSS 4 y shadcn/ui
-- Recharts, qrcode.react, lucide-react, sonner
-- pnpm como gestor de paquetes
+Conectar el talento de posgrado del TecNM mediante una comunidad nacional de profesionales que colabora, investiga y transforma al país, proporcionando herramientas digitales para la vinculación académica, científica y profesional.
 
-## Requisitos previos
 
-- Node.js 20 o superior
-- pnpm 9 o superior
 
-~~~bash
-npm install -g pnpm
-~~~
+##  Stack Tecnológico
 
-## Instalación
+### Frontend
+- **Next.js 16** (App Router + Turbopack)
+- **TypeScript** y **React 19**
+- **Tailwind CSS** + **shadcn/ui**
+- **Lucide React** (iconografía)
+- **Sonner** (notificaciones toast)
 
-~~~bash
+### Backend
+- **Django 5.0.6** + **Django REST Framework 3.15**
+- **Python 3.12**
+- **django-cors-headers** (CORS)
+- **Pillow** (procesamiento de imágenes)
+
+### Base de Datos
+- **PostgreSQL 15** (Alpine)
+
+### Almacenamiento
+- **MinIO** (compatible con S3, para archivos multimedia)
+
+### Infraestructura
+- **Docker** + **Docker Compose** (contenedores de desarrollo)
+- **Nginx** (proxy reverso, ruteo de peticiones)
+- **Git** (control de versiones)
+
+
+
+##  Estructura del Proyecto
+
+```
+reptecnm/
+├── frontend/              # Aplicación Next.js (puerto 3000)
+│   ├── app/
+│   │   ├── (public)/      # Rutas públicas (inicio, blog, catálogo, credencial)
+│   │   ├── (admin)/       # Panel administrativo (dashboard, CMS, aprobaciones)
+│   │   └── layout.tsx     # Layout raíz
+│   ├── components/
+│   │   ├── ui/            # Componentes shadcn reutilizables
+│   │   └── public/        # Componentes específicos (avisos, barra sesión, etc.)
+│   ├── lib/               # Utilidades, mocks, validaciones
+│   ├── public/            # Assets estáticos (logo, imágenes)
+│   └── Dockerfile
+│
+├── backend/               # API Django (puerto 8000)
+│   ├── config/            # Configuración principal (settings, urls)
+│   ├── cms/               # Módulo CMS (contenido de inicio)
+│   ├── blog/              # Módulo de publicaciones
+│   ├── afiliados/         # Gestión de afiliados
+│   ├── media_files/       # Archivos subidos (imágenes, PDFs)
+│   └── Dockerfile
+│
+├── nginx/                 # Configuración del proxy reverso
+│   ├── Dockerfile
+│   └── default.conf
+│
+├── docs/                  # Documentación (diagramas, especificaciones)
+├── docker-compose.dev.yml # Orquestación de contenedores en desarrollo
+├── .gitignore
+└── README.md
+```
+
+
+
+##  Requisitos Previos
+
+- **Docker** y **Docker Compose** instalados
+- **Git** (clonar el repositorio)
+- **8 GB RAM** recomendados (para correr todos los contenedores)
+- **Puertos disponibles**: 80 (Nginx), 3000 (frontend), 8000 (backend), 9000/9001 (MinIO)
+
+
+
+##  Instalación y Ejecución
+
+### 1. Clonar el repositorio
+
+```bash
 git clone https://github.com/Alberth812/RepTecNM.git
 cd RepTecNM
-pnpm install
-~~~
+```
 
-## Ejecución en desarrollo
+### 2. Levantar los contenedores
 
-~~~bash
-pnpm dev
-~~~
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
 
-Direcciones disponibles al arrancar:
+Este comando construye y levanta los 5 servicios:
+- `reptecnm-frontend` (Next.js)
+- `reptecnm-backend` (Django)
+- `reptecnm-db` (PostgreSQL)
+- `reptecnm-minio` (Almacenamiento)
+- `reptecnm-nginx` (Proxy)
 
-| Entorno | Dirección |
-|---------|-----------|
-| Local | http://localhost:3000 |
-| Red local | http://TU_IP:3000 (la muestra la terminal) |
+### 3. Verificar estado
 
-La dirección de red permite probar en teléfonos y escanear el QR de la credencial durante demostraciones.
+```bash
+docker compose -f docker-compose.dev.yml ps
+```
 
-## Estructura del proyecto
+Todos los servicios deben aparecer en estado **Up**.
 
-![Estructura del proyecto](docs/estructura.png)
+### 4. Aplicar migraciones del backend
 
-El diagrama se genera desde `docs/estructura.puml` (PlantUML). Para regenerarlo:
+```bash
+docker compose -f docker-compose.dev.yml exec backend python manage.py migrate
+```
 
-~~~bash
-curl -X POST https://kroki.io/plantuml/png \
-  -H "Content-Type: text/plain" \
-  --data-binary @docs/estructura.puml \
-  -o docs/estructura.png
-~~~
+### 5. Crear superusuario (admin del CMS)
 
-## Rutas principales
-
-### Lado público
-
-| Ruta | Descripción |
-|------|-------------|
-| `/` | Inicio con slider editable (incluye avisos importantes), estadísticas agregadas y secciones |
-| `/catalogo` | Búsqueda con relevancia (pesos 5-4-2-1) y filtros combinables |
-| `/catalogo/[id]` | Ficha completa del profesional |
-| `/repositorio` | Publicaciones con visor en línea, foro por documento y contacto al autor |
-| `/credencial` | Espacio personal con credencial digital editable e impresión en PDF |
-| `/verificar/[folio]` | Verificación pública por código QR con enlace al perfil público |
-| `/mensajeria` | Mensajería interna con adjuntos, no leídos y bloqueo |
-| `/seguimiento` | Cuestionario de seguimiento en 7 secciones con autoguardado |
-| `/registro` | Registro multi-paso con verificación de correo y política de contraseña |
-| `/login` | Inicio de sesión con recuperación de contraseña |
-| `/aviso-de-privacidad` | Aviso de privacidad y tratamiento de datos |
-
-### Panel de administración
-
-| Ruta | Descripción |
-|------|-------------|
-| `/dashboard` | Estadísticas operativas con gráficas |
-| `/aprobaciones` | Bandeja de aprobación con versionado de solicitudes y observaciones |
-| `/cms` | Editor de la página de inicio (slides normales o avisos importantes) |
-| `/reportes` | Gestión de reportes de documentos |
-| `/afiliados` | Administración de membresías: estados, transiciones y bajas |
-| `/moderacion` | Moderación del foro del repositorio |
-| `/institutos` | Alta y habilitación de institutos TecNM |
-
-### Manejo de errores
-
-| Archivo | Función |
-|---------|---------|
-| `app/not-found.tsx` | 404 con mensajes aleatorios de humor y salidas útiles |
-| `app/error.tsx` | Falla en cualquier página con reintento |
-| `app/global-error.tsx` | Última línea de defensa ante caída total del servicio |
-
-## Requisitos funcionales cubiertos
-
-- RF-AUTH: autenticación, verificación de correo y recuperación de contraseña
-- RF-PERFIL: perfil profesional multi-sección con autoguardado
-- RF-MEMB: membresía y estados (ACTIVO, INACTIVO, BAJA, PENDIENTE_APROBACION)
-- RF-CAT: catálogo de profesionales
-- RF-CRED: credencial digital con QR, verificación pública e impresión en PDF
-- RF-DOC: repositorio con visor en línea, foro, reportes y moderación
-- RF-MSG: mensajería interna
-- RF-SEG: cuestionario de seguimiento con indicador al día/desactualizado
-- RF-DASH: dashboard y estadísticas públicas agregadas
-- RF-ADMIN: administración, aprobaciones, CMS, reportes, afiliados e institutos
-- RF-NOTIF: notificaciones en el panel de administración
-
-## Validaciones centralizadas
-
-`lib/validaciones.ts` es la fuente única de verdad de las reglas de negocio del front: política de contraseña, rangos de año y edad, tamaños y tipos de archivo, longitudes de texto y pesos de búsqueda. El backend del Incremento 1 debe espejar estas mismas reglas.
-
-## Scripts disponibles
-
-~~~bash
-pnpm dev     # servidor de desarrollo en http://localhost:3000
-pnpm build   # build de producción
-pnpm start   # servidor de producción
-pnpm lint    # ESLint
-~~~
-
-## Colaboración
-
-Protocolo de trabajo del equipo:
-
-~~~bash
-git pull --rebase origin main   # antes de empezar y antes de cada push
-git add .
-git commit -m "tipo: descripcion clara"   # tipos: feat, fix, docs, qa
-git push
-~~~
-
-División sugerida por módulos (no por capas) para evitar conflictos en los mismos archivos.
+```bash
+docker compose -f docker-compose.dev.yml exec backend python manage.py createsuperuser
+```
 
 
-## Equipo
 
-- Desarrollo: Andres
-- Desarrollo:
-- Validación: directivos de la Asociación de Egresados de Posgrado del TecNM
+##  URLs de Acceso
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| **Sitio público** | http://localhost | Página principal, blog, catálogo |
+| **Panel Admin Django** | http://localhost/admin/ | Administración de modelos Django |
+| **Consola MinIO** | http://localhost:9001 | Gestión de archivos multimedia |
+| **API Backend** | http://localhost/api/ | Endpoints REST (JSON) |
+| **Frontend directo** | http://localhost:3000 | Next.js (sin Nginx) |
+
+
+
+##  Credenciales de Prueba
+
+| Rol | Usuario | Contraseña |
+|-----|---------|------------|
+| Administrador | `Adminrep` | `RepTecNM2026` |
+
+>  **Importante**: Cambia estas credenciales antes de cualquier despliegue en producción.
+
+
+
+##  Funcionalidades Implementadas
+
+### Página Pública
+- **Hero dinámico**: Slider con hasta 5 slides editables desde el CMS
+- **Sección Nosotros**: Texto e imágenes configurables
+- **Misión y Visión**: Tarjetas con diseño institucional (banda azul + glassmorphism)
+- **Qué Hacemos**: Descripción de servicios de la asociación
+- **Afiliación**: Beneficios, requisitos y proceso de afiliación
+- **Testimonios**: Sección preparada para opiniones de afiliados
+- **Contacto**: Correo, teléfono, dirección y redes sociales
+- **Avisos flotantes**: Notificaciones gestionables desde el CMS con tipos (informativo, aviso, urgente, convocatoria)
+
+### Panel Administrativo (`/dashboard`)
+- **Dashboard**: Estadísticas operativas (afiliados, publicaciones, institutos)
+- **CMS de Inicio**: Editor completo de la página principal (slides, textos, imágenes, avisos)
+- **Publicar Blog**: Formulario con subida de imágenes y PDFs
+- **Aprobaciones**: Gestión de solicitudes de afiliación
+- **Catálogo**: Directorio de profesionales afiliados
+- **Mensajería**: Bandeja de entrada y formularios de contacto
+- **Configuración**: Cambio de tema (claro/oscuro/sepia) y datos de perfil
+
+### Sistema de Autenticación
+- Login con credenciales
+- Recuperación de contraseña (flujo por correo)
+- Roles: Visitante, Afiliado, Administrador
+- Cierre de sesión automático al cerrar la pestaña
+
+
+
+##  Arquitectura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Nginx (Puerto 80)                     │
+│  ┌─────────────────────┐  ┌──────────────────────────────┐  │
+│  │  / → Frontend:3000  │  │  /api/ → Backend:8000        │  │
+│  │  /media/ → MinIO    │  │  /admin/ → Backend:8000      │  │
+│  └─────────────────────┘  ──────────────────────────────┘  │
+─────────────────────────────────────────────────────────────┘
+         │                              │
+         ▼                              ▼
+─────────────────┐            ┌─────────────────────┐
+│  Next.js 16     │            │  Django 5.0.6       │
+│  (Turbopack)    │            │  + DRF              │
+│  TypeScript     │            │  PostgreSQL 15      │
+│  Tailwind CSS   │            │  MinIO (S3)         │
+└─────────────────┘            └─────────────────────┘
+```
+
+
+
+## 📋 Comandos Útiles
+
+```bash
+# Ver logs en tiempo real
+docker compose -f docker-compose.dev.yml logs -f
+
+# Logs de un servicio específico
+docker compose -f docker-compose.dev.yml logs backend --tail 50
+
+# Reiniciar un servicio
+docker compose -f docker-compose.dev.yml restart frontend
+
+# Detener todos los contenedores
+docker compose -f docker-compose.dev.yml down
+
+# Limpiar caché de Next.js
+docker compose -f docker-compose.dev.yml exec frontend rm -rf .next
+
+# Acceder a la shell del backend
+docker compose -f docker-compose.dev.yml exec backend bash
+
+# Ejecutar migraciones
+docker compose -f docker-compose.dev.yml exec backend python manage.py makemigrations
+docker compose -f docker-compose.dev.yml exec backend python manage.py migrate
+```
+
+
+
+##  Desarrollo
+
+### Frontend (Next.js)
+
+Los cambios en el frontend se reflejan automáticamente gracias al **hot-reload** de Turbopack. Los archivos se sincronizan mediante volúmenes de Docker.
+
+### Backend (Django)
+
+Django corre en modo desarrollo con `StatReloader`, detectando cambios en los archivos `.py` automáticamente.
+
+### Base de Datos
+
+Los datos de PostgreSQL persisten en un volumen Docker (`pgdata`), por lo que no se pierden al reiniciar contenedores.
 
 ---
 
-Última actualización: 2026-08-21
+##  Licencia
+
+Proyecto desarrollado para la **Asociación de Egresados de Posgrado del Tecnológico Nacional de México, A.C.**
+
+Última actualización: **1 de septiembre de 2026**
+
+---
+
+##  Equipo
+
+- **Desarrollo Frontend & Arquitectura**: Andrés Hernández Sosa
+- **Asesoría**: Dr. 
+- **Colaboración Backend**: Raúl 
+
+
+
