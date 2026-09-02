@@ -147,8 +147,6 @@ export default function CmsPage() {
             _beneficios_list: (data.afiliacion_beneficios || "").split("\n").filter((l: string) => l.trim() !== ""),
             _requisitos_list: (data.afiliacion_requisitos || "").split("\n").filter((l: string) => l.trim() !== ""),
             _proceso_list: (data.afiliacion_proceso || "").split("\n").filter((l: string) => l.trim() !== ""),
-            contactoTitulo: data.contacto_titulo || data.contactoTitulo || "",
-            contactoTexto: data.contacto_texto || data.contactoTexto || "",
             contactoEmail: data.contacto_email || data.contactoEmail || "",
             contactoTelefono: data.contacto_telefono || data.contactoTelefono || "",
             contactoDireccion: data.contacto_direccion || data.contactoDireccion || "",
@@ -373,8 +371,6 @@ export default function CmsPage() {
       formData.append("linkedin_url", c.redes.linkedin);
       formData.append("youtube_url", c.redes.youtube);
       formData.append("tiktok_url", c.redes.tiktok);
-      formData.append("contacto_titulo", c.contactoTitulo);
-      formData.append("contacto_texto", c.contactoTexto);
       formData.append("contacto_email", c.contactoEmail || "");
       formData.append("contacto_telefono", c.contactoTelefono || "");
       formData.append("contacto_direccion", c.contactoDireccion || "");
@@ -848,8 +844,6 @@ export default function CmsPage() {
       <section className="rounded-xl border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Contacto y Redes Sociales</h2>
         <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2"><Label>Título de contacto</Label><Input value={c.contactoTitulo || ""} onChange={(e) => setC({ ...c, contactoTitulo: e.target.value })} /></div>
-          <div className="space-y-2 md:col-span-2"><Label>Texto de contacto</Label><Textarea value={c.contactoTexto || ""} onChange={(e) => setC({ ...c, contactoTexto: e.target.value })} /></div>
           <div className="space-y-2"><Label className="flex items-center gap-2"><Mail className="h-4 w-4" /> Correo</Label><Input value={c.contactoEmail || ""} onChange={(e) => setC({ ...c, contactoEmail: e.target.value })} /></div>
           <div className="space-y-2"><Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Teléfono</Label><Input value={c.contactoTelefono || ""} onChange={(e) => setC({ ...c, contactoTelefono: e.target.value })} /></div>
           <div className="space-y-2 md:col-span-2"><Label className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Dirección</Label><Input value={c.contactoDireccion || ""} onChange={(e) => setC({ ...c, contactoDireccion: e.target.value })} /></div>

@@ -247,7 +247,67 @@ export default function HomePage() {
       </section>
 
       {/* ===== AFILIACIÓN ===== */}
-      {/* TEMP: Sección de afiliación deshabilitada hasta conectar backend */}
+      
+
+      
+      {/* ===== AFILIACIÓN ===== */}
+      <section id="afiliacion" className="py-12 sm:py-16 md:py-20 bg-background">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center mb-10 sm:mb-12">
+            <Badge variant="secondary" className="mb-3 text-xs uppercase tracking-wider">Únete a la red</Badge>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#004B87]">Afiliación</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted-foreground">Conoce los beneficios, requisitos y el proceso para unirte a la Red de Egresados de Posgrado del TecNM.</p>
+          </div>
+          <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4 text-lg text-[#004B87]">Beneficios</h3>
+                <ul className="space-y-3">
+                  {beneficios.map((b, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4 text-lg text-[#004B87]">Requisitos</h3>
+                <ul className="space-y-3">
+                  {requisitos.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4 text-lg text-[#004B87]">Proceso</h3>
+                <ol className="space-y-3">
+                  {proceso.map((p, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#004B87] text-xs font-bold text-white">{i + 1}</span>
+                      <span>{p}</span>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+          </div>
+          <div className="mt-10 text-center">
+            <Link href="/registro">
+              <Button size="lg" className="bg-[#004B87] hover:bg-[#003562] text-sm sm:text-base">
+                Iniciar proceso de afiliación <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ===== TESTIMONIOS ===== */}
       <section className="py-12 sm:py-16 md:py-20 bg-[#003562] text-white">
@@ -283,9 +343,9 @@ export default function HomePage() {
             <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted-foreground">{contenido.contactoTexto || "Estamos para ayudarte en tu proceso de afiliación."}</p>
           </div>
           <div className="grid gap-4 sm:gap-6 sm:grid-cols-3 mb-8">
-            {limpiar(contenido.contactoEmail) && <Card><CardContent className="p-6 text-center"><Mail className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Correo</h3><p className="text-sm text-muted-foreground break-all">{limpiar(contenido.contactoEmail)}</p></CardContent></Card>}
-            {limpiar(contenido.contactoTelefono) && <Card><CardContent className="p-6 text-center"><Phone className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Teléfono</h3><p className="text-sm text-muted-foreground">{limpiar(contenido.contactoTelefono)}</p></CardContent></Card>}
-            {limpiar(contenido.contactoDireccion) && <Card><CardContent className="p-6 text-center"><MapPinIcon className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Ubicación</h3><p className="text-sm text-muted-foreground">{limpiar(contenido.contactoDireccion)}</p></CardContent></Card>}
+            {contenido.contactoEmail && <Card><CardContent className="p-6 text-center"><Mail className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Correo</h3><p className="text-sm text-muted-foreground break-all">{contenido.contactoEmail}</p></CardContent></Card>}
+            {contenido.contactoTelefono && <Card><CardContent className="p-6 text-center"><Phone className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Teléfono</h3><p className="text-sm text-muted-foreground">{contenido.contactoTelefono}</p></CardContent></Card>}
+            {contenido.contactoDireccion && <Card><CardContent className="p-6 text-center"><MapPinIcon className="mx-auto mb-3 h-8 w-8 text-[#004B87]" /><h3 className="mb-1 font-semibold">Ubicación</h3><p className="text-sm text-muted-foreground">{contenido.contactoDireccion}</p></CardContent></Card>}
           </div>
           {(contenido.redes?.facebook || contenido.redes?.instagram || contenido.redes?.linkedin || contenido.redes?.twitter || contenido.redes?.youtube) && (
             <div className="flex flex-col items-center gap-4 mt-8">
