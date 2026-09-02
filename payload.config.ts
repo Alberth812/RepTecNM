@@ -44,10 +44,10 @@ export default buildConfig({
   },
 
   // Rutas raíz: por defecto Payload usa /admin y /api.
-  // Usamos cms-api para no interferir con la API de backend
+  // Usamos contenido-api para no interferir con la API de backend
   routes: {
-    admin: "/cms",
-    api: "/cms-api",
+    admin: "/contenido",
+    api: "/contenido-api",
   },
 
   // No usamos GraphQL en esta primera prueba: menos superficie, menos rutas.

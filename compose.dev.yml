@@ -11,8 +11,6 @@ services:
     networks:
       app:
       backend:
-        aliases:
-          - s3.localhost
 
   next:
     image: node:24-alpine

@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   images: {
     localPatterns: [
       {
-        pathname: "/cms-api/media/**",
+        pathname: "/contenido-api/media/**",
       },
     ],
     remotePatterns: [
@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "3000",
-        pathname: "/cms-api/media/**",
+        pathname: "/contenido-api/media/**",
       },
     ],
   },

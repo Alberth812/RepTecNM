@@ -1,4 +1,4 @@
-// app/(payload)/cms/[[...segments]]/page.tsx
+// app/(payload)/contenido/[[...segments]]/page.tsx
 import type { Metadata } from "next";
 import config from "@payload-config";
 import { RootPage, generatePageMetadata } from "@payloadcms/next/views";

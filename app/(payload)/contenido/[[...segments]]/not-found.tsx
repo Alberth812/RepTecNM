@@ -1,4 +1,4 @@
-// app/(payload)/cms/[[...segments]]/not-found.tsx
+// app/(payload)/contenido/[[...segments]]/not-found.tsx
 import type { Metadata } from "next";
 import config from "@payload-config";
 import { NotFoundPage, generatePageMetadata } from "@payloadcms/next/views";

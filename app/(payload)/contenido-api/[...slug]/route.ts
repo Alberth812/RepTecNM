@@ -1,4 +1,4 @@
-// app/(payload)/cms-api/[...slug]/route.ts
+// app/(payload)/contenido/[...slug]/route.ts
 import {
   REST_DELETE,
   REST_GET,
