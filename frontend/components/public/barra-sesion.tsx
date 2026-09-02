@@ -20,26 +20,12 @@ const RUTAS_CON_SIDEBAR = [
 ];
 
 export function BarraSesion() {
-  const { rol, nombre, cambiar } = useRol();
+  const { rol, nombre, cerrarSesion } = useRol();
   const pathname = usePathname();
   const conSidebar = RUTAS_CON_SIDEBAR.some((r) => pathname.startsWith(r));
 
   const salir = async () => {
-    try {
-      const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
-      await fetch("/api/auth/logout/", {
-        method: "POST",
-        credentials: "include",
-        headers: { "X-CSRFToken": csrfToken || "" },
-      });
-    } catch (error) {
-      console.error("Error al cerrar sesión", error);
-    }
-    cambiar("visitante");
-    localStorage.removeItem("rep-rol");
-    localStorage.removeItem("rep-usuario");
-    localStorage.removeItem("rep-tema");
-    window.location.href = "/";
+    await cerrarSesion();
   };
 
   return (

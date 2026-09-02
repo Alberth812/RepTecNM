@@ -1,10 +1,8 @@
+import Script from "next/script";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "REP TecNM - Red de Egresados de Posgrado",
@@ -19,26 +17,33 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <script
+        <Script
           id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              try {
-                const theme = localStorage.getItem('vite-ui-theme');
-                // Forzar tema claro por defecto
-                  document.documentElement.classList.remove('dark');
+              (function() {
+                try {
+                  var theme = localStorage.getItem('rep-tema') || localStorage.getItem('vite-ui-theme');
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {
+                  /* Ignorar errores de localStorage */
                 }
-              } catch (_) {}
+              })();
             `,
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <ThemeProvider defaultTheme="system" disableTransitionOnChange>
           {children}
         </ThemeProvider>
-            <Toaster richColors position="top-center" />
-    </body>
+        <Toaster richColors position="top-center" />
+      </body>
     </html>
   );
 }

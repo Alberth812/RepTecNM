@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CONTENIDO_DEFAULT, type ContenidoHome } from "@/lib/mock/cms";
+import { useFetchResiliente } from "@/lib/hooks/use-fetch-resiliente";
+import { toast } from "sonner";
 
 const STATS = [
   { icon: Users, valor: "1,248", etiqueta: "Afiliados activos" },
@@ -26,59 +28,64 @@ function parsearLista(texto: string) {
 }
 
 export default function HomePage() {
-  const limpiar = (val: any) => (val === "undefined" || !val) ? "" : String(val);
-  const [contenido, setContenido] = useState<ContenidoHome>(CONTENIDO_DEFAULT);
   const [slide, setSlide] = useState(0);
-  const [cargando, setCargando] = useState(true);
+  const limpiar = (val: any) => (val === "undefined" || !val) ? "" : String(val);
+  const { data: contenidoRaw, estado: estadoContenido } = useFetchResiliente<ContenidoHome>({
+    url: "/api/cms/contenido-inicio/publico/",
+    fallback: CONTENIDO_DEFAULT,
+    cacheKey: "rep-cms-cache",
+    timeoutMs: 5000,
+    mostrarIndicador: true,
+  });
 
-  useEffect(() => {
-    const fetchContenido = async () => {
-      try {
-        const res = await fetch("/api/cms/contenido-inicio/publico/");
-        if (res.ok) {
-          const data = await res.json();
-          const mappedData: ContenidoHome = {
-            ...CONTENIDO_DEFAULT,
-            ...data,
-            nosotrosTexto: data.nosotros_texto || data.nosotrosTexto || CONTENIDO_DEFAULT.nosotrosTexto,
-            queHacemosTexto: data.que_hacemos_texto || data.queHacemosTexto || CONTENIDO_DEFAULT.queHacemosTexto,
-            nosotrosImagen1: data.nosotros_imagen_1 || data.nosotrosImagen1 || "",
-            nosotrosImagen2: data.nosotros_imagen_2 || data.nosotrosImagen2 || "",
-            afiliacion_beneficios: data.afiliacion_beneficios || CONTENIDO_DEFAULT.afiliacion_beneficios,
-            afiliacion_requisitos: data.afiliacion_requisitos || CONTENIDO_DEFAULT.afiliacion_requisitos,
-            afiliacion_proceso: data.afiliacion_proceso || CONTENIDO_DEFAULT.afiliacion_proceso,
-            contactoTitulo: data.contacto_titulo || data.contactoTitulo || "",
-            contactoTexto: data.contacto_texto || data.contactoTexto || "",
-            contactoEmail: data.contacto_email || data.contactoEmail || "",
-            contactoTelefono: data.contacto_telefono || data.contactoTelefono || "",
-            contactoDireccion: data.contacto_direccion || data.contactoDireccion || "",
-            mision: data.mision || "",
-            vision: data.vision || "",
-            redes: {
-              facebook: data.facebook_url || data.redes?.facebook || "",
-              twitter: data.twitter_url || data.redes?.twitter || "",
-              instagram: data.instagram_url || data.redes?.instagram || "",
-              linkedin: data.linkedin_url || data.redes?.linkedin || "",
-              youtube: data.youtube_url || data.redes?.youtube || "",
-              tiktok: data.tiktok_url || data.redes?.tiktok || ""},
-            slides: (data.slides || []).map((s: any) => ({
-              ...s,
-              ctaLabel: s.boton_texto || s.ctaLabel || "",
-              ctaHref: s.boton_url || s.ctaHref || ""})),
-            testimonios: (data.testimonios || []).map((t: any) => ({
-              ...t,
-              nombre: t.autor_nombre || t.nombre || "",
-              cargo: t.autor_cargo || t.cargo || ""}))};
-          setContenido(mappedData);
-        }
-      } catch (error) {
-        console.error("Error al cargar contenido del CMS, usando fallback", error);
-      } finally {
-        setCargando(false);
-      }
+  const contenido: ContenidoHome = useMemo(() => {
+    const data = contenidoRaw || CONTENIDO_DEFAULT;
+    return {
+      ...CONTENIDO_DEFAULT,
+      ...data,
+      nosotrosTexto: data.nosotros_texto || data.nosotrosTexto || CONTENIDO_DEFAULT.nosotrosTexto,
+      queHacemosTexto: data.que_hacemos_texto || data.queHacemosTexto || CONTENIDO_DEFAULT.queHacemosTexto,
+      nosotrosImagen1: data.nosotros_imagen_1 || data.nosotrosImagen1 || "",
+      nosotrosImagen2: data.nosotros_imagen_2 || data.nosotrosImagen2 || "",
+      afiliacion_beneficios: data.afiliacion_beneficios || CONTENIDO_DEFAULT.afiliacion_beneficios,
+      afiliacion_requisitos: data.afiliacion_requisitos || CONTENIDO_DEFAULT.afiliacion_requisitos,
+      afiliacion_proceso: data.afiliacion_proceso || CONTENIDO_DEFAULT.afiliacion_proceso,
+      contactoTitulo: data.contacto_titulo || data.contactoTitulo || "",
+      contactoTexto: data.contacto_texto || data.contactoTexto || "",
+      contactoEmail: data.contacto_email || data.contactoEmail || "",
+      contactoTelefono: data.contacto_telefono || data.contactoTelefono || "",
+      contactoDireccion: data.contacto_direccion || data.contactoDireccion || "",
+      mision: data.mision || "",
+      vision: data.vision || "",
+      redes: {
+        facebook: data.facebook_url || data.redes?.facebook || "",
+        twitter: data.twitter_url || data.redes?.twitter || "",
+        instagram: data.instagram_url || data.redes?.instagram || "",
+        linkedin: data.linkedin_url || data.redes?.linkedin || "",
+        youtube: data.youtube_url || data.redes?.youtube || "",
+        tiktok: data.tiktok_url || data.redes?.tiktok || "",
+      },
+      slides: (data.slides || []).map((s: any) => ({
+        ...s,
+        ctaLabel: s.boton_texto || s.ctaLabel || "",
+        ctaHref: s.boton_url || s.ctaHref || "",
+      })),
+      testimonios: (data.testimonios || []).map((t: any) => ({
+        ...t,
+        nombre: t.autor_nombre || t.nombre || "",
+        cargo: t.autor_cargo || t.cargo || "",
+      })),
     };
-    fetchContenido();
-  }, []);
+  }, [contenidoRaw]);
+
+    // Indicador sutil SOLO si el backend falla definitivamente
+  useEffect(() => {
+    if (estadoContenido === "offline") {
+      toast.error("No se pudo conectar al servidor. Mostrando contenido en caché.", {
+        duration: 4000,
+      });
+    }
+  }, [estadoContenido]);
 
   const slidesOrden = useMemo(() => {
     if (!contenido?.slides || contenido.slides.length === 0) return [];
@@ -108,10 +115,6 @@ export default function HomePage() {
   const proceso = parsearLista(contenido.afiliacion_proceso || "").length > 0
     ? parsearLista(contenido.afiliacion_proceso!)
     : ["01 | Registro inicial: Completa el formulario.", "02 | Validación: Verificamos tu grado en 5 días.", "03 | Aprobación: Recibes tu credencial digital.", "04 | Activa tu perfil: Comienza a conectar."];
-
-  if (cargando) {
-    return <div className="flex min-h-screen items-center justify-center"><p className="text-muted-foreground">Cargando...</p></div>;
-  }
 
   return (
     <div>
