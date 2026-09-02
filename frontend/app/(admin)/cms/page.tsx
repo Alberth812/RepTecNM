@@ -1,5 +1,7 @@
 "use client";
 
+import { GestorAvisos } from "@/components/admin/gestor-avisos";
+
 import { useEffect, useState } from "react";
 import { Plus, RotateCcw, Save, Trash2, Mail, Phone, MapPin, Image as ImageIcon, X } from "lucide-react";
 import { toast } from "sonner";
@@ -133,7 +135,7 @@ export default function CmsPage() {
         const res = await fetch("/api/cms/contenido-inicio/publico/");
         if (res.ok) {
           const data = await res.json();
-          setC({
+                    setC({
             ...CONTENIDO_DEFAULT,
             ...data,
             nosotrosTexto: data.nosotros_texto || data.nosotrosTexto || CONTENIDO_DEFAULT.nosotrosTexto,
@@ -143,7 +145,6 @@ export default function CmsPage() {
             afiliacion_beneficios: data.afiliacion_beneficios || CONTENIDO_DEFAULT.afiliacion_beneficios,
             afiliacion_requisitos: data.afiliacion_requisitos || CONTENIDO_DEFAULT.afiliacion_requisitos,
             afiliacion_proceso: data.afiliacion_proceso || CONTENIDO_DEFAULT.afiliacion_proceso,
-            // Inicializar listas dinámicas de afiliación
             _beneficios_list: (data.afiliacion_beneficios || "").split("\n").filter((l: string) => l.trim() !== ""),
             _requisitos_list: (data.afiliacion_requisitos || "").split("\n").filter((l: string) => l.trim() !== ""),
             _proceso_list: (data.afiliacion_proceso || "").split("\n").filter((l: string) => l.trim() !== ""),
@@ -162,8 +163,14 @@ export default function CmsPage() {
               tiktok: data.tiktok_url || data.redes?.tiktok || "",
             },
             slides: (data.slides || []).map((s: any) => ({ ...s, ctaLabel: s.boton_texto || s.ctaLabel || "", ctaHref: s.boton_url || s.ctaHref || "" })),
-            testimonios: (data.testimonios || []).map((t: any) => ({ ...t, nombre: t.autor_nombre || t.nombre || "", cargo: t.autor_cargo || t.cargo || "" }))});
+            testimonios: (data.testimonios || []).map((t: any) => ({ ...t, nombre: t.autor_nombre || t.nombre || "", cargo: t.autor_cargo || t.cargo || "" }))
+          });
           
+          setAvisos(data.avisos || []);
+          
+          // Cargar avisos en el estado local
+          setAvisos(data.avisos || []);
+
           if (data.nosotros_imagen_1 || data.nosotrosImagen1) {
             setImagen1Preview(data.nosotros_imagen_1 || data.nosotrosImagen1);
           }
@@ -401,6 +408,7 @@ export default function CmsPage() {
 
       const res = await fetch("/api/cms/contenido-inicio/", {
         method: "PUT",
+        credentials: "include",
         headers: {
           "X-CSRFToken": getCookie("csrftoken") || "",
         },

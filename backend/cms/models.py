@@ -73,3 +73,45 @@ class Testimonio(models.Model):
     
     def __str__(self):
         return f"Testimonio {self.orden}: {self.autor_nombre}"
+
+class Aviso(models.Model):
+    TIPO_CHOICES = [
+        ('info', 'Informativo'),
+        ('warning', 'Advertencia'),
+        ('error', 'Error'),
+        ('success', 'Éxito'),
+        ('urgente', 'Urgente'),
+        ('importante', 'Importante'),
+        ('convocatoria', 'Convocatoria'),
+    ]
+    
+    titulo = models.CharField(max_length=200)
+    contenido = models.TextField()
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='info')
+    imagen = models.ImageField(upload_to='cms/avisos/', blank=True, null=True)
+    activo = models.BooleanField(default=True)
+    fecha_activacion = models.DateTimeField(null=True, blank=True, help_text="Dejar vacío para activar inmediatamente")
+    fecha_expiracion = models.DateTimeField(null=True, blank=True, help_text="Dejar vacío para que no expire")
+    segmentacion_area = models.CharField(max_length=100, blank=True, help_text="Área de conocimiento (vacío = todos)")
+    segmentacion_estado = models.CharField(max_length=50, blank=True, help_text="Estado de residencia (vacío = todos)")
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-fecha_creacion']
+        verbose_name = "Aviso"
+        verbose_name_plural = "Avisos"
+    
+    def __str__(self):
+        return f"{self.titulo} ({self.get_tipo_display()})"
+    
+    def es_activo_ahora(self):
+        from django.utils import timezone
+        now = timezone.now()
+        if not self.activo:
+            return False
+        if self.fecha_activacion and now < self.fecha_activacion:
+            return False
+        if self.fecha_expiracion and now > self.fecha_expiracion:
+            return False
+        return True

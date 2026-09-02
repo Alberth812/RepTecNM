@@ -1,5 +1,7 @@
 "use client";
 
+import { AvisosFlotantes } from "@/components/public/avisos-flotantes";
+
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import {

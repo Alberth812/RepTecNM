@@ -1,24 +1,20 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
+import { X, Info, AlertTriangle, AlertCircle, CheckCircle, Bell, ChevronRight } from "lucide-react";
 
-type AvisoCMS = {
+interface Aviso {
+  id?: number | string;
   titulo: string;
   contenido: string;
-  tipo: "info" | "aviso" | "urgente" | "convocatoria";
-};
-
-const TONOS = {
-  info: { borde: "border-[#004B87]/40", icono: Info, color: "text-[#004B87]", bg: "bg-blue-50/80 dark:bg-blue-950/40" },
-  aviso: { borde: "border-amber-500/60", icono: AlertTriangle, color: "text-amber-700", bg: "bg-amber-50/80 dark:bg-amber-950/40" },
-  urgente: { borde: "border-red-500/60", icono: AlertTriangle, color: "text-red-700", bg: "bg-red-50/80 dark:bg-red-950/40" },
-  convocatoria: { borde: "border-green-500/50", icono: CheckCircle2, color: "text-green-700", bg: "bg-green-50/80 dark:bg-green-950/40" },
-};
+  tipo: string;
+  imagen_url?: string | null;
+  imagen_base64?: string | null;
+}
 
 export function AvisosFlotantes() {
-  const [avisos, setAvisos] = useState<AvisoCMS[]>([]);
-  const [cerrados, setCerrados] = useState<string[]>([]);
+  const [avisos, setAvisos] = useState<Aviso[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const cargarAvisos = async () => {
@@ -26,63 +22,126 @@ export function AvisosFlotantes() {
         const res = await fetch("/api/cms/contenido-inicio/publico/");
         if (res.ok) {
           const data = await res.json();
-          console.log('📢 Avisos crudos del CMS:', data.avisos);
-          // Leer qué avisos ya cerró el usuario en este navegador
-          const cerradosLocal = JSON.parse(localStorage.getItem("rep-avisos-cerrados") || "[]");
-          setCerrados(cerradosLocal);
-          
-          // Filtrar solo los avisos válidos que no hayan sido cerrados
-          const avisosActivos = (data.avisos || []).filter((a: AvisoCMS) => 
-            a.titulo && a.contenido && !cerradosLocal.includes(a.titulo)
-          );
-          setAvisos(avisosActivos);
+          const avisosValidos = (data.avisos || []).filter((a: any) => a.titulo && a.contenido);
+          setAvisos(avisosValidos);
         }
       } catch (error) {
-        console.error("Error cargando avisos del CMS", error);
+        console.error("Error cargando avisos:", error);
       }
     };
-    // Pequeño delay para no bloquear el render inicial de la página
-    const t = setTimeout(cargarAvisos, 500);
-    return () => clearTimeout(t);
+    cargarAvisos();
   }, []);
 
-  const cerrar = (titulo: string) => {
-    const nuevosCerrados = [...cerrados, titulo];
-    localStorage.setItem("rep-avisos-cerrados", JSON.stringify(nuevosCerrados));
-    setCerrados(nuevosCerrados);
-    setAvisos((prev) => prev.filter((a) => a.titulo !== titulo));
+  // Bloquear scroll del body cuando hay avisos visibles
+  useEffect(() => {
+    if (avisos.length > 0 && visible) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [avisos.length, visible]);
+
+  if (!visible || avisos.length === 0) return null;
+
+  const avisoActual = avisos[currentIndex];
+  const hayMasAvisos = avisos.length > 1;
+
+  const getIcono = (tipo: string) => {
+    switch (tipo) {
+      case "warning": return <AlertTriangle className="h-6 w-6" />;
+      case "error": return <AlertCircle className="h-6 w-6" />;
+      case "success": return <CheckCircle className="h-6 w-6" />;
+      case "urgente": return <Bell className="h-6 w-6" />;
+      default: return <Info className="h-6 w-6" />;
+    }
   };
 
-  if (avisos.length === 0) return null;
+  const getColor = (tipo: string) => {
+    switch (tipo) {
+      case "warning": return "bg-amber-50 border-amber-300 text-amber-900";
+      case "error": return "bg-red-50 border-red-300 text-red-900";
+      case "success": return "bg-green-50 border-green-300 text-green-900";
+      case "urgente": return "bg-purple-50 border-purple-300 text-purple-900";
+      default: return "bg-blue-50 border-blue-300 text-blue-900";
+    }
+  };
+
+  const siguienteAviso = () => {
+    if (currentIndex < avisos.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      setVisible(false);
+    }
+  };
+
+  const imagenSrc = avisoActual.imagen_url || avisoActual.imagen_base64;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60] grid w-[calc(100%-2rem)] max-w-sm gap-3">
-      {avisos.map((a, index) => {
-        const t = TONOS[a.tipo as keyof typeof TONOS] ?? TONOS.info;
-        const Icono = t.icono;
-        return (
-          <div
-            key={index}
-            className={`relative rounded-2xl border ${t.borde} ${t.bg} p-4 pr-10 shadow-xl backdrop-blur-md transition-all`}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
+      {/* Overlay con blur, clickeable para cerrar todo */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+        onClick={() => setVisible(false)} 
+      />
+      
+      {/* Contenedor del aviso actual */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className={`relative w-full border-2 shadow-2xl rounded-2xl ${getColor(avisoActual.tipo)}`}>
+          
+          {/* Botón cerrar absoluto */}
+          <button 
+            onClick={() => setVisible(false)} 
+            className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg hover:bg-white transition-colors"
+            aria-label="Cerrar aviso"
           >
-            <button
-              type="button"
-              onClick={() => cerrar(a.titulo)}
-              aria-label="Cerrar aviso"
-              className="absolute right-2 top-2 rounded-md p-1 text-muted-foreground transition-colors hover:bg-black/5 dark:hover:bg-white/10"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <div className="flex gap-3">
-              <Icono className={`mt-0.5 h-5 w-5 shrink-0 ${t.color}`} />
-              <div>
-                <p className="text-sm font-semibold">{a.titulo}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{a.contenido}</p>
+            <X className="h-5 w-5" />
+          </button>
+          
+          {/* Contenido con scroll interno si es muy largo */}
+          <div className="max-h-[85vh] overflow-y-auto">
+            {imagenSrc && (
+              <div className="w-full">
+                <img 
+                  src={imagenSrc} 
+                  alt={avisoActual.titulo} 
+                  className="w-full h-auto object-contain"
+                />
+              </div>
+            )}
+            
+            <div className="p-6 md:p-8">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 mt-1 p-3 bg-white/60 rounded-full">
+                  {getIcono(avisoActual.tipo)}
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-2xl md:text-3xl mb-3">{avisoActual.titulo}</h4>
+                  <p className="text-base md:text-lg whitespace-pre-wrap leading-relaxed mb-6">
+                    {avisoActual.contenido}
+                  </p>
+                  
+                  {/* Indicador de progreso y botón de siguiente */}
+                  {hayMasAvisos && (
+                    <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                      <span className="text-sm font-medium opacity-70">
+                        Aviso {currentIndex + 1} de {avisos.length}
+                      </span>
+                      <button
+                        onClick={siguienteAviso}
+                        className="flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-bold text-amber-950 shadow-md transition-all hover:bg-amber-300 hover:scale-105 active:scale-95"
+                      >
+                        {currentIndex === avisos.length - 1 ? "Cerrar" : "Ver siguiente aviso"}
+                        {currentIndex !== avisos.length - 1 && <ChevronRight className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        );
-      })}
+        </div>
+      </div>
     </div>
   );
 }
