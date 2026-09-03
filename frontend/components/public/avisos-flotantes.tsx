@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
-import { X, Info, AlertTriangle, AlertCircle, CheckCircle, Bell, ChevronRight } from "lucide-react";
+import { X, Info, AlertTriangle, AlertCircle, CheckCircle, Bell, ChevronRight, ChevronLeft } from "lucide-react";
 import { useFetchResiliente } from "@/lib/hooks/use-fetch-resiliente";
 
 interface Aviso {
@@ -42,38 +42,48 @@ export function AvisosFlotantes() {
     };
   }, [avisos.length, visible]);
 
+  // Navegación con teclado (flechas izquierda/derecha)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (!visible) return;
+      if (e.key === "ArrowLeft") avisoAnterior();
+      if (e.key === "ArrowRight") siguienteAviso();
+      if (e.key === "Escape") setVisible(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [visible, currentIndex, avisos.length]);
+
   if (!visible || avisos.length === 0) return null;
 
   const avisoActual = avisos[currentIndex];
   const hayMasAvisos = avisos.length > 1;
+  const esPrimero = currentIndex === 0;
+  const esUltimo = currentIndex === avisos.length - 1;
 
   const getIcono = (tipo: string) => {
     switch (tipo) {
-      case "warning":
-        return <AlertTriangle className="h-6 w-6" />;
-      case "error":
-        return <AlertCircle className="h-6 w-6" />;
-      case "success":
-        return <CheckCircle className="h-6 w-6" />;
-      case "urgente":
-        return <Bell className="h-6 w-6" />;
-      default:
-        return <Info className="h-6 w-6" />;
+      case "warning": return <AlertTriangle className="h-6 w-6" />;
+      case "error": return <AlertCircle className="h-6 w-6" />;
+      case "success": return <CheckCircle className="h-6 w-6" />;
+      case "urgente": return <Bell className="h-6 w-6" />;
+      default: return <Info className="h-6 w-6" />;
     }
   };
 
   const getColor = (tipo: string) => {
     switch (tipo) {
-      case "warning":
-        return "bg-amber-50 border-amber-300 text-amber-900";
-      case "error":
-        return "bg-red-50 border-red-300 text-red-900";
-      case "success":
-        return "bg-green-50 border-green-300 text-green-900";
-      case "urgente":
-        return "bg-purple-50 border-purple-300 text-purple-900";
-      default:
-        return "bg-blue-50 border-blue-300 text-blue-900";
+      case "warning": return "bg-amber-50 border-amber-300 text-amber-900";
+      case "error": return "bg-red-50 border-red-300 text-red-900";
+      case "success": return "bg-green-50 border-green-300 text-green-900";
+      case "urgente": return "bg-purple-50 border-purple-300 text-purple-900";
+      default: return "bg-blue-50 border-blue-300 text-blue-900";
+    }
+  };
+
+  const avisoAnterior = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
     }
   };
 
@@ -89,13 +99,16 @@ export function AvisosFlotantes() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
+      {/* Overlay con blur, clickeable para cerrar todo */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => setVisible(false)}
       />
 
+      {/* Contenedor del aviso actual */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className={`relative w-full border-2 shadow-2xl ${getColor(avisoActual.tipo)}`}>
+          {/* Botón cerrar absoluto */}
           <button
             onClick={() => setVisible(false)}
             className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg hover:bg-white transition-colors"
@@ -104,6 +117,7 @@ export function AvisosFlotantes() {
             <X className="h-5 w-5" />
           </button>
 
+          {/* Contenido con scroll interno si es muy largo */}
           <div className="max-h-[85vh] overflow-y-auto">
             {imagenSrc && (
               <div className="w-full">
@@ -126,18 +140,32 @@ export function AvisosFlotantes() {
                     {avisoActual.contenido}
                   </p>
 
+                  {/* Indicador de progreso y botones de navegación */}
                   {hayMasAvisos && (
-                    <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                    <div className="flex items-center justify-between pt-4 border-t border-black/10 gap-3">
                       <span className="text-sm font-medium opacity-70">
                         Aviso {currentIndex + 1} de {avisos.length}
                       </span>
-                      <button
-                        onClick={siguienteAviso}
-                        className="flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-bold text-amber-950 shadow-md transition-all hover:bg-amber-300 hover:scale-105 active:scale-95"
-                      >
-                        {currentIndex === avisos.length - 1 ? "Cerrar" : "Ver siguiente aviso"}
-                        {currentIndex !== avisos.length - 1 && <ChevronRight className="h-4 w-4" />}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {/* Botón Anterior - solo aparece si no es el primero */}
+                        {!esPrimero && (
+                          <button
+                            onClick={avisoAnterior}
+                            className="flex items-center gap-2 rounded-lg border-2 border-current bg-white/60 px-4 py-2.5 text-sm font-bold transition-all hover:bg-white hover:scale-105 active:scale-95"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            Anterior
+                          </button>
+                        )}
+                        {/* Botón Siguiente / Cerrar */}
+                        <button
+                          onClick={siguienteAviso}
+                          className="flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2.5 text-sm font-bold text-amber-950 shadow-md transition-all hover:bg-amber-300 hover:scale-105 active:scale-95"
+                        >
+                          {esUltimo ? "Cerrar" : "Ver siguiente aviso"}
+                          {!esUltimo && <ChevronRight className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -183,21 +183,83 @@ export default function HomePage() {
       </section>
 
       {/* ===== NOSOTROS ===== */}
-      <section id="nosotros" className="py-12 sm:py-16 md:py-20 bg-background">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="text-center mb-10 sm:mb-12">
-            <Badge variant="secondary" className="mb-3 text-xs uppercase tracking-wider">Quiénes somos</Badge>
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#004B87]">Una comunidad que transforma</h2>
-            <p className="mx-auto mt-4 max-w-3xl text-sm sm:text-base text-muted-foreground whitespace-pre-line">{contenido.nosotrosTexto}</p>
+      <section id="nosotros" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-background to-muted/20">
+      <div className="mx-auto max-w-6xl px-4">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+          
+          {/* Columna de texto */}
+          <div className="space-y-6">
+            {/* Etiqueta superior */}
+            <div className="flex items-center gap-3">
+              <div className="h-px w-12 bg-[#004B87]" />
+              <span className="text-sm font-semibold tracking-widest text-[#004B87] uppercase">Quiénes Somos</span>
+            </div>
+            
+            {/* Título */}
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-tight">
+              Una comunidad que<br />
+              <span className="text-[#004B87]">transforma</span>
+            </h2>
+            
+            {/* Texto descriptivo */}
+            <p className="text-base sm:text-lg leading-relaxed text-muted-foreground whitespace-pre-line">
+              {contenido.nosotrosTexto}
+            </p>
+            
+            {/* Elemento decorativo */}
+            <div className="flex items-center gap-2 pt-4">
+              <div className="h-1 w-16 rounded-full bg-[#004B87]" />
+              <div className="h-1 w-8 rounded-full bg-[#004B87]/50" />
+              <div className="h-1 w-4 rounded-full bg-[#004B87]/30" />
+            </div>
           </div>
+          
+          {/* Columna de imágenes en grid limpio */}
           {(contenido.nosotrosImagen1 || contenido.nosotrosImagen2) && (
-            <div className="grid gap-6 md:grid-cols-2">
-              {contenido.nosotrosImagen1 && <div className="rounded-xl overflow-hidden border bg-muted aspect-video"><img src={contenido.nosotrosImagen1} alt="Nosotros 1" className="w-full h-full object-cover" /></div>}
-              {contenido.nosotrosImagen2 && <div className="rounded-xl overflow-hidden border bg-muted aspect-video"><img src={contenido.nosotrosImagen2} alt="Nosotros 2" className="w-full h-full object-cover" /></div>}
+            <div className="grid grid-cols-2 gap-4">
+              {/* Imagen 1 */}
+              {contenido.nosotrosImagen1 && (
+                <div className="group relative overflow-hidden rounded-2xl bg-card shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="aspect-square overflow-hidden">
+                    <img 
+                      src={contenido.nosotrosImagen1} 
+                      alt="Nosotros 1" 
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {/* Imagen 2 */}
+              {contenido.nosotrosImagen2 && (
+                <div className="group relative overflow-hidden rounded-2xl bg-card shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="aspect-square overflow-hidden">
+                    <img 
+                      src={contenido.nosotrosImagen2} 
+                      alt="Nosotros 2" 
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {/* Si solo hay una imagen, ocupar todo el ancho */}
+              {contenido.nosotrosImagen1 && !contenido.nosotrosImagen2 && (
+                <div className="col-span-2 group relative overflow-hidden rounded-2xl bg-card shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="aspect-video overflow-hidden">
+                    <img 
+                      src={contenido.nosotrosImagen1} 
+                      alt="Nosotros 1" 
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
-      </section>
+      </div>
+    </section>
       {/* MISIÓN Y VISIÓN */}
       <section className="bg-gradient-to-br from-[#003366] via-[#004B87] to-[#0077c8] py-20 text-white">
         <div className="mx-auto max-w-6xl px-4">
