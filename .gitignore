@@ -74,3 +74,4 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .emoji_backups/
+.emoji_backups/
