@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,backend', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,backend,10.168.0.109', cast=Csv()))
 INSTALLED_APPS = [
     'autenticacion',
     'users',
@@ -40,7 +40,7 @@ DATABASES = {
     }
 }
 
-CORS_ALLOWED_ORIGINS = ["http://localhost", "http://127.0.0.1", "http://frontend:3000"]
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,http://10.168.0.109:8003', cast=Csv())
 
 # Configuración MinIO
 
@@ -48,7 +48,7 @@ CORS_ALLOWED_ORIGINS = ["http://localhost", "http://127.0.0.1", "http://frontend
 # ==========================================
 # SEGURIDAD Y COOKIES (Desarrollo/Producción)
 # ==========================================
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:3000,http://127.0.0.1:3000,http://10.168.0.109:8003', cast=Csv())
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 'true'

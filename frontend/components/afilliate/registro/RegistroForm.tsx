@@ -38,7 +38,7 @@ const STEP_COMPONENTS = [
 ];
 
 const LAST_STEP = FORM_STEPS.length - 1;
-const SUBMIT_ENDPOINT = "http://localhost:8001/api/afiliados/solicitudes/";
+const SUBMIT_ENDPOINT = "/api/afiliados/solicitudes/";
 
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
 

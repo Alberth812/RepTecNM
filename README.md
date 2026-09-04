@@ -201,7 +201,7 @@ docker compose -f docker-compose.dev.yml exec backend python manage.py createsup
 
 
 
-## 📋 Comandos Útiles
+##  Comandos Útiles
 
 ```bash
 # Ver logs en tiempo real

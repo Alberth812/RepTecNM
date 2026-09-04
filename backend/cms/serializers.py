@@ -26,13 +26,13 @@ class SlideSerializer(serializers.ModelSerializer):
             request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(f'/media/{clean_path}')
-            return f"http://localhost/media/{clean_path}"
+            return f"/media/{clean_path}"
             
         if not url.startswith('http'):
             request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(obj.imagen.url)
-            return f"http://localhost/media/{obj.imagen}"
+            return f"/media/{obj.imagen}"
             
         return url
 
