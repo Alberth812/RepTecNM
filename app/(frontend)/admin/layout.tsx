@@ -1,7 +1,5 @@
 // app/admin/layout.tsx
-import { BarraAdmin } from "@/components/barra-admin/BarraAdmin.js";
-import "@payloadcms/next/css";
-import React from "react";
+import { BarraAdmin } from "@/components/barra-admin/BarraAdmin";
 
 type Args = { children: React.ReactNode };
 

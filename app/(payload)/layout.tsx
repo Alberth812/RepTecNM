@@ -7,7 +7,7 @@ import React from "react";
 
 import { importMap } from "./contenido/importMap.js";
 import "./custom.scss";
-import { BarraAdmin } from "@/components/barra-admin/BarraAdmin.js";
+import { BarraAdmin } from "@/components/barra-admin/BarraAdmin";
 
 type Args = { children: React.ReactNode };
 

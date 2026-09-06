@@ -10,7 +10,6 @@ import { NAV_GROUPS, ACCOUNT_ITEM, type NavItem } from "./nav-config";
 import "./barra-admin.css";
 
 const STORAGE_KEY = "barra-admin:collapsed";
-// Debe coincidir con el breakpoint usado en barra-admin.css
 const MOBILE_QUERY = "(max-width: 768px)";
 
 type BarraAdminProps = {
@@ -20,26 +19,26 @@ type BarraAdminProps = {
 export function BarraAdmin({ children }: BarraAdminProps) {
   const pathname = usePathname();
 
-  const [collapsed, setCollapsed] = useState(false);
-  // Evita animar el ancho/posición la primera vez que se lee el valor guardado.
+  // Se obtiene el localStorage antes del primer render
+  // para evitar el salto visual. Por defecto es `false` (abierto).
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const isMobile = window.matchMedia(MOBILE_QUERY).matches;
+      if (isMobile) return true;
+
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      // Si hay un valor guardado lo usamos, de lo contrario por defecto es abierto (false)
+      return stored !== null ? stored === "true" : false;
+    } catch {
+      return false;
+    }
+  });
+
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const isMobile = window.matchMedia(MOBILE_QUERY).matches;
-
-    try {
-      if (isMobile) {
-        // En mobile siempre inicia cerrado (solo se ve el botón flotante),
-        // sin importar lo que haya quedado guardado desde escritorio.
-        setCollapsed(true);
-      } else {
-        const stored = window.localStorage.getItem(STORAGE_KEY);
-        if (stored !== null) setCollapsed(stored === "true");
-      }
-    } catch {
-      // localStorage no disponible (SSR, modo privado, etc.) -> se ignora.
-    }
-
+    // Marcamos como listo para habilitar las transiciones CSS
     const frame = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(frame);
   }, []);
@@ -60,14 +59,12 @@ export function BarraAdmin({ children }: BarraAdminProps) {
       try {
         window.localStorage.setItem(STORAGE_KEY, String(next));
       } catch {
-        // Si falla el guardado, el sidebar sigue funcionando en memoria.
+        // no-op
       }
       return next;
     });
   }, []);
 
-  // Cierra el sidebar al navegar, pero solo en mobile: en desktop es
-  // persistente y no debe colapsarse solo por dar clic en un link.
   const closeOnMobileNavigate = useCallback(() => {
     if (window.matchMedia(MOBILE_QUERY).matches) {
       setCollapsed(true);
@@ -89,14 +86,12 @@ export function BarraAdmin({ children }: BarraAdminProps) {
 
   return (
     <div className={shellClassName}>
-      {/* Fondo oscuro detrás del sidebar cuando está abierto en mobile */}
       <div
         className="ba-backdrop"
         onClick={toggleCollapsed}
         aria-hidden="true"
       />
 
-      {/* Botón flotante: solo visible en mobile cuando el sidebar está cerrado */}
       <button
         type="button"
         className="ba-mobile-toggle"
