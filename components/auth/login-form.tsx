@@ -46,8 +46,14 @@ export function LoginForm() {
         toast.success(result.message);
       }
 
-      router.push("/inicio");
-      router.refresh();
+      if (result.user) {
+        if (result.user.role === "ADMINISTRADOR") {
+          router.push("/admin/inicio");
+        } else {
+          router.push("/afiliado/inicio");
+        }
+        router.refresh();
+      }
     } catch (error) {
       if (error instanceof ApiRequestError) {
         if (

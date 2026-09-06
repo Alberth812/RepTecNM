@@ -5,8 +5,9 @@ import config from "@payload-config";
 import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import React from "react";
 
-import { importMap } from "./cms/importMap.js";
+import { importMap } from "./contenido/importMap.js";
 import "./custom.scss";
+import { BarraAdmin } from "@/components/barra-admin/BarraAdmin.js";
 
 type Args = { children: React.ReactNode };
 
@@ -21,7 +22,7 @@ const Layout = ({ children }: Args) => (
     importMap={importMap}
     serverFunction={serverFunction}
   >
-    {children}
+    <BarraAdmin>{children}</BarraAdmin>
   </RootLayout>
 );
 
