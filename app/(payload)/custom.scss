@@ -1,3 +1,21 @@
 // app/(payload)/custom.scss
 // Estilos propios del Admin Panel (opcional).
 // Agregar estilos de barra y payload modal
+/* 1. Force the main container grid to act like the sidebar is closed */
+.template-default.template-default--nav-open {
+  /* Resets the layout grid columns so the main content takes up 100% width */
+  grid-template-columns: 1fr !important;
+}
+
+/* 2. Hide the sidebar completely when it has the open class */
+.nav.nav--nav-open {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  /*transform: translateX(-100%) !important;*/ /* Pushes it off-screen if absolute positioned */
+}
+
+/* Optional: Ensure the mobile menu trigger button is hidden if you want it entirely gone */
+#nav-toggler {
+  display: none !important;
+}

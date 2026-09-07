@@ -1,4 +1,4 @@
-import { QueryProvider } from "@/components/providers/query-provider";
+/*import { QueryProvider } from "@/components/providers/query-provider";
 
 export default function RootLayout({
   children,
@@ -7,3 +7,4 @@ export default function RootLayout({
 }) {
   return <QueryProvider>{children}</QueryProvider>;
 }
+*/
