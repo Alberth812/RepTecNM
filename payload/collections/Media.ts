@@ -19,6 +19,7 @@ export const Media: CollectionConfig = {
     // con collections: { media: true } se engancha solo porque esta collection
     // tiene `upload` habilitado. Esto SOLO restringe el picker/validación de archivos.
     mimeTypes: ["image/*"],
+    bulkUpload: false,
     imageSizes: [
       {
         name: "thumbnail",
