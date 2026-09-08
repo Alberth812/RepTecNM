@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,6 +36,8 @@ const verifyEmailFormSchema = z.object({
 
 type VerifyEmailValues = z.infer<typeof verifyEmailFormSchema>;
 
+const INITIAL_RESEND_COOLDOWN = 120;
+
 export function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -56,6 +58,10 @@ export function VerifyEmailForm() {
     },
   });
 
+  useEffect(() => {
+    startCooldown(INITIAL_RESEND_COOLDOWN);
+  }, [startCooldown]);
+
   async function onSubmit(values: VerifyEmailValues) {
     setFormError(null);
     setIsVerifying(true);
@@ -71,7 +77,9 @@ export function VerifyEmailForm() {
         return;
       }
 
-      router.push("/login?verified=1");
+      router.push(
+        `/login?verified=1&email=${encodeURIComponent(values.email)}`,
+      );
     } catch {
       setFormError("Ocurrió un error inesperado. Intenta de nuevo.");
     } finally {
@@ -104,7 +112,7 @@ export function VerifyEmailForm() {
       if (error instanceof ApiRequestError) {
         setFormError(error.message);
 
-        if (error.retryAfterSeconds) {
+        if (error.retryAfterSeconds !== undefined) {
           startCooldown(error.retryAfterSeconds);
         }
 
@@ -163,9 +171,9 @@ export function VerifyEmailForm() {
               {...form.register("email")}
             />
 
-            {form.formState.errors.email && (
+            {form.formState.errors.email ? (
               <FieldError>{form.formState.errors.email.message}</FieldError>
-            )}
+            ) : null}
           </FieldContent>
         </Field>
 
@@ -194,9 +202,9 @@ export function VerifyEmailForm() {
                   </InputOTPGroup>
                 </InputOTP>
 
-                {fieldState.error && (
+                {fieldState.error ? (
                   <FieldError>{fieldState.error.message}</FieldError>
-                )}
+                ) : null}
               </FieldContent>
             </Field>
           )}
@@ -207,7 +215,9 @@ export function VerifyEmailForm() {
           className="w-full bg-[#004B87] hover:bg-[#003a68]"
           disabled={isVerifying}
         >
-          {isVerifying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+          {isVerifying ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : null}
           Verificar correo
         </Button>
 

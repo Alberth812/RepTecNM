@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { toast } from "sonner";
 import type { z } from "zod";
-import { Loader2, TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert, CheckCircle2 } from "lucide-react";
 
 import { loginSchema } from "@/lib/validation/schemas";
 import { useLoginMutation } from "@/lib/hooks/use-auth";
@@ -18,6 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+
+const searchParams = useSearchParams();
+
+const verified = searchParams.get("verified") === "1";
+const verifiedEmail = searchParams.get("email") ?? "";
 
 type LoginValues = z.infer<typeof loginSchema>;
 
@@ -30,10 +37,16 @@ export function LoginForm() {
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      email: verifiedEmail,
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (verifiedEmail) {
+      form.setValue("email", verifiedEmail);
+    }
+  }, [verifiedEmail, form]);
 
   async function onSubmit(values: LoginValues) {
     setFormError(null);
@@ -97,6 +110,15 @@ export function LoginForm() {
         </>
       }
     >
+      {verified ? (
+        <Alert>
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertTitle>Correo verificado</AlertTitle>
+          <AlertDescription>
+            Tu correo fue verificado correctamente. Ahora puedes iniciar sesión.
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4"
