@@ -37,15 +37,12 @@ export function resendVerificationRequest(input: ResendVerificationInput) {
 }
 
 export interface LoginResponse {
-  user?: {
+  user: {
     id: string;
     email: string;
-    role?: "ADMINISTRADOR" | "AFILIADO";
+    role: "ADMINISTRADOR" | "AFILIADO";
     [key: string]: unknown;
   };
-  /** Presente solo para administradores (RF-AUTH-013), texto exacto del backend. */
-  message?: string;
-  [key: string]: unknown;
 }
 
 /** Único punto de entrada soportado para iniciar sesión: POST /api/login */

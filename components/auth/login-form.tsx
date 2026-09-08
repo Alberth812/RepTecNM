@@ -42,11 +42,8 @@ export function LoginForm() {
     try {
       const result = await loginMutation.mutateAsync(values);
 
-      if (result.message) {
-        toast.success(result.message);
-      }
-
       if (result.user) {
+        toast.success(`Bienvenido ${result.user.email}`);
         if (result.user.role === "ADMINISTRADOR") {
           router.push("/admin/inicio");
         } else {
@@ -63,17 +60,15 @@ export function LoginForm() {
           return;
         }
 
-        if (
-          error.code === "EMAIL_NOT_VERIFIED" ||
-          /verif/i.test(error.message)
-        ) {
+        if (error.code === "EMAIL_NOT_VERIFIED") {
           setUnverifiedEmail(values.email);
           return;
         }
 
-        const retrySuffix = error.retryAfterSeconds
-          ? ` (intenta de nuevo en ${error.retryAfterSeconds}s)`
-          : "";
+        const retrySuffix =
+          error.retryAfterSeconds !== undefined
+            ? ` (intenta de nuevo en ${Math.ceil(error.retryAfterSeconds)}s)`
+            : "";
 
         setFormError(`${error.message}${retrySuffix}`);
         return;
