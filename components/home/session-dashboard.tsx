@@ -313,6 +313,7 @@ export function SessionDashboard() {
                         <ArrowRight className="h-4 w-4 shrink-0" />
                       </Link>
                     )}
+                    
                   </div>
                 </div>
               </section>

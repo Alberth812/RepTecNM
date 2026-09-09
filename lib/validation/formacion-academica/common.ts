@@ -7,6 +7,21 @@
 import { z } from "zod";
 
 /**
+ * Envuelve un schema para que:
+ *  - el INPUT acepte `null` (así el estado "vacío" del form es válido a
+ *    nivel de tipos, sin necesitar `as unknown as`),
+ *  - el OUTPUT, una vez parseado con éxito, sea el tipo real (sin null).
+ */
+export function required<T extends z.ZodType>(
+  schema: T,
+  message = "Este campo es requerido.",
+) {
+  return schema
+    .nullable()
+    .refine((value): value is z.infer<T> => value !== null, { message });
+}
+
+/**
  * Año actual calculado en el momento en que se ejecuta la validación (no al
  * definir el esquema). Cumple con:
  * "El año actual debe obtenerse dinámicamente en tiempo de validación;
@@ -21,7 +36,7 @@ export function currentYear(): number {
  * mayor al año actual (global_validation_notes). El máximo se evalúa dentro
  * de un `refine` (no en `.max()`) para que se recalcule en cada validación.
  */
-export const anioAcademicoSchema = z
+export const anioAcademicoBase = z
   .number({
     error: "El año debe ser un número.",
   })
@@ -31,8 +46,10 @@ export const anioAcademicoSchema = z
     message: "El año no puede ser mayor al año actual.",
   });
 
+
 /** Variante nullish (para campos de año condicionados u opcionales). */
-export const anioAcademicoOpcionalSchema = anioAcademicoSchema.nullish();
+export const anioAcademicoOpcionalSchema = anioAcademicoBase.nullish();
+export const anioAcademicoSchema = required(anioAcademicoBase, "Este campo es requerido.");
 
 /** Atajo para registrar un issue de validación en una ruta específica. */
 export function addCustomIssue(

@@ -11,8 +11,8 @@
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
-import { Plus } from "lucide-react";
+import { FieldErrors, useFieldArray, useForm } from "react-hook-form";
+import { AlertCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -23,9 +23,9 @@ import {
 } from "@/lib/validation/formacion-academica";
 import { LicenciaturaFields } from "./licenciatura-fields";
 import { PosgradoFields } from "./posgrado-fields";
-import { ResumenPosgradoFields } from "./resumen-posgrado-fields";
 import { EstanciaPosdoctoralFields } from "./estancia-posdoctoral-fields";
 import type { Institucion } from "./shared";
+import { cn } from "@/lib/utils";
 
 export type { Institucion };
 
@@ -47,7 +47,7 @@ const emptyLicenciatura = {
   tieneTitulo: null,
   anioTitulacion: null,
   motivoNoTitulacion: null,
-} as unknown as FormacionAcademica["licenciaturas"][number];
+};
 
 const emptyPosgrado = {
   tipoPosgrado: null,
@@ -109,11 +109,6 @@ function buildDefaultValues(
 
     posgrados: initial?.posgrados?.length ? initial.posgrados : [emptyPosgrado],
 
-    resumenPosgrado: initial?.resumenPosgrado ?? {
-      programasPosgradoCursados: [],
-      trayectoriaMaestriaDoctoradoIntegrada: null,
-    },
-
     estanciasPosdoctorales: initial?.estanciasPosdoctorales?.length
       ? initial.estanciasPosdoctorales
       : [emptyEstanciaPosdoctoral],
@@ -129,12 +124,21 @@ export type FormacionAcademicaFormProps = {
   onSubmit?: (data: FormacionAcademica) => Promise<void> | void;
 };
 
+type TabValue = "licenciatura" | "posgrado" | "posdoctorado";
+
+const SECTION_BY_TAB: Record<TabValue, keyof FormacionAcademicaInput> = {
+  licenciatura: "licenciaturas",
+  posgrado: "posgrados",
+  posdoctorado: "estanciasPosdoctorales",
+};
+
 export function FormacionAcademicaForm({
   instituciones,
   defaultValues,
   onSubmit,
 }: FormacionAcademicaFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const form = useForm<
     FormacionAcademicaInput,
@@ -156,34 +160,86 @@ export function FormacionAcademicaForm({
     name: "estanciasPosdoctorales",
   });
 
+  const [activeTab, setActiveTab] = useState<TabValue>("licenciatura");
+  const errors = form.formState.errors;
+  const hasErrorIn = (tab: TabValue) => Boolean(errors[SECTION_BY_TAB[tab]]);
+
+  function onInvalid(formErrors: FieldErrors<FormacionAcademicaInput>) {
+    const firstTabWithError = (Object.keys(SECTION_BY_TAB) as TabValue[]).find(
+      (tab) => formErrors[SECTION_BY_TAB[tab]],
+    );
+    if (firstTabWithError) setActiveTab(firstTabWithError);
+  }
+
   async function handleSubmit(values: FormacionAcademicaOutput) {
     setSubmitError(null);
+    setSubmitSuccess(false);
     try {
       if (onSubmit) {
         await onSubmit(values);
+        setSubmitSuccess(true);
         return;
       }
-      // TODO: reemplazar por la llamada real al endpoint, por ejemplo:
-      // const res = await fetch("/api/afiliados/formacion-academica", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(values),
-      // });
-      // if (!res.ok) throw new Error("request failed");
-      console.log("Formación académica (endpoint pendiente):", values);
-    } catch {
-      setSubmitError("No se pudo guardar la información. Intenta de nuevo.");
+
+      const res = await fetch("/api/afiliados/formacion-academica", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      console.log(res);
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error ?? "No se pudo guardar la información.");
+      }
+
+      setSubmitSuccess(true);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo guardar la información. Intenta de nuevo.",
+      );
     }
   }
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-      <Tabs defaultValue="licenciatura">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="licenciatura">Licenciatura</TabsTrigger>
-          <TabsTrigger value="posgrado">Posgrado</TabsTrigger>
-          <TabsTrigger value="resumen">Resumen</TabsTrigger>
-          <TabsTrigger value="posdoctorado">Posdoctorado</TabsTrigger>
+    <form
+      onSubmit={form.handleSubmit(handleSubmit, onInvalid)}
+      className="space-y-6"
+      noValidate
+    >
+      {form.formState.submitCount > 0 && Object.keys(errors).length > 0 ? (
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          Hay campos con errores que debes corregir antes de guardar.
+        </div>
+      ) : null}
+
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as TabValue)}
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          {(Object.keys(SECTION_BY_TAB) as TabValue[]).map((tab) => (
+            <TabsTrigger
+              key={tab}
+              value={tab}
+              className={cn(hasErrorIn(tab) && "text-destructive")}
+            >
+              {SECTION_BY_TAB[tab][0].toUpperCase() + SECTION_BY_TAB[tab].slice(1)}
+              {hasErrorIn(tab) ? (
+                <span
+                  className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-destructive"
+                  aria-hidden
+                />
+              ) : null}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="licenciatura" className="space-y-4 pt-4">
@@ -230,10 +286,6 @@ export function FormacionAcademicaForm({
           </Button>
         </TabsContent>
 
-        <TabsContent value="resumen" className="space-y-4 pt-4">
-          <ResumenPosgradoFields control={form.control} />
-        </TabsContent>
-
         <TabsContent value="posdoctorado" className="space-y-4 pt-4">
           {estancias.fields.map((field, index) => (
             <EstanciaPosdoctoralFields
@@ -259,6 +311,11 @@ export function FormacionAcademicaForm({
 
       {submitError ? (
         <p className="text-sm text-destructive">{submitError}</p>
+      ) : null}
+      {submitSuccess ? (
+        <p className="text-sm text-emerald-600">
+          Formación académica guardada.
+        </p>
       ) : null}
 
       <div className="flex justify-end">

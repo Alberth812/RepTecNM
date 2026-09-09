@@ -21,11 +21,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
-const searchParams = useSearchParams();
-
-const verified = searchParams.get("verified") === "1";
-const verifiedEmail = searchParams.get("email") ?? "";
-
 type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
@@ -33,6 +28,11 @@ export function LoginForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const loginMutation = useLoginMutation();
+
+  const searchParams = useSearchParams();
+
+  const verified = searchParams.get("verified") === "1";
+  const verifiedEmail = searchParams.get("email") ?? "";
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -60,7 +60,7 @@ export function LoginForm() {
         if (result.user.role === "ADMINISTRADOR") {
           router.push("/admin/inicio");
         } else {
-          router.push("/afiliado/inicio");
+          router.push("/afiliados/inicio");
         }
         router.refresh();
       }

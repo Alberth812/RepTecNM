@@ -19,7 +19,7 @@ const SITUACIONES_CON_DETALLE = ["CONCLUIDA", "ACTUAL"] as const;
 
 export const estanciaPosdoctoralSchema = z
   .object({
-    id: z.string().uuid().optional(),
+    id: z.uuid().optional(),
     situacion: z.enum(situacionPosdoctoradoEnum.enumValues),
 
     // Los siguientes campos solo aplican cuando situacion in (CONCLUIDA, ACTUAL)
@@ -51,6 +51,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["institucionId"],
       "La institución",
+      { requiredWhenVisible: true }
     );
     validateConditionalField(
       ctx,
@@ -58,6 +59,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["programa"],
       "El programa o proyecto",
+      { requiredWhenVisible: true }
     );
     validateConditionalField(
       ctx,
@@ -65,6 +67,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["campoInvestigacion"],
       "El campo de investigación",
+      { requiredWhenVisible: true }
     );
     validateConditionalField(
       ctx,
@@ -79,6 +82,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["anioInicio"],
       "El año de inicio",
+      { requiredWhenVisible: true }
     );
     validateConditionalField(
       ctx,
@@ -86,6 +90,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["recibioApoyoEconomico"],
       "El apoyo económico",
+      { requiredWhenVisible: true }
     );
 
     // campo_investigacion_otro visible_when campo_investigacion = OTRO
@@ -123,6 +128,7 @@ export const estanciaPosdoctoralSchema = z
       data.recibioApoyoEconomico === true,
       ["fuentesFinanciamiento"],
       "La fuente de financiamiento",
+      { requiredWhenVisible: true }
     );
 
     // fuentes_financiamiento_otro visible_when fuentes_financiamiento contiene OTRO

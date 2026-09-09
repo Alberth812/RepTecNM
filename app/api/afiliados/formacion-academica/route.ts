@@ -19,11 +19,11 @@ import {
   estanciasPosdoctorales,
   licenciaturas,
   posgrados,
-  resumenPosgrado,
 } from "@/lib/db/schema/formacion-academica";
 import { formacionAcademicaSchema } from "@/lib/validation/formacion-academica";
 import { requireAfiliado } from "@/lib/auth/session";
 import { ApiError } from "@/lib/errors";
+import z from "zod";
 
 // -----------------------------------------------------------------------
 // GET
@@ -32,14 +32,11 @@ export async function GET() {
   try {
     const { afiliado } = await requireAfiliado();
 
-    const [lics, posg, resumen, estancias] = await Promise.all([
+    const [lics, posg, estancias] = await Promise.all([
       db.query.licenciaturas.findMany({
         where: { afiliadoId: afiliado.userId },
       }),
       db.query.posgrados.findMany({ where: { afiliadoId: afiliado.userId } }),
-      db.query.resumenPosgrado.findFirst({
-        where: { afiliadoId: afiliado.userId },
-      }),
       db.query.estanciasPosdoctorales.findMany({
         where: { afiliadoId: afiliado.userId },
       }),
@@ -48,7 +45,6 @@ export async function GET() {
     return NextResponse.json({
       licenciaturas: lics,
       posgrados: posg,
-      resumenPosgrado: resumen ?? null,
       estanciasPosdoctorales: estancias,
     });
   } catch (error) {
@@ -77,7 +73,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: "Datos de formación académica inválidos.",
-          issues: parsed.error.flatten(),
+          issues: z.treeifyError(parsed.error),
         },
         { status: 422 },
       );
@@ -86,7 +82,7 @@ export async function POST(request: NextRequest) {
     const data = parsed.data;
 
     // Estrategia: reemplazo completo dentro de una transacción. El formulario
-    // envía siempre el estado íntegro de las 4 secciones, así que no hace
+    // envía siempre el estado íntegro de las 3 secciones, así que no hace
     // falta reconciliar altas/bajas/ediciones fila por fila; se descartan los
     // `id` que haya mandado el cliente y se regeneran al insertar.
     await db.transaction(async (tx) => {
@@ -123,20 +119,6 @@ export async function POST(request: NextRequest) {
             afiliadoId,
           })),
         );
-      }
-
-      if (data.resumenPosgrado) {
-        await tx
-          .insert(resumenPosgrado)
-          .values({ afiliadoId, ...data.resumenPosgrado })
-          .onConflictDoUpdate({
-            target: resumenPosgrado.afiliadoId,
-            set: data.resumenPosgrado,
-          });
-      } else {
-        await tx
-          .delete(resumenPosgrado)
-          .where(eq(resumenPosgrado.afiliadoId, afiliadoId));
       }
     });
 

@@ -192,7 +192,7 @@ export function InstitucionFormField({
           <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
 
           <Select
-            value={(field.value as string | null | undefined) ?? undefined}
+            value={(field.value as string | null | undefined) ?? ""}
             onValueChange={field.onChange}
           >
             <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
@@ -246,7 +246,7 @@ export function YesNoField({
 
             <RadioGroup
               className="flex gap-4"
-              value={value === true ? "si" : value === false ? "no" : undefined}
+              value={value === true ? "si" : value === false ? "no" : ""}
               onValueChange={(v) => {
                 const next = v === "si";
 
@@ -317,7 +317,7 @@ export function RadioEnumField({
                   ? "flex flex-wrap gap-4"
                   : "flex flex-col gap-2"
               }
-              value={(field.value as string | null | undefined) ?? undefined}
+              value={(field.value as string | null | undefined) ?? ""}
               onValueChange={(v) => {
                 field.onChange(v);
                 onChangeExtra?.(v);

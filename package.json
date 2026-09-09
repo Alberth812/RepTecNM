@@ -12,6 +12,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed-root": "tsx scripts/seed-root-admin.ts",
+    "db:seed-instituciones": "tsx scripts/seed-instituciones.ts",
     "db:reset": "tsx scripts/db-reset.ts",
     "payload": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts payload"
   },

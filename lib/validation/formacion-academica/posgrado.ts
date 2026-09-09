@@ -44,14 +44,13 @@ export const motivoEleccionInstitucionSchema = z.object({
 
 export const posgradoSchema = z
   .object({
-    id: z.string().uuid().optional(),
+    id: z.uuid().optional(),
 
     tipoPosgrado: z.enum(tipoPosgradoEnum.enumValues),
     // Conserva la semántica de "Maestría y Doctorado" sin forzar una entidad única.
     trayectoriaPosgrado: z.enum(trayectoriaPosgradoEnum.enumValues).nullish(), // visible_when tipo_posgrado = DOCTORADO
 
     institucionId: z
-      .string()
       .uuid({ message: "Selecciona una institución válida." }),
     programa: z.string().min(1, "El programa es requerido."),
     disciplina: z.string().min(1, "La disciplina es requerida."),
@@ -138,6 +137,7 @@ export const posgradoSchema = z
       data.becado === true,
       ["fuentesFinanciamiento"],
       "La fuente de financiamiento",
+      { requiredWhenVisible: true },
     );
 
     // fuentes_financiamiento_otro visible_when fuentes_financiamiento contiene OTRO
@@ -177,6 +177,7 @@ export const posgradoSchema = z
       data.tieneGrado === true,
       ["mesesObtencionGrado"],
       "Los meses para obtener el grado",
+      { requiredWhenVisible: true }
     );
 
     // motivo_no_obtencion_grado visible_when tiene_grado = false
@@ -186,6 +187,7 @@ export const posgradoSchema = z
       data.tieneGrado === false,
       ["motivoNoObtencionGrado"],
       "El motivo por el que no ha obtenido el grado",
+      { requiredWhenVisible: true }
     );
     validateOtroEspecifique(
       ctx,

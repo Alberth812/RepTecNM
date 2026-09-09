@@ -18,19 +18,16 @@
 import { z } from "zod";
 import { licenciaturaSchema } from "./licenciatura";
 import { posgradoSchema } from "./posgrado";
-import { resumenPosgradoSchema } from "./resumen-posgrado";
 import { estanciaPosdoctoralSchema } from "./estancia-posdoctoral";
 
 export * from "./common";
 export * from "./licenciatura";
 export * from "./posgrado";
-export * from "./resumen-posgrado";
 export * from "./estancia-posdoctoral";
 
 export const formacionAcademicaSchema = z.object({
   licenciaturas: z.array(licenciaturaSchema).default([]),
   posgrados: z.array(posgradoSchema).default([]),
-  resumenPosgrado: resumenPosgradoSchema.nullish(),
   estanciasPosdoctorales: z.array(estanciaPosdoctoralSchema).default([]),
 });
 

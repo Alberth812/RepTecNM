@@ -4,7 +4,6 @@
 // Separa la trayectoria académica del afiliado en entidades relacionadas (recommended_persistence_strategy):
 //   afiliados -> licenciaturas (1:N)
 //   afiliados -> posgrados (1:N)
-//   afiliados -> resumen_posgrado (1:1)
 //   afiliados -> estancias_posdoctorales (1:N)
 //
 // NOTA: ajusta la ruta de importación de `instituciones` si tu catálogo vive en otro archivo.
@@ -229,32 +228,6 @@ export const posgrados = pgTable("posgrados", {
 });
 
 // ---------------------------------------------------------------------------
-// Sección "Resumen de estudios de posgrado" (entity: resumen_posgrado, one_to_one)
-// Dato de navegación/resumen; NO sustituye los registros detallados de `posgrados`.
-// ---------------------------------------------------------------------------
-export const resumenPosgrado = pgTable("resumen_posgrado", {
-  afiliadoId: text("afiliado_id")
-    .primaryKey()
-    .references(() => afiliados.userId, { onDelete: "cascade" }),
-
-  // checkbox -> reutiliza tipoPosgradoEnum como array (MAESTRIA / DOCTORADO)
-  programasPosgradoCursados: tipoPosgradoEnum(
-    "programas_posgrado_cursados",
-  ).array(),
-  trayectoriaMaestriaDoctoradoIntegrada: boolean(
-    "trayectoria_maestria_doctorado_integrada",
-  ),
-
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-});
-
-// ---------------------------------------------------------------------------
 // Sección "Posdoctorado / Estancias posdoctorales" (entity: estancia_posdoctoral, one_to_many)
 // ---------------------------------------------------------------------------
 export const estanciasPosdoctorales = pgTable("estancias_posdoctorales", {
@@ -299,10 +272,6 @@ export const afiliadoFormacionAcademicaRelations = relations(
   ({ many, one }) => ({
     licenciaturas: many(licenciaturas),
     posgrados: many(posgrados),
-    resumenPosgrado: one(resumenPosgrado, {
-      fields: [afiliados.userId],
-      references: [resumenPosgrado.afiliadoId],
-    }),
     estanciasPosdoctorales: many(estanciasPosdoctorales),
   }),
 );
@@ -328,16 +297,6 @@ export const posgradosRelations = relations(posgrados, ({ one }) => ({
     references: [instituciones.id],
   }),
 }));
-
-export const resumenPosgradoRelations = relations(
-  resumenPosgrado,
-  ({ one }) => ({
-    afiliado: one(afiliados, {
-      fields: [resumenPosgrado.afiliadoId],
-      references: [afiliados.userId],
-    }),
-  }),
-);
 
 export const estanciasPosdoctoralesRelations = relations(
   estanciasPosdoctorales,

@@ -193,6 +193,7 @@ export function EstanciaPosdoctoralFields({
               name={`${path}.recibioApoyoEconomico`}
               label="¿Recibió o recibe apoyo económico para su posdoctorado?"
               onChangeExtra={(recibio) => {
+                console.log(recibio);
                 if (!recibio) {
                   setValue(`${path}.fuentesFinanciamiento`, null);
                   setValue(`${path}.fuentesFinanciamientoOtro`, null);

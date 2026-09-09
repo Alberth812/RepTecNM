@@ -12,7 +12,18 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = loginSchema.parse(await request.json());
+    let rawBody: unknown;
+
+    try {
+      rawBody = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid or empty JSON body" },
+        { status: 400 },
+      );
+    }
+
+    const body = loginSchema.parse(rawBody);
     const ip = getClientIp(request);
 
     await assertLoginAllowed(body.email, ip);

@@ -8,16 +8,15 @@ import { z } from "zod";
 import {
   anioAcademicoOpcionalSchema,
   anioAcademicoSchema,
+  required,
   validateConditionalField,
   validateRangoAnios,
 } from "./common";
 
 export const licenciaturaSchema = z
   .object({
-    id: z.string().uuid().optional(), // ausente al crear, presente al editar
-    institucionId: z
-      .string()
-      .uuid({ message: "Selecciona una institución válida." }),
+    id: z.uuid().optional(), // ausente al crear, presente al editar
+    institucionId: required(z.uuid(), "Selecciona una institución válida."),
     programa: z.string().min(1, "El programa es requerido."),
     disciplina: z.string().min(1, "La disciplina es requerida."),
 
@@ -46,6 +45,7 @@ export const licenciaturaSchema = z
       data.tieneTitulo === true,
       ["anioTitulacion"],
       "El año de titulación",
+      { requiredWhenVisible: true }
     );
 
     // cross_entity_validation_rules: anio_titulacion >= anio_egreso
@@ -66,6 +66,7 @@ export const licenciaturaSchema = z
       data.tieneTitulo === false,
       ["motivoNoTitulacion"],
       "El motivo por el que no ha obtenido el título",
+      { requiredWhenVisible: true }
     );
   });
 

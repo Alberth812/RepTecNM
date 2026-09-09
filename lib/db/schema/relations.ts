@@ -8,7 +8,6 @@ import { solicitudes } from "./solicitudes";
 import {
   licenciaturas,
   posgrados,
-  resumenPosgrado,
   estanciasPosdoctorales,
 } from "./formacion-academica";
 import { instituciones } from "./instituciones";
@@ -29,7 +28,6 @@ export const relations = defineRelations(
 
     licenciaturas,
     posgrados,
-    resumenPosgrado,
     estanciasPosdoctorales,
     instituciones,
   },
@@ -140,11 +138,6 @@ export const relations = defineRelations(
       posgrados: r.many.posgrados({
         from: r.afiliados.userId,
         to: r.posgrados.afiliadoId,
-      }),
-
-      resumenPosgrado: r.one.resumenPosgrado({
-        from: r.afiliados.userId,
-        to: r.resumenPosgrado.afiliadoId,
       }),
 
       estanciasPosdoctorales: r.many.estanciasPosdoctorales({
@@ -260,14 +253,6 @@ export const relations = defineRelations(
       institucion: r.one.instituciones({
         from: r.posgrados.institucionId,
         to: r.instituciones.id,
-        optional: false,
-      }),
-    },
-
-    resumenPosgrado: {
-      afiliado: r.one.afiliados({
-        from: r.resumenPosgrado.afiliadoId,
-        to: r.afiliados.userId,
         optional: false,
       }),
     },
