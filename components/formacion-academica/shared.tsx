@@ -46,6 +46,7 @@ type SharedProps = {
 // ---------------------------------------------------------------------------
 // type: "text"
 // ---------------------------------------------------------------------------
+
 export function TextFormField({
   control,
   name,
@@ -187,32 +188,40 @@ export function InstitucionFormField({
     <Controller
       control={control}
       name={name}
-      render={({ field, fieldState }) => (
-        <Field data-invalid={fieldState.invalid}>
-          <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+      render={({ field, fieldState }) => {
+        const institucionSeleccionada = instituciones.find(
+          (inst) => String(inst.id) === String(field.value),
+        );
 
-          <Select
-            value={(field.value as string | null | undefined) ?? ""}
-            onValueChange={field.onChange}
-          >
-            <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
-              <SelectValue placeholder="Selecciona una institución" />
-            </SelectTrigger>
+        return (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
 
-            <SelectContent>
-              {instituciones.map((inst) => (
-                <SelectItem key={inst.id} value={inst.id}>
-                  {inst.nombre}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select
+              value={field.value != null ? String(field.value) : ""}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
+                <SelectValue placeholder="Selecciona una institución">
+                  {institucionSeleccionada?.nombre}
+                </SelectValue>
+              </SelectTrigger>
 
-          {fieldState.invalid ? (
-            <FieldError errors={[fieldState.error]} />
-          ) : null}
-        </Field>
-      )}
+              <SelectContent>
+                {instituciones.map((inst) => (
+                  <SelectItem key={inst.id} value={inst.id}>
+                    {inst.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {fieldState.invalid ? (
+              <FieldError errors={[fieldState.error]} />
+            ) : null}
+          </Field>
+        );
+      }}
     />
   );
 }
@@ -454,7 +463,7 @@ export function RatingSelectField({
           ) : null}
 
           <Select
-            value={field.value != null ? String(field.value) : undefined}
+            value={field.value != null ? String(field.value) : ""}
             onValueChange={(v) => field.onChange(Number(v))}
           >
             <SelectTrigger

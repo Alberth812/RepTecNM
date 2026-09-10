@@ -46,10 +46,12 @@ export const anioAcademicoBase = z
     message: "El año no puede ser mayor al año actual.",
   });
 
-
 /** Variante nullish (para campos de año condicionados u opcionales). */
 export const anioAcademicoOpcionalSchema = anioAcademicoBase.nullish();
-export const anioAcademicoSchema = required(anioAcademicoBase, "Este campo es requerido.");
+export const anioAcademicoSchema = required(
+  anioAcademicoBase,
+  "Este campo es requerido.",
+);
 
 /** Atajo para registrar un issue de validación en una ruta específica. */
 export function addCustomIssue(
@@ -60,7 +62,11 @@ export function addCustomIssue(
   ctx.addIssue({ code: "custom", path, message });
 }
 
-function isEmptyValue(value: unknown): boolean {
+function isEmptyValue(value: unknown, isYesNo: boolean): boolean {
+  if (isYesNo) {
+    return typeof value !== "boolean";
+  }
+
   return (
     value === null ||
     value === undefined ||
@@ -90,8 +96,9 @@ export function validateConditionalField(
   path: (string | number)[],
   fieldLabel: string,
   options: { requiredWhenVisible?: boolean } = {},
+  isYesNo: boolean = false,
 ) {
-  const empty = isEmptyValue(value);
+  const empty = isEmptyValue(value, isYesNo);
 
   if (!shouldBeVisible && !empty) {
     addCustomIssue(

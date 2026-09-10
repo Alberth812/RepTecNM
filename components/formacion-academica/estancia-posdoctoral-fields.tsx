@@ -2,8 +2,6 @@
 //
 // Sección "Posdoctorado / Estancias posdoctorales" del JSON de especificación.
 
-//
-
 "use client";
 
 import { Trash2 } from "lucide-react";

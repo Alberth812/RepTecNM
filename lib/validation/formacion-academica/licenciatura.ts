@@ -9,7 +9,6 @@ import {
   anioAcademicoOpcionalSchema,
   anioAcademicoSchema,
   required,
-  validateConditionalField,
   validateRangoAnios,
 } from "./common";
 
@@ -24,9 +23,7 @@ export const licenciaturaSchema = z
     anioEgreso: anioAcademicoSchema, // required: true
 
     // Se separa egreso de titulación porque egresar no implica haber obtenido el título.
-    tieneTitulo: z.boolean().nullish(), // required: false
-    anioTitulacion: anioAcademicoOpcionalSchema, // visible_when tiene_titulo = true
-    motivoNoTitulacion: z.string().nullish(), // visible_when tiene_titulo = false
+    anioTitulacion: anioAcademicoSchema,
   })
   .superRefine((data, ctx) => {
     // cross_entity_validation_rules: anio_egreso >= anio_ingreso
@@ -37,36 +34,12 @@ export const licenciaturaSchema = z
       ["anioEgreso"],
       "El año de egreso debe ser mayor o igual al año de ingreso.",
     );
-
-    // visible_when tiene_titulo = true
-    validateConditionalField(
+    validateRangoAnios(
       ctx,
+      data.anioEgreso,
       data.anioTitulacion,
-      data.tieneTitulo === true,
       ["anioTitulacion"],
-      "El año de titulación",
-      { requiredWhenVisible: true }
-    );
-
-    // cross_entity_validation_rules: anio_titulacion >= anio_egreso
-    if (data.tieneTitulo === true) {
-      validateRangoAnios(
-        ctx,
-        data.anioEgreso,
-        data.anioTitulacion,
-        ["anioTitulacion"],
-        "El año de titulación debe ser mayor o igual al año de egreso.",
-      );
-    }
-
-    // visible_when tiene_titulo = false
-    validateConditionalField(
-      ctx,
-      data.motivoNoTitulacion,
-      data.tieneTitulo === false,
-      ["motivoNoTitulacion"],
-      "El motivo por el que no ha obtenido el título",
-      { requiredWhenVisible: true }
+      "El año de titulación debe ser mayor o igual al año de egreso.",
     );
   });
 

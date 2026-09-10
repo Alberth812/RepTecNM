@@ -3,7 +3,6 @@
 // Sección "Posgrados" del JSON de especificación (entity: posgrado). Cubre
 // tanto maestría como doctorado, distinguidos por `tipoPosgrado`.
 
-import { z } from "zod";
 import {
   dedicacionPosgradoEnum,
   estadoCivilEnum,
@@ -13,6 +12,7 @@ import {
   tipoPosgradoEnum,
   trayectoriaPosgradoEnum,
 } from "@/lib/db/schema/formacion-academica";
+import { z } from "zod";
 import {
   anioAcademicoOpcionalSchema,
   anioAcademicoSchema,
@@ -50,8 +50,7 @@ export const posgradoSchema = z
     // Conserva la semántica de "Maestría y Doctorado" sin forzar una entidad única.
     trayectoriaPosgrado: z.enum(trayectoriaPosgradoEnum.enumValues).nullish(), // visible_when tipo_posgrado = DOCTORADO
 
-    institucionId: z
-      .uuid({ message: "Selecciona una institución válida." }),
+    institucionId: z.uuid({ message: "Selecciona una institución válida." }),
     programa: z.string().min(1, "El programa es requerido."),
     disciplina: z.string().min(1, "La disciplina es requerida."),
     lineaInvestigacion: z.string().nullish(),
@@ -177,7 +176,7 @@ export const posgradoSchema = z
       data.tieneGrado === true,
       ["mesesObtencionGrado"],
       "Los meses para obtener el grado",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
 
     // motivo_no_obtencion_grado visible_when tiene_grado = false
@@ -187,7 +186,7 @@ export const posgradoSchema = z
       data.tieneGrado === false,
       ["motivoNoObtencionGrado"],
       "El motivo por el que no ha obtenido el grado",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
     validateOtroEspecifique(
       ctx,

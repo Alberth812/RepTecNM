@@ -10,6 +10,7 @@ import {
 } from "@/lib/db/schema/formacion-academica";
 import {
   anioAcademicoOpcionalSchema,
+  required,
   validateConditionalField,
   validateOtroEspecifique,
   validateRangoAnios,
@@ -23,7 +24,7 @@ export const estanciaPosdoctoralSchema = z
     situacion: z.enum(situacionPosdoctoradoEnum.enumValues),
 
     // Los siguientes campos solo aplican cuando situacion in (CONCLUIDA, ACTUAL)
-    institucionId: z.string().uuid().nullish(),
+    institucionId: z.uuid().nullish(),
     programa: z.string().nullish(),
     campoInvestigacion: z
       .enum(campoInvestigacionPosdoctoradoEnum.enumValues)
@@ -51,7 +52,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["institucionId"],
       "La institución",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
     validateConditionalField(
       ctx,
@@ -59,7 +60,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["programa"],
       "El programa o proyecto",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
     validateConditionalField(
       ctx,
@@ -67,7 +68,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["campoInvestigacion"],
       "El campo de investigación",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
     validateConditionalField(
       ctx,
@@ -82,7 +83,7 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["anioInicio"],
       "El año de inicio",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
     validateConditionalField(
       ctx,
@@ -90,7 +91,8 @@ export const estanciaPosdoctoralSchema = z
       conDetalle,
       ["recibioApoyoEconomico"],
       "El apoyo económico",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
+      true,
     );
 
     // campo_investigacion_otro visible_when campo_investigacion = OTRO
@@ -128,7 +130,7 @@ export const estanciaPosdoctoralSchema = z
       data.recibioApoyoEconomico === true,
       ["fuentesFinanciamiento"],
       "La fuente de financiamiento",
-      { requiredWhenVisible: true }
+      { requiredWhenVisible: true },
     );
 
     // fuentes_financiamiento_otro visible_when fuentes_financiamiento contiene OTRO

@@ -5,20 +5,15 @@
 
 "use client";
 
-import { Trash2 } from "lucide-react";
-import type { Control, UseFormSetValue } from "react-hook-form";
-import { useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type {
-  FormacionAcademica,
-  FormacionAcademicaInput,
-} from "@/lib/validation/formacion-academica";
+import type { FormacionAcademicaInput } from "@/lib/validation/formacion-academica";
+import { Trash2 } from "lucide-react";
+import type { Control, UseFormSetValue } from "react-hook-form";
 import {
   AnioFormField,
   InstitucionFormField,
   TextFormField,
-  YesNoField,
   type Institucion,
 } from "./shared";
 
@@ -39,9 +34,9 @@ export function LicenciaturaFields({
   onRemove,
   removable,
 }: LicenciaturaFieldsProps) {
-  const row = useWatch({ control, name: `licenciaturas.${index}` }) as
+  /*const row = useWatch({ control, name: `licenciaturas.${index}` }) as
     | FormacionAcademica["licenciaturas"][number]
-    | undefined;
+    | undefined;*/
 
   return (
     <Card>
@@ -90,35 +85,11 @@ export function LicenciaturaFields({
           </div>
         </div>
 
-        <YesNoField
+        <AnioFormField
           control={control}
-          name={`licenciaturas.${index}.tieneTitulo`}
-          label="¿Obtuvo el título de licenciatura?"
-          onChangeExtra={(tieneTitulo) => {
-            // Limpia el campo que deja de aplicar (visible_when tiene_titulo)
-            if (tieneTitulo) {
-              setValue(`licenciaturas.${index}.motivoNoTitulacion`, null);
-            } else {
-              setValue(`licenciaturas.${index}.anioTitulacion`, null);
-            }
-          }}
+          name={`licenciaturas.${index}.anioTitulacion`}
+          label="Año de obtención del título"
         />
-
-        {row?.tieneTitulo === true ? (
-          <AnioFormField
-            control={control}
-            name={`licenciaturas.${index}.anioTitulacion`}
-            label="Año de obtención del título"
-          />
-        ) : null}
-
-        {row?.tieneTitulo === false ? (
-          <TextFormField
-            control={control}
-            name={`licenciaturas.${index}.motivoNoTitulacion`}
-            label="Motivo por el que no ha obtenido el título"
-          />
-        ) : null}
       </CardContent>
     </Card>
   );

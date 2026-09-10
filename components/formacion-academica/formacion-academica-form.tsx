@@ -231,7 +231,8 @@ export function FormacionAcademicaForm({
               value={tab}
               className={cn(hasErrorIn(tab) && "text-destructive")}
             >
-              {SECTION_BY_TAB[tab][0].toUpperCase() + SECTION_BY_TAB[tab].slice(1)}
+              {SECTION_BY_TAB[tab][0].toUpperCase() +
+                SECTION_BY_TAB[tab].slice(1)}
               {hasErrorIn(tab) ? (
                 <span
                   className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-destructive"

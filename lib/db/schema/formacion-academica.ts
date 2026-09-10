@@ -145,9 +145,7 @@ export const licenciaturas = pgTable("licenciaturas", {
   anioEgreso: integer("anio_egreso").notNull(), // required: true
 
   // tiene_titulo separa egreso de titulación
-  tieneTitulo: boolean("tiene_titulo"),
-  anioTitulacion: integer("anio_titulacion"), // visible_when tiene_titulo = true
-  motivoNoTitulacion: text("motivo_no_titulacion"), // visible_when tiene_titulo = false
+  anioTitulacion: integer("anio_titulacion").notNull(), // required: false
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
