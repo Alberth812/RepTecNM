@@ -11,11 +11,16 @@ import { FormacionAcademicaForm } from "@/components/formacion-academica/formaci
 import { requireAfiliado } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import type { FormacionAcademica } from "@/lib/validation/formacion-academica";
+import Link from "next/link";
 
 // Excluye columnas que no forman parte del esquema Zod del formulario
 // (afiliadoId, createdAt, updatedAt) para que el shape calce exacto con
 // `FormacionAcademica` sin necesidad de mapear campo por campo.
-const OMITIR_METADATOS = { afiliadoId: false, createdAt: false, updatedAt: false } as const;
+const OMITIR_METADATOS = {
+  afiliadoId: false,
+  createdAt: false,
+  updatedAt: false,
+} as const;
 
 export default async function FormacionAcademicaPage() {
   const { afiliado } = await requireAfiliado();
@@ -58,7 +63,15 @@ export default async function FormacionAcademicaPage() {
         </p>
       </div>
 
-      <FormacionAcademicaForm instituciones={catalogoInstituciones} defaultValues={defaultValues} />
+      <FormacionAcademicaForm
+        instituciones={catalogoInstituciones}
+        defaultValues={defaultValues}
+      />
+      <div>
+        <p>
+          <Link href={"/afiliados/inicio"}>Regresar a inicio</Link>
+        </p>
+      </div>
     </div>
   );
 }

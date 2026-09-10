@@ -21,6 +21,7 @@ import {
   validateRangoAnios,
 } from "./common";
 
+//
 // Sección "Posgrados" -> campo motivos_eleccion_institucion (scale_matrix_with_custom_rows)
 // Filas fijas como propiedades estructuradas + motivos personalizados con su propia calificación.
 export const motivoEleccionInstitucionSchema = z.object({
@@ -117,6 +118,7 @@ export const posgradoSchema = z
       data.actualmenteCursa !== true,
       ["anioEgreso"],
       "El año de egreso",
+      { requiredWhenVisible: true },
     );
 
     // modalidad_otra visible_when modalidad = OTRA

@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   ClipboardList,
@@ -10,11 +7,16 @@ import {
   TriangleAlert,
   User,
 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-import { useMeQuery } from "@/lib/hooks/use-auth";
-import { ApiRequestError } from "@/lib/api/http-error";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { ApiRequestError } from "@/lib/api/http-error";
+import { useMeQuery } from "@/lib/hooks/use-auth";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -22,11 +24,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MEMBERSHIP_LABELS: Record<string, string> = {
   NO_INICIADA: "NO_INICIADA",
@@ -313,7 +312,6 @@ export function SessionDashboard() {
                         <ArrowRight className="h-4 w-4 shrink-0" />
                       </Link>
                     )}
-                    
                   </div>
                 </div>
               </section>

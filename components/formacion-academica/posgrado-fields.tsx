@@ -265,20 +265,6 @@ export function PosgradoFields({
 
         <MotivosEleccionInstitucionFields control={control} index={index} />
 
-        <div className="grid grid-cols-2 gap-4">
-          <AnioFormField
-            control={control}
-            name={`${path}.anioIngreso`}
-            label="Año de ingreso"
-          />
-          <AnioFormField
-            control={control}
-            name={`${path}.anioEgreso`}
-            label="Año de egreso o conclusión de créditos"
-            description="Déjalo vacío si actualmente cursa el posgrado"
-          />
-        </div>
-
         <YesNoField
           control={control}
           name={`${path}.actualmenteCursa`}
@@ -288,6 +274,22 @@ export function PosgradoFields({
             if (actualmenteCursa) setValue(`${path}.anioEgreso`, null);
           }}
         />
+
+        <div className="grid grid-cols-2 gap-4">
+          <AnioFormField
+            control={control}
+            name={`${path}.anioIngreso`}
+            label="Año de ingreso"
+          />
+
+          {row?.actualmenteCursa === false && (
+            <AnioFormField
+              control={control}
+              name={`${path}.anioEgreso`}
+              label="Año de egreso o conclusión de créditos"
+            />
+          )}
+        </div>
 
         <RadioEnumField
           control={control}
