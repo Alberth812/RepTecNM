@@ -1,4 +1,4 @@
-// app/api/afiliados/formacion-academica/route.ts
+// app/api/afiliado/formacion-academica/route.ts
 //
 // GET  -> devuelve la formación académica del afiliado autenticado (para
 //         hidratar `defaultValues` en <FormacionAcademicaForm />).

@@ -60,7 +60,7 @@ export function LoginForm() {
         if (result.user.role === "ADMINISTRADOR") {
           router.push("/admin/inicio");
         } else {
-          router.push("/afiliados/inicio");
+          router.push("/afiliado/inicio");
         }
         router.refresh();
       }

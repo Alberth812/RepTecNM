@@ -69,7 +69,7 @@ export default async function FormacionAcademicaPage() {
       />
       <div>
         <p>
-          <Link href={"/afiliados/inicio"}>Regresar a inicio</Link>
+          <Link href={"/afiliado/inicio"}>Regresar a inicio</Link>
         </p>
       </div>
     </div>
