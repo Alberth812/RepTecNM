@@ -23,53 +23,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = loginSchema.parse(rawBody);
+    const result = loginSchema.safeParse(rawBody);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Invalid request body" },
+        { status: 400 },
+      );
+    }
+
+    const { email, password } = result.data;
     const ip = getClientIp(request);
 
-    await assertLoginAllowed(body.email, ip);
+    await assertLoginAllowed(email, ip);
 
     let response: Response;
 
     try {
       response = await auth.api.signInEmail({
-        body: {
-          email: body.email,
-          password: body.password,
-        },
+        body: { email, password },
         asResponse: true,
       });
     } catch (error) {
       const normalizedError = normalizeLoginError(error);
 
       if (normalizedError.code === "INVALID_CREDENTIALS") {
-        await recordLoginFailure(body.email, ip);
+        await recordLoginFailure(email, ip);
       }
 
       throw normalizedError;
     }
 
-    await resetLoginFailures(body.email);
-
-    const data = (await response.json().catch(() => null)) as {
-      user?: {
-        id: string;
-        email: string;
-        role?: string;
-      };
-    } | null;
-
-    const headers = new Headers({
-      "content-type": "application/json",
-    });
-
-    for (const cookie of response.headers.getSetCookie()) {
-      headers.append("set-cookie", cookie);
+    if (!response.ok) {
+      // Important: only do this if signInEmail returns
+      // authentication failures as a Response rather than throwing.
+      // Normalize/check the response according to your auth API contract.
+      return response;
     }
 
-    return new NextResponse(JSON.stringify(data), {
-      status: response.status,
-      headers,
-    });
+    await resetLoginFailures(email);
+
+    return response;
   } catch (error) {
     return toErrorResponse(error);
   }
