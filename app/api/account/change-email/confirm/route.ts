@@ -9,6 +9,7 @@ import { changeEmailConfirmSchema } from "@/lib/validation/schemas";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 
 /** RF-AUTH-012, paso 2: confirma el código de 6 dígitos enviado al nuevo correo. */
+//
 export async function POST(request: NextRequest) {
   try {
     const session = await requireAfiliado();

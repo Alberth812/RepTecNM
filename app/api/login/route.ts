@@ -7,7 +7,10 @@ import {
   resetLoginFailures,
 } from "@/lib/rate-limit/login-lockout";
 import { loginSchema } from "@/lib/validation/schemas";
-import { normalizeLoginError } from "@/lib/api/normalize-login-error";
+import {
+  normalizeLoginError,
+  normalizeLoginResponse,
+} from "@/lib/api/normalize-login-error";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -18,7 +21,12 @@ export async function POST(request: NextRequest) {
       rawBody = await request.json();
     } catch {
       return NextResponse.json(
-        { error: "Invalid or empty JSON body" },
+        {
+          error: {
+            code: "INVALID_JSON",
+            message: "Invalid or empty JSON body.",
+          },
+        },
         { status: 400 },
       );
     }
@@ -27,21 +35,29 @@ export async function POST(request: NextRequest) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: "Invalid request body" },
+        {
+          error: {
+            code: "VALIDATION_ERROR",
+            message: "Datos inválidos.",
+            issues: result.error.issues,
+          },
+        },
         { status: 400 },
       );
     }
 
     const { email, password } = result.data;
     const ip = getClientIp(request);
-
     await assertLoginAllowed(email, ip);
 
     let response: Response;
 
     try {
       response = await auth.api.signInEmail({
-        body: { email, password },
+        body: {
+          email,
+          password,
+        },
         asResponse: true,
       });
     } catch (error) {
@@ -54,13 +70,25 @@ export async function POST(request: NextRequest) {
       throw normalizedError;
     }
 
+    /*
+     * Better Auth may return authentication errors as a Response
+     * rather than throwing when `asResponse: true` is used.
+     *
+     * Do not return the raw error response. Normalize it first so
+     * the frontend always receives our API error contract.
+     */
     if (!response.ok) {
-      // Important: only do this if signInEmail returns
-      // authentication failures as a Response rather than throwing.
-      // Normalize/check the response according to your auth API contract.
-      return response;
+      // NORMALIZAR LA RESPUESTA
+      const normalizedError = await normalizeLoginResponse(response);
+
+      if (normalizedError.code === "INVALID_CREDENTIALS") {
+        await recordLoginFailure(email, ip);
+      }
+
+      throw normalizedError;
     }
 
+    // Successful login: clear the account's failed-login state.
     await resetLoginFailures(email);
 
     return response;
