@@ -30,7 +30,7 @@
 // parcial.
 
 import { NextResponse } from "next/server";
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { z } from "zod";
 
 import { db } from "@/lib/db/client";
@@ -40,6 +40,7 @@ import {
   afiliadosEmpleos,
   afiliadosInformacionLaboral,
 } from "@/lib/db/schema/informacion-laboral";
+import { getInformacionLaboralSeccion } from "@/lib/seguimiento/informacion-laboral";
 import { informacionLaboralSeccionSchema } from "@/lib/validation/informacion-laboral";
 
 type InformacionLaboralSeccionOutput = z.output<
@@ -135,26 +136,8 @@ function toEmpleoValues(afiliadoUserId: string, empleo: EmpleoOutput) {
 export async function GET() {
   try {
     const { afiliado } = await requireAfiliado();
-
-    const [informacionLaboralRow] = await db
-      .select()
-      .from(afiliadosInformacionLaboral)
-      .where(eq(afiliadosInformacionLaboral.userId, afiliado.userId))
-      .limit(1);
-
-    const historialEmpleos = await db
-      .select()
-      .from(afiliadosEmpleos)
-      .where(eq(afiliadosEmpleos.afiliadoUserId, afiliado.userId))
-      .orderBy(
-        asc(afiliadosEmpleos.fechaInicioAnio),
-        asc(afiliadosEmpleos.fechaInicioMes),
-      );
-
-    return NextResponse.json({
-      informacionLaboral: informacionLaboralRow ?? null,
-      historialEmpleos,
-    });
+    const seccion = await getInformacionLaboralSeccion(afiliado.userId);
+    return NextResponse.json(seccion);
   } catch (error) {
     return handleRouteError(error);
   }
