@@ -14,6 +14,14 @@ import {
   type FieldPath,
   type FieldValues,
 } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MESES_OPTIONS } from "./informacion-laboral-options";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -217,8 +225,7 @@ export function RadioOptionsField<
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const fieldValue =
-          typeof field.value === "string" ? field.value : undefined;
+        const fieldValue = typeof field.value === "string" ? field.value : "";
 
         const otroOption = options.find((o) => o.requiresDetail);
 
@@ -309,11 +316,7 @@ export function BooleanRadioField<
             className="flex flex-row gap-6"
             disabled={disabled}
             value={
-              field.value === true
-                ? "si"
-                : field.value === false
-                  ? "no"
-                  : undefined
+              field.value === true ? "si" : field.value === false ? "no" : ""
             }
             onValueChange={(value) => field.onChange(value === "si")}
           >
@@ -338,5 +341,57 @@ export function BooleanRadioField<
         </Field>
       )}
     />
+  );
+}
+
+interface MesSelectProps {
+  id: string;
+  name: string;
+  value: number | null | undefined;
+  onChange: (value: number | undefined) => void;
+  onBlur: () => void;
+  ref?: React.Ref<HTMLButtonElement>;
+  "aria-label"?: string;
+  "aria-invalid"?: boolean;
+  invalid?: boolean;
+}
+
+export function MesSelect({
+  id,
+  name,
+  value,
+  onChange,
+  onBlur,
+  ref,
+  invalid,
+  ...aria
+}: MesSelectProps) {
+  return (
+    <Select
+      items={MESES_OPTIONS}
+      value={value != null ? String(value) : null}
+      onValueChange={(value) => {
+        onChange(value === null ? undefined : Number(value));
+      }}
+    >
+      <SelectTrigger
+        id={id}
+        name={name}
+        ref={ref}
+        onBlur={onBlur}
+        aria-invalid={invalid}
+        {...aria}
+      >
+        <SelectValue placeholder="Selecciona mes" />
+      </SelectTrigger>
+
+      <SelectContent>
+        {MESES_OPTIONS.map((mes) => (
+          <SelectItem key={mes.value} value={mes.value}>
+            {mes.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

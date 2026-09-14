@@ -27,6 +27,7 @@ import type { InformacionLaboralFormValues } from "./informacion-laboral-types";
 import {
   BooleanRadioField,
   CheckboxGroupField,
+  MesSelect,
   RadioOptionsField,
 } from "./informacion-laboral-fields";
 
@@ -41,10 +42,13 @@ import {
   VALORACION_IMPACTO_OPTIONS,
   VALORACION_NIVEL_OPTIONS,
 } from "./informacion-laboral-options";
+import { NumberInput } from "./number-input";
 
 /* -------------------------------------------------------------------------- */
 /* Tipos                                                                      */
 /* -------------------------------------------------------------------------- */
+
+const anioActual = new Date().getFullYear();
 
 interface EmpleoFieldsetProps {
   control: Control<InformacionLaboralFormValues>;
@@ -184,33 +188,16 @@ export function EmpleoFieldset({
                   name={empleoField(index, "fechaInicioMes")}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <Input
+                      <MesSelect
                         id={field.name}
-                        type="number"
-                        placeholder="Mes"
-                        min={1}
-                        max={12}
-                        value={
-                          (field.value as
-                            | string
-                            | number
-                            | readonly string[]
-                            | undefined) ?? ""
-                        }
-                        onChange={(event) => {
-                          const value = event.target.value;
-
-                          field.onChange(
-                            value === "" ? undefined : Number(value),
-                          );
-                        }}
-                        onBlur={field.onBlur}
                         name={field.name}
+                        value={field.value as number | undefined}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
                         ref={field.ref}
-                        aria-invalid={fieldState.invalid}
                         aria-label="Mes de inicio"
+                        invalid={fieldState.invalid}
                       />
-
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
                       )}
@@ -224,30 +211,19 @@ export function EmpleoFieldset({
                   name={empleoField(index, "fechaInicioAnio")}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <Input
+                      <NumberInput
                         id={field.name}
-                        type="number"
+                        name={field.name}
                         placeholder="Año"
                         min={1965}
-                        value={
-                          (field.value as
-                            | string
-                            | number
-                            | readonly string[]
-                            | undefined) ?? ""
-                        }
-                        onChange={(event) => {
-                          const value = event.target.value;
-
-                          field.onChange(
-                            value === "" ? undefined : Number(value),
-                          );
-                        }}
+                        max={anioActual}
+                        maxDigits={4}
+                        value={field.value as number | undefined}
+                        onChange={field.onChange}
                         onBlur={field.onBlur}
-                        name={field.name}
                         ref={field.ref}
-                        aria-invalid={fieldState.invalid}
                         aria-label="Año de inicio"
+                        aria-invalid={fieldState.invalid}
                       />
 
                       {fieldState.invalid && (
@@ -269,40 +245,31 @@ export function EmpleoFieldset({
                   <Controller
                     control={control}
                     name={empleoField(index, "fechaFinMes")}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <Input
-                          id={field.name}
-                          type="number"
-                          placeholder="Mes"
-                          min={1}
-                          max={12}
-                          value={
-                            (field.value as
-                              | string
-                              | number
-                              | readonly string[]
-                              | undefined) ?? ""
-                          }
-                          onChange={(event) => {
-                            const value = event.target.value;
+                    render={({ field, fieldState }) => {
+                      console.log({
+                        value: field.value,
+                        type: typeof field.value,
+                      });
 
-                            field.onChange(
-                              value === "" ? undefined : Number(value),
-                            );
-                          }}
-                          onBlur={field.onBlur}
-                          name={field.name}
-                          ref={field.ref}
-                          aria-invalid={fieldState.invalid}
-                          aria-label="Mes de término"
-                        />
+                      return (
+                        <Field data-invalid={fieldState.invalid}>
+                          <MesSelect
+                            id={field.name}
+                            name={field.name}
+                            value={field.value as number | undefined}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            aria-label="Mes de término"
+                            invalid={fieldState.invalid}
+                          />
 
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
+                          {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                          )}
+                        </Field>
+                      );
+                    }}
                   />
 
                   {/* Año */}
@@ -311,30 +278,19 @@ export function EmpleoFieldset({
                     name={empleoField(index, "fechaFinAnio")}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <Input
+                        <NumberInput
                           id={field.name}
-                          type="number"
+                          name={field.name}
                           placeholder="Año"
                           min={1965}
-                          value={
-                            (field.value as
-                              | string
-                              | number
-                              | readonly string[]
-                              | undefined) ?? ""
-                          }
-                          onChange={(event) => {
-                            const value = event.target.value;
-
-                            field.onChange(
-                              value === "" ? undefined : Number(value),
-                            );
-                          }}
+                          max={anioActual}
+                          maxDigits={4}
+                          value={field.value as number | undefined}
+                          onChange={field.onChange}
                           onBlur={field.onBlur}
-                          name={field.name}
                           ref={field.ref}
-                          aria-invalid={fieldState.invalid}
                           aria-label="Año de término"
+                          aria-invalid={fieldState.invalid}
                         />
 
                         {fieldState.invalid && (
@@ -384,26 +340,17 @@ export function EmpleoFieldset({
                     Salario mensual bruto (MXN)
                   </FieldLabel>
 
-                  <Input
+                  <NumberInput
                     id={field.name}
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    inputMode="decimal"
-                    value={
-                      (field.value as
-                        | string
-                        | number
-                        | readonly string[]
-                        | undefined) ?? ""
-                    }
-                    onChange={(event) => {
-                      const value = event.target.value;
-
-                      field.onChange(value === "" ? undefined : Number(value));
-                    }}
-                    onBlur={field.onBlur}
                     name={field.name}
+                    decimal
+                    min={0}
+                    max={10_000_000}
+                    maxDigits={10}
+                    placeholder="0.00"
+                    value={field.value as number | undefined}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
                     ref={field.ref}
                     aria-invalid={fieldState.invalid}
                   />
@@ -423,30 +370,19 @@ export function EmpleoFieldset({
                   <FieldLabel htmlFor={field.name}>
                     Horas semanales trabajadas
                   </FieldLabel>
-
-                  <Input
+                  <NumberInput
                     id={field.name}
-                    type="number"
+                    name={field.name}
                     min={1}
                     max={48}
-                    value={
-                      (field.value as
-                        | string
-                        | number
-                        | readonly string[]
-                        | undefined) ?? ""
-                    }
-                    onChange={(event) => {
-                      const value = event.target.value;
-
-                      field.onChange(value === "" ? undefined : Number(value));
-                    }}
+                    maxDigits={2}
+                    placeholder="Horas"
+                    value={field.value as number | undefined}
+                    onChange={field.onChange}
                     onBlur={field.onBlur}
-                    name={field.name}
                     ref={field.ref}
                     aria-invalid={fieldState.invalid}
                   />
-
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

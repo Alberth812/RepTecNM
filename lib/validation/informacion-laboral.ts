@@ -74,7 +74,7 @@ export const informacionLaboralSchema =
 
     if (!consiguioEmpleo && data.factoresEmpleo.length > 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["factoresEmpleo"],
         message: "No aplica cuando aún no cuenta con empleo.",
       });
@@ -85,7 +85,7 @@ export const informacionLaboralSchema =
       !data.factoresEmpleoOtro
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["factoresEmpleoOtro"],
         message: "Especifique el otro factor.",
       });
@@ -93,7 +93,7 @@ export const informacionLaboralSchema =
 
     if (data.laboraActualmente && data.causasDesempleo.length > 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["causasDesempleo"],
         message: "No aplica cuando la persona labora actualmente.",
       });
@@ -104,7 +104,7 @@ export const informacionLaboralSchema =
       !data.causasDesempleoOtro
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["causasDesempleoOtro"],
         message: "Especifique la otra causa.",
       });
@@ -112,7 +112,7 @@ export const informacionLaboralSchema =
 
     if (!consiguioEmpleo && data.estrategiaPostgrado.length > 0) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["estrategiaPostgrado"],
         message: "No aplica cuando aún no cuenta con empleo.",
       });
@@ -123,7 +123,7 @@ export const informacionLaboralSchema =
       !data.estrategiaPostgradoOtro
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["estrategiaPostgradoOtro"],
         message: "Especifique la otra estrategia.",
       });
@@ -215,7 +215,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
   // Fecha de inicio no puede ser futura
   if (esFechaFutura(data.fechaInicioAnio, data.fechaInicioMes)) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: ["fechaInicioMes"],
       message: "La fecha de inicio no puede ser posterior al mes/año actual.",
     });
@@ -225,7 +225,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
     // No es el empleo actual -> fecha de término requerida
     if (data.fechaFinAnio == null || data.fechaFinMes == null) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["fechaFinAnio"],
         message:
           "La fecha de término es requerida si el empleo no es el actual.",
@@ -233,7 +233,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
     } else {
       if (esFechaFutura(data.fechaFinAnio, data.fechaFinMes)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["fechaFinMes"],
           message:
             "La fecha de término no puede ser posterior al mes/año actual.",
@@ -243,7 +243,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
       const fin = data.fechaFinAnio * 12 + data.fechaFinMes;
       if (fin < inicio) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["fechaFinMes"],
           message:
             "La fecha de término no puede ser anterior a la fecha de inicio.",
@@ -253,7 +253,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
   } else if (data.fechaFinAnio != null || data.fechaFinMes != null) {
     // Es el empleo actual -> fecha de término debe quedar vacía
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: ["fechaFinAnio"],
       message: "Debe quedar vacía si es el empleo actual.",
     });
@@ -261,7 +261,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
 
   if (data.tipoContratacion === "otro" && !data.tipoContratacionOtro) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path: ["tipoContratacionOtro"],
       message: "Especifique el otro tipo de contratación.",
     });
@@ -299,7 +299,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
     for (const [field, value] of Object.entries(soloEmpleoActual)) {
       if (value != null && value !== "") {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: [field],
           message: "Este campo solo aplica cuando es el empleo actual.",
         });
@@ -308,14 +308,14 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
   } else {
     if (data.tipoInstitucion.includes("otro") && !data.tipoInstitucionOtro) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["tipoInstitucionOtro"],
         message: "Especifique el otro tipo de institución.",
       });
     }
     if (data.tipoActividad.includes("otro") && !data.tipoActividadOtro) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["tipoActividadOtro"],
         message: "Especifique el otro tipo de actividad.",
       });
@@ -325,7 +325,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
       !data.estrategiaEmpleoActualOtro
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["estrategiaEmpleoActualOtro"],
         message: "Especifique la otra estrategia.",
       });

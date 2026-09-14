@@ -204,14 +204,25 @@ export function InformacionLaboralForm({
 
   const consiguioEmpleo = tiempoPrimerEmpleo !== "sin_empleo";
 
-  const submit = handleSubmit(async (data) => {
-    if (onSubmit) {
-      await onSubmit(data);
-      return;
-    }
-    // eslint-disable-next-line no-console
-    console.log("Sección 3 · Información laboral", data);
-  });
+  const submit = handleSubmit(
+    async (data) => {
+      console.log("✅ Formulario válido. Payload:", data);
+
+      if (onSubmit) {
+        await onSubmit(data);
+        return;
+      }
+
+      console.log("Información laboral", data);
+    },
+    (errors) => {
+      console.log("❌ Error de validación del formulario");
+      console.log("Errores RHF/Zod:", errors);
+
+      // Para inspeccionar cada error de forma más legible:
+      console.log("Errores serializados:", JSON.stringify(errors, null, 2));
+    },
+  );
 
   return (
     <form onSubmit={submit} noValidate className="space-y-10">
@@ -219,7 +230,7 @@ export function InformacionLaboralForm({
       {/* Situación laboral general                                       */}
       {/* --------------------------------------------------------------- */}
       <FieldSet>
-        <FieldLegend>Sección 3. Información laboral</FieldLegend>
+        <FieldLegend>Información laboral</FieldLegend>
         <FieldDescription>
           Información sobre la situación laboral del egresado, incluyendo tiempo
           para conseguir el primer empleo, factores que influyeron, historial de

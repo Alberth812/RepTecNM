@@ -45,7 +45,7 @@ export function InformacionLaboralFormClient({
 
     let response: Response;
     try {
-      response = await fetch("/api/informacion-laboral", {
+      response = await fetch("/api/afiliados/informacion-laboral", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

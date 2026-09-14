@@ -39,6 +39,21 @@ export const TIEMPO_PRIMER_EMPLEO_OPTIONS: SelectOption<
   { label: "Aún no cuento con empleo", value: "sin_empleo" },
 ];
 
+export const MESES_OPTIONS = [
+  { value: "1", label: "Enero" },
+  { value: "2", label: "Febrero" },
+  { value: "3", label: "Marzo" },
+  { value: "4", label: "Abril" },
+  { value: "5", label: "Mayo" },
+  { value: "6", label: "Junio" },
+  { value: "7", label: "Julio" },
+  { value: "8", label: "Agosto" },
+  { value: "9", label: "Septiembre" },
+  { value: "10", label: "Octubre" },
+  { value: "11", label: "Noviembre" },
+  { value: "12", label: "Diciembre" },
+] as const;
+
 export const FACTOR_EMPLEO_OPTIONS: SelectOption<
   EnumValue<typeof factorEmpleoEnum>
 >[] = [
@@ -171,3 +186,4 @@ export const VALORACION_IMPACTO_OPTIONS: SelectOption<
   { label: "Alto", value: "alto" },
   { label: "Muy alto", value: "muy_alto" },
 ];
+
