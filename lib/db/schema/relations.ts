@@ -11,6 +11,10 @@ import {
   estanciasPosdoctorales,
 } from "./formacion-academica";
 import { instituciones } from "./instituciones";
+import {
+  afiliadosEmpleos,
+  afiliadosInformacionLaboral,
+} from "./informacion-laboral";
 
 export const relations = defineRelations(
   {
@@ -30,6 +34,9 @@ export const relations = defineRelations(
     posgrados,
     estanciasPosdoctorales,
     instituciones,
+
+    afiliadosInformacionLaboral,
+    afiliadosEmpleos,
   },
   (r) => ({
     // -------------------------------------------------------------------------
@@ -143,6 +150,17 @@ export const relations = defineRelations(
       estanciasPosdoctorales: r.many.estanciasPosdoctorales({
         from: r.afiliados.userId,
         to: r.estanciasPosdoctorales.afiliadoId,
+      }),
+
+      // Información laboral
+      informacionLaboral: r.one.afiliadosInformacionLaboral({
+        from: r.afiliados.userId,
+        to: r.afiliadosInformacionLaboral.userId,
+      }),
+
+      empleos: r.many.afiliadosEmpleos({
+        from: r.afiliados.userId,
+        to: r.afiliadosEmpleos.afiliadoUserId,
       }),
     },
 
@@ -288,6 +306,26 @@ export const relations = defineRelations(
       estanciasPosdoctorales: r.many.estanciasPosdoctorales({
         from: r.instituciones.id,
         to: r.estanciasPosdoctorales.institucionId,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // INFORMACIÓN LABORAL
+    // -------------------------------------------------------------------------
+
+    afiliadosInformacionLaboral: {
+      afiliado: r.one.afiliados({
+        from: r.afiliadosInformacionLaboral.userId,
+        to: r.afiliados.userId,
+        optional: false,
+      }),
+    },
+
+    afiliadosEmpleos: {
+      afiliado: r.one.afiliados({
+        from: r.afiliadosEmpleos.afiliadoUserId,
+        to: r.afiliados.userId,
+        optional: false,
       }),
     },
   }),
