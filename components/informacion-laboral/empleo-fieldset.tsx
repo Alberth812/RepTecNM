@@ -2,7 +2,14 @@
 
 "use client";
 
-import { Controller, useWatch, type Control } from "react-hook-form";
+import {
+  Controller,
+  UseFormResetField,
+  UseFormSetValue,
+  UseFormTrigger,
+  useWatch,
+  type Control,
+} from "react-hook-form";
 
 import { Trash2 } from "lucide-react";
 
@@ -43,6 +50,7 @@ import {
   VALORACION_NIVEL_OPTIONS,
 } from "./informacion-laboral-options";
 import { NumberInput } from "./number-input";
+import { useEffect } from "react";
 
 /* -------------------------------------------------------------------------- */
 /* Tipos                                                                      */
@@ -52,9 +60,13 @@ const anioActual = new Date().getFullYear();
 
 interface EmpleoFieldsetProps {
   control: Control<InformacionLaboralFormValues>;
+  setValue: UseFormSetValue<InformacionLaboralFormValues>;
+  resetField: UseFormResetField<InformacionLaboralFormValues>;
+  trigger: UseFormTrigger<InformacionLaboralFormValues>;
   index: number;
   onRemove: () => void;
   canRemove: boolean;
+  permiteEmpleoActual: boolean;
 }
 
 /**
@@ -89,14 +101,58 @@ function empleoField<K extends keyof Empleo>(
 
 export function EmpleoFieldset({
   control,
+  setValue,
+  resetField,
+  trigger,
   index,
   onRemove,
   canRemove,
+  permiteEmpleoActual,
 }: EmpleoFieldsetProps) {
-  const esActual = useWatch({
-    control,
-    name: empleoField(index, "esActual"),
-  });
+  const esActual = useWatch({ control, name: empleoField(index, "esActual") });
+
+  // Sincroniza los campos que dependen de esActual.
+  useEffect(() => {
+    if (esActual) {
+      resetField(empleoField(index, "fechaFinAnio"), { defaultValue: null });
+      resetField(empleoField(index, "fechaFinMes"), { defaultValue: null });
+    } else {
+      resetField(empleoField(index, "tipoInstitucion"), { defaultValue: [] });
+      resetField(empleoField(index, "tipoInstitucionOtro"), {
+        defaultValue: null,
+      });
+      resetField(empleoField(index, "telefonoOrganismo"), { defaultValue: "" });
+      resetField(empleoField(index, "sectorPrimario"), { defaultValue: [] });
+      resetField(empleoField(index, "sectorSecundario"), { defaultValue: [] });
+      resetField(empleoField(index, "sectorTerciario"), { defaultValue: [] });
+      resetField(empleoField(index, "tipoActividad"), { defaultValue: [] });
+      resetField(empleoField(index, "tipoActividadOtro"), {
+        defaultValue: null,
+      });
+      resetField(empleoField(index, "actividadesPrincipales"), {
+        defaultValue: "",
+      });
+      resetField(empleoField(index, "estrategiaEmpleoActual"), {
+        defaultValue: [],
+      });
+      resetField(empleoField(index, "estrategiaEmpleoActualOtro"), {
+        defaultValue: null,
+      });
+      resetField(empleoField(index, "valoracionCoincidenciaConocimientos"), {
+        defaultValue: null,
+      });
+      resetField(empleoField(index, "valoracionCapacidadResolverProblemas"), {
+        defaultValue: null,
+      });
+      resetField(empleoField(index, "valoracionImpactoSocial"), {
+        defaultValue: null,
+      });
+      resetField(empleoField(index, "valoracionPertinenciaPrograma"), {
+        defaultValue: null,
+      });
+    }
+    trigger();
+  }, [esActual, resetField, trigger, index]);
 
   return (
     <Card>
@@ -224,6 +280,7 @@ export function EmpleoFieldset({
                         ref={field.ref}
                         aria-label="Año de inicio"
                         aria-invalid={fieldState.invalid}
+                        clampOnBlur={false}
                       />
 
                       {fieldState.invalid && (
@@ -245,31 +302,24 @@ export function EmpleoFieldset({
                   <Controller
                     control={control}
                     name={empleoField(index, "fechaFinMes")}
-                    render={({ field, fieldState }) => {
-                      console.log({
-                        value: field.value,
-                        type: typeof field.value,
-                      });
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <MesSelect
+                          id={field.name}
+                          name={field.name}
+                          value={field.value as number | undefined}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                          ref={field.ref}
+                          aria-label="Mes de término"
+                          invalid={fieldState.invalid}
+                        />
 
-                      return (
-                        <Field data-invalid={fieldState.invalid}>
-                          <MesSelect
-                            id={field.name}
-                            name={field.name}
-                            value={field.value as number | undefined}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            aria-label="Mes de término"
-                            invalid={fieldState.invalid}
-                          />
-
-                          {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                          )}
-                        </Field>
-                      );
-                    }}
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
                   />
 
                   {/* Año */}
@@ -291,6 +341,7 @@ export function EmpleoFieldset({
                           ref={field.ref}
                           aria-label="Año de término"
                           aria-invalid={fieldState.invalid}
+                          clampOnBlur={false}
                         />
 
                         {fieldState.invalid && (
@@ -308,11 +359,18 @@ export function EmpleoFieldset({
           {/* Empleo actual                                                   */}
           {/* ---------------------------------------------------------------- */}
 
-          <BooleanRadioField
-            control={control}
-            name={empleoField(index, "esActual")}
-            label="¿Este es un empleo actual?"
-          />
+          {permiteEmpleoActual ? (
+            <BooleanRadioField
+              control={control}
+              name={empleoField(index, "esActual")}
+              label="¿Este es un empleo actual?"
+            />
+          ) : (
+            <FieldDescription>
+              Este empleo se registrará como finalizado, ya que indicó que
+              actualmente no labora.
+            </FieldDescription>
+          )}
 
           {/* ---------------------------------------------------------------- */}
           {/* Contratación                                                    */}

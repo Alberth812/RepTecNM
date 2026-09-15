@@ -23,7 +23,7 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -186,7 +186,8 @@ export function InformacionLaboralForm({
     mode: "onBlur",
   });
 
-  const { control, handleSubmit, formState } = form;
+  const { control, handleSubmit, formState, setValue, resetField, trigger } =
+    form;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -203,6 +204,38 @@ export function InformacionLaboralForm({
   });
 
   const consiguioEmpleo = tiempoPrimerEmpleo !== "sin_empleo";
+
+  // Si nunca consiguió empleo: no aplican factores/estrategia, y tampoco
+  // puede estar laborando actualmente.
+  useEffect(() => {
+    if (!consiguioEmpleo) {
+      resetField("informacionLaboral.factoresEmpleo", { defaultValue: [] });
+      resetField("informacionLaboral.factoresEmpleoOtro", {
+        defaultValue: null,
+      });
+      resetField("informacionLaboral.estrategiaPostgrado", {
+        defaultValue: [],
+      });
+      resetField("informacionLaboral.estrategiaPostgradoOtro", {
+        defaultValue: null,
+      });
+      setValue("informacionLaboral.laboraActualmente", false, {
+        shouldDirty: false,
+      });
+      trigger();
+    }
+  }, [consiguioEmpleo, resetField, setValue, trigger]);
+
+  // Si labora actualmente, "causas de desempleo" no aplica.
+  useEffect(() => {
+    if (laboraActualmente) {
+      resetField("informacionLaboral.causasDesempleo", { defaultValue: [] });
+      resetField("informacionLaboral.causasDesempleoOtro", {
+        defaultValue: null,
+      });
+      trigger();
+    }
+  }, [laboraActualmente, resetField, trigger]);
 
   const submit = handleSubmit(
     async (data) => {
@@ -268,11 +301,19 @@ export function InformacionLaboralForm({
 
           <FieldSeparator />
 
-          <BooleanRadioField
-            control={control}
-            name="informacionLaboral.laboraActualmente"
-            label="¿Labora actualmente?"
-          />
+          {consiguioEmpleo && (
+            <BooleanRadioField
+              control={control}
+              name="informacionLaboral.laboraActualmente"
+              label="¿Labora actualmente?"
+            />
+          )}
+          {!consiguioEmpleo && (
+            <FieldDescription>
+              Como aún no ha conseguido empleo, se considerará que no labora
+              actualmente.
+            </FieldDescription>
+          )}
 
           {laboraActualmente === false && (
             <CheckboxGroupField
@@ -305,9 +346,13 @@ export function InformacionLaboralForm({
             <EmpleoFieldset
               key={field.id}
               control={control}
+              setValue={setValue}
+              resetField={resetField}
+              trigger={trigger}
               index={index}
               onRemove={() => remove(index)}
               canRemove={fields.length > 0}
+              permiteEmpleoActual={laboraActualmente === true}
             />
           ))}
         </div>

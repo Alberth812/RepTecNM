@@ -24,6 +24,9 @@ import {
 /* -------------------------------------------------------------------------- */
 /* Enums Zod (derivados directamente de los pgEnum de Drizzle)               */
 /* -------------------------------------------------------------------------- */
+//
+//
+//
 
 const tiempoPrimerEmpleoSchema = z.enum(tiempoPrimerEmpleoEnum.enumValues);
 const factorEmpleoSchema = z.enum(factorEmpleoEnum.enumValues);
@@ -31,7 +34,14 @@ const causaDesempleoSchema = z.enum(causaDesempleoEnum.enumValues);
 const estrategiaConsecucionEmpleoSchema = z.enum(
   estrategiaConsecucionEmpleoEnum.enumValues,
 );
-const tipoContratacionSchema = z.enum(tipoContratacionEnum.enumValues);
+const tipoContratacionSchema = z
+  .enum(tipoContratacionEnum.enumValues, {
+    error: "El tipo de contratación no es válido",
+  })
+  .nullable()
+  .refine((value) => value !== null, {
+    error: "El tipo de contratación es requerido",
+  });
 const tipoInstitucionSchema = z.enum(tipoInstitucionEnum.enumValues);
 const sectorPrimarioSchema = z.enum(sectorPrimarioEnum.enumValues);
 const sectorSecundarioSchema = z.enum(sectorSecundarioEnum.enumValues);
@@ -48,17 +58,20 @@ const baseInformacionLaboralSchema = z.object({
   tiempoPrimerEmpleo: tiempoPrimerEmpleoSchema,
 
   factoresEmpleo: z.array(factorEmpleoSchema).optional().default([]),
+
   factoresEmpleoOtro: z.string().trim().min(1).max(500).nullable().optional(),
 
   laboraActualmente: z.boolean().default(false),
 
   causasDesempleo: z.array(causaDesempleoSchema).optional().default([]),
+
   causasDesempleoOtro: z.string().trim().min(1).max(500).nullable().optional(),
 
   estrategiaPostgrado: z
     .array(estrategiaConsecucionEmpleoSchema)
     .optional()
     .default([]),
+
   estrategiaPostgradoOtro: z
     .string()
     .trim()
@@ -70,63 +83,99 @@ const baseInformacionLaboralSchema = z.object({
 
 export const informacionLaboralSchema =
   baseInformacionLaboralSchema.superRefine((data, ctx) => {
-    const consiguioEmpleo = data.tiempoPrimerEmpleo !== "sin_empleo";
+    const sinEmpleo =
+      data.tiempoPrimerEmpleo === tiempoPrimerEmpleoSchema.enum.sin_empleo;
 
-    if (!consiguioEmpleo && data.factoresEmpleo.length > 0) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["factoresEmpleo"],
-        message: "No aplica cuando aún no cuenta con empleo.",
-      });
-    }
-    if (
-      consiguioEmpleo &&
-      data.factoresEmpleo.includes("otro") &&
-      !data.factoresEmpleoOtro
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["factoresEmpleoOtro"],
-        message: "Especifique el otro factor.",
-      });
-    }
+    if (sinEmpleo) {
+      // ----------------------------------------------------------------------
+      // Sin empleo:
+      // causasDesempleo es obligatorio y debe tener al menos un elemento.
+      // factoresEmpleo y estrategiaPostgrado no aplican.
+      // ----------------------------------------------------------------------
 
-    if (data.laboraActualmente && data.causasDesempleo.length > 0) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["causasDesempleo"],
-        message: "No aplica cuando la persona labora actualmente.",
-      });
-    }
-    if (
-      !data.laboraActualmente &&
-      data.causasDesempleo.includes("otro") &&
-      !data.causasDesempleoOtro
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["causasDesempleoOtro"],
-        message: "Especifique la otra causa.",
-      });
-    }
+      if (data.causasDesempleo.length === 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["causasDesempleo"],
+          message: "Debe seleccionar al menos una causa de desempleo.",
+        });
+      }
 
-    if (!consiguioEmpleo && data.estrategiaPostgrado.length > 0) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["estrategiaPostgrado"],
-        message: "No aplica cuando aún no cuenta con empleo.",
-      });
-    }
-    if (
-      consiguioEmpleo &&
-      data.estrategiaPostgrado.includes("otro") &&
-      !data.estrategiaPostgradoOtro
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["estrategiaPostgradoOtro"],
-        message: "Especifique la otra estrategia.",
-      });
+      if (data.factoresEmpleo.length > 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["factoresEmpleo"],
+          message: "No aplica cuando aún no cuenta con empleo.",
+        });
+      }
+
+      if (data.estrategiaPostgrado.length > 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["estrategiaPostgrado"],
+          message: "No aplica cuando aún no cuenta con empleo.",
+        });
+      }
+
+      // "Otro" en causas de desempleo
+      if (data.causasDesempleo.includes("otro") && !data.causasDesempleoOtro) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["causasDesempleoOtro"],
+          message: "Especifique la otra causa.",
+        });
+      }
+    } else {
+      // ----------------------------------------------------------------------
+      // Con empleo:
+      // factoresEmpleo y estrategiaPostgrado son obligatorios y no vacíos.
+      // causasDesempleo no aplica.
+      // ----------------------------------------------------------------------
+
+      if (data.factoresEmpleo.length === 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["factoresEmpleo"],
+          message: "Debe seleccionar al menos un factor de empleo.",
+        });
+      }
+
+      if (data.estrategiaPostgrado.length === 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["estrategiaPostgrado"],
+          message: "Debe seleccionar al menos una estrategia.",
+        });
+      }
+
+      if (data.causasDesempleo.length > 0) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["causasDesempleo"],
+          message: "No aplica cuando cuenta con empleo.",
+        });
+      }
+
+      // "Otro" en factores de empleo
+      if (data.factoresEmpleo.includes("otro") && !data.factoresEmpleoOtro) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["factoresEmpleoOtro"],
+          message: "Especifique el otro factor.",
+        });
+      }
+
+      // "Otro" en estrategia de posgrado
+      if (
+        data.estrategiaPostgrado.includes("otro") &&
+        !data.estrategiaPostgradoOtro
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["estrategiaPostgradoOtro"],
+          message: "Especifique la otra estrategia.",
+        });
+      }
     }
   });
 
@@ -151,19 +200,30 @@ const baseEmpleoSchema = z.object({
   puesto: z.string().trim().min(1, "El puesto es requerido").max(200),
   institucion: z.string().trim().min(1, "La institución es requerida").max(250),
 
-  fechaInicioAnio: z.coerce.number().int().min(1965),
-  fechaInicioMes: z.coerce.number().int().min(1).max(12),
+  fechaInicioAnio: z.coerce
+    .number()
+    .int()
+    .min(1965, { error: "El año de inicio debe ser 1965 o posterior" }),
+  fechaInicioMes: z.coerce
+    .number()
+    .int()
+    .min(1, { error: "El mes de término debe ser entre 1 y 12" })
+    .max(12, { error: "El mes de término debe ser entre 1 y 12" }),
 
+  // Obligatorio en el resultado, false por defecto
   esActual: z.boolean().default(false),
 
-  fechaFinAnio: z.coerce.number().int().min(1965).nullable().optional(),
+  fechaFinAnio: z.coerce
+    .number()
+    .int()
+    .min(1965, { error: "El año de inicio debe ser 1965 o posterior" })
+    .nullable()
+    .optional(),
   fechaFinMes: z.coerce.number().int().min(1).max(12).nullable().optional(),
 
-  tipoContratacion: tipoContratacionSchema.nullable().optional(),
+  tipoContratacion: tipoContratacionSchema,
   tipoContratacionOtro: z.string().trim().min(1).max(200).nullable().optional(),
 
-  // numeric() de Drizzle devuelve string por defecto: se acepta string o
-  // number desde el formulario/API y se normaliza a number para validar.
   salarioMensualBruto: z.coerce.number().min(0).nullable().optional(),
   horasSemanales: z.coerce.number().int().min(1).max(48).nullable().optional(),
 
@@ -193,6 +253,7 @@ const baseEmpleoSchema = z.object({
     .array(estrategiaConsecucionEmpleoSchema)
     .optional()
     .default([]),
+
   estrategiaEmpleoActualOtro: z
     .string()
     .trim()
@@ -204,15 +265,21 @@ const baseEmpleoSchema = z.object({
   valoracionCoincidenciaConocimientos: valoracionNivelSchema
     .nullable()
     .optional(),
+
   valoracionCapacidadResolverProblemas: valoracionNivelSchema
     .nullable()
     .optional(),
+
   valoracionImpactoSocial: valoracionImpactoSchema.nullable().optional(),
+
   valoracionPertinenciaPrograma: valoracionNivelSchema.nullable().optional(),
 });
 
 export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
-  // Fecha de inicio no puede ser futura
+  // --------------------------------------------------------------------------
+  // Fecha de inicio
+  // --------------------------------------------------------------------------
+
   if (esFechaFutura(data.fechaInicioAnio, data.fechaInicioMes)) {
     ctx.addIssue({
       code: "custom",
@@ -221,17 +288,32 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
     });
   }
 
+  // --------------------------------------------------------------------------
+  // Fecha de término según esActual
+  // --------------------------------------------------------------------------
+
   if (!data.esActual) {
-    // No es el empleo actual -> fecha de término requerida
-    if (data.fechaFinAnio == null || data.fechaFinMes == null) {
+    const faltaAnio = data.fechaFinAnio == null;
+    const faltaMes = data.fechaFinMes == null;
+
+    if (faltaAnio) {
       ctx.addIssue({
         code: "custom",
         path: ["fechaFinAnio"],
-        message:
-          "La fecha de término es requerida si el empleo no es el actual.",
+        message: "El año de término es requerido si el empleo no es el actual.",
       });
-    } else {
-      if (esFechaFutura(data.fechaFinAnio, data.fechaFinMes)) {
+    }
+
+    if (faltaMes) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["fechaFinMes"],
+        message: "El mes de término es requerido si el empleo no es el actual.",
+      });
+    }
+
+    if (!faltaAnio && !faltaMes) {
+      if (esFechaFutura(data.fechaFinAnio!, data.fechaFinMes!)) {
         ctx.addIssue({
           code: "custom",
           path: ["fechaFinMes"],
@@ -239,8 +321,10 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
             "La fecha de término no puede ser posterior al mes/año actual.",
         });
       }
+
       const inicio = data.fechaInicioAnio * 12 + data.fechaInicioMes;
-      const fin = data.fechaFinAnio * 12 + data.fechaFinMes;
+      const fin = data.fechaFinAnio! * 12 + data.fechaFinMes!;
+
       if (fin < inicio) {
         ctx.addIssue({
           code: "custom",
@@ -251,13 +335,16 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
       }
     }
   } else if (data.fechaFinAnio != null || data.fechaFinMes != null) {
-    // Es el empleo actual -> fecha de término debe quedar vacía
     ctx.addIssue({
       code: "custom",
       path: ["fechaFinAnio"],
       message: "Debe quedar vacía si es el empleo actual.",
     });
   }
+
+  // --------------------------------------------------------------------------
+  // Tipo de contratación
+  // --------------------------------------------------------------------------
 
   if (data.tipoContratacion === "otro" && !data.tipoContratacionOtro) {
     ctx.addIssue({
@@ -267,32 +354,47 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
     });
   }
 
+  // --------------------------------------------------------------------------
+  // Campos exclusivos del empleo actual
+  // --------------------------------------------------------------------------
+
   if (!data.esActual) {
-    // Campos que en el formulario solo se muestran cuando es el empleo actual
     const soloEmpleoActual: Record<string, unknown> = {
       tipoInstitucion: data.tipoInstitucion.length
         ? data.tipoInstitucion
         : undefined,
-      telefonoOrganismo: data.telefonoOrganismo,
+
+      // telefonoOrganismo queda fuera deliberadamente
+      telefonoOrganismo: undefined,
+
       sectorPrimario: data.sectorPrimario.length
         ? data.sectorPrimario
         : undefined,
+
       sectorSecundario: data.sectorSecundario.length
         ? data.sectorSecundario
         : undefined,
+
       sectorTerciario: data.sectorTerciario.length
         ? data.sectorTerciario
         : undefined,
+
       tipoActividad: data.tipoActividad.length ? data.tipoActividad : undefined,
+
       actividadesPrincipales: data.actividadesPrincipales,
+
       estrategiaEmpleoActual: data.estrategiaEmpleoActual.length
         ? data.estrategiaEmpleoActual
         : undefined,
+
       valoracionCoincidenciaConocimientos:
         data.valoracionCoincidenciaConocimientos,
+
       valoracionCapacidadResolverProblemas:
         data.valoracionCapacidadResolverProblemas,
+
       valoracionImpactoSocial: data.valoracionImpactoSocial,
+
       valoracionPertinenciaPrograma: data.valoracionPertinenciaPrograma,
     };
 
@@ -306,6 +408,105 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
       }
     }
   } else {
+    // ------------------------------------------------------------------------
+    // Campos OBLIGATORIOS cuando esActual === true
+    // ------------------------------------------------------------------------
+
+    if (data.tipoInstitucion.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["tipoInstitucion"],
+        message: "Seleccione al menos un tipo de institución.",
+      });
+    }
+
+    if (data.sectorPrimario.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["sectorPrimario"],
+        message: "Seleccione al menos un sector primario.",
+      });
+    }
+
+    if (data.sectorSecundario.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["sectorSecundario"],
+        message: "Seleccione al menos un sector secundario.",
+      });
+    }
+
+    if (data.sectorTerciario.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["sectorTerciario"],
+        message: "Seleccione al menos un sector terciario.",
+      });
+    }
+
+    if (data.tipoActividad.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["tipoActividad"],
+        message: "Seleccione al menos un tipo de actividad.",
+      });
+    }
+
+    if (
+      data.actividadesPrincipales == null ||
+      data.actividadesPrincipales.trim() === ""
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["actividadesPrincipales"],
+        message: "Las actividades principales son requeridas.",
+      });
+    }
+
+    if (data.estrategiaEmpleoActual.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["estrategiaEmpleoActual"],
+        message: "Seleccione al menos una estrategia.",
+      });
+    }
+
+    if (data.valoracionCoincidenciaConocimientos == null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["valoracionCoincidenciaConocimientos"],
+        message: "La valoración es requerida.",
+      });
+    }
+
+    if (data.valoracionCapacidadResolverProblemas == null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["valoracionCapacidadResolverProblemas"],
+        message: "La valoración es requerida.",
+      });
+    }
+
+    if (data.valoracionImpactoSocial == null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["valoracionImpactoSocial"],
+        message: "La valoración es requerida.",
+      });
+    }
+
+    if (data.valoracionPertinenciaPrograma == null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["valoracionPertinenciaPrograma"],
+        message: "La valoración es requerida.",
+      });
+    }
+
+    // --------------------------------------------------------------
+    // Campos "Otro"
+    // --------------------------------------------------------------
+
     if (data.tipoInstitucion.includes("otro") && !data.tipoInstitucionOtro) {
       ctx.addIssue({
         code: "custom",
@@ -313,6 +514,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
         message: "Especifique el otro tipo de institución.",
       });
     }
+
     if (data.tipoActividad.includes("otro") && !data.tipoActividadOtro) {
       ctx.addIssue({
         code: "custom",
@@ -320,6 +522,7 @@ export const empleoSchema = baseEmpleoSchema.superRefine((data, ctx) => {
         message: "Especifique el otro tipo de actividad.",
       });
     }
+
     if (
       data.estrategiaEmpleoActual.includes("otro") &&
       !data.estrategiaEmpleoActualOtro

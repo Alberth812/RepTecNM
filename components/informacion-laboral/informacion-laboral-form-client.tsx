@@ -24,6 +24,7 @@ import {
   type InformacionLaboralFormValues,
   type InformacionLaboralSeccionOutput,
 } from "./informacion-laboral-form";
+import { toast } from "sonner";
 
 interface InformacionLaboralFormClientProps {
   defaultValues?: DeepPartial<InformacionLaboralFormValues>;
@@ -61,19 +62,24 @@ export function InformacionLaboralFormClient({
 
     if (!response.ok) {
       const body = await response.json().catch(() => null);
-      setStatus({
+      /*setStatus({
         type: "error",
         message:
           body?.error ??
           "No se pudo guardar la información laboral. Intenta de nuevo.",
+      });*/
+
+      toast.error("No se pudo guardar la información laboral", {
+        description: "Intenta de nuevo.",
       });
       return;
     }
 
-    setStatus({
+    /*setStatus({
       type: "success",
       message: "Información laboral guardada correctamente.",
-    });
+    });*/
+    toast.success("Información laboral guardada correctamente");
     // Revalida los datos del Server Component (por si el usuario vuelve a
     // entrar a esta página o navega a un resumen que dependa de ella).
     router.refresh();
