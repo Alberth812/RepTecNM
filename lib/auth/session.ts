@@ -5,6 +5,15 @@ import { db } from "@/lib/db/client";
 import { administradores } from "@/lib/db/schema/administradores";
 import { ApiError } from "@/lib/errors";
 import { ROLES, ADMIN_SUBTYPES } from "@/lib/constants";
+import { membershipStatusEnum } from "../db/schema/enums";
+
+const values = membershipStatusEnum.enumValues;
+
+const MembershipStatus = Object.fromEntries(
+  values.map((value) => [value, value]),
+) as Record<(typeof values)[number], (typeof values)[number]>;
+
+type MembershipStatus = keyof typeof MembershipStatus;
 
 export async function getCurrentSession() {
   return auth.api.getSession({ headers: await headers() });
@@ -18,7 +27,9 @@ export async function requireSession() {
 }
 
 /** Exige sesión de un AFILIADO. */
-export async function requireAfiliado() {
+export async function requireAfiliado(
+  membershipStatus?: MembershipStatus | MembershipStatus[],
+) {
   const session = await requireSession();
 
   if (session.user.role !== ROLES.AFILIADO) {
@@ -37,6 +48,18 @@ export async function requireAfiliado() {
     throw ApiError.forbidden(
       "La cuenta no tiene un perfil de afiliado asociado.",
     );
+  }
+
+  if (membershipStatus) {
+    const allowedStatuses = Array.isArray(membershipStatus)
+      ? membershipStatus
+      : [membershipStatus];
+
+    if (!allowedStatuses.includes(afiliado.membershipStatus)) {
+      throw ApiError.unauthorized(
+        "El estado de membresía de la cuenta no permite realizar esta operación.",
+      );
+    }
   }
 
   return {
