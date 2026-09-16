@@ -262,6 +262,7 @@ export function YesNoField({
                 field.onChange(next);
                 onChangeExtra?.(next);
               }}
+              onBlur={field.onBlur}
               aria-invalid={fieldState.invalid}
             >
               <div className="flex items-center gap-2">
@@ -331,6 +332,7 @@ export function RadioEnumField({
                 field.onChange(v);
                 onChangeExtra?.(v);
               }}
+              onBlur={field.onBlur}
               aria-invalid={fieldState.invalid}
             >
               {options.map((opt) => (

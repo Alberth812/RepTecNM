@@ -6,7 +6,7 @@
 "use client";
 
 import { Plus, Trash2 } from "lucide-react";
-import type { Control, UseFormSetValue } from "react-hook-form";
+import type { Control, UseFormSetValue, UseFormTrigger } from "react-hook-form";
 import { useFieldArray, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -296,8 +296,9 @@ export function PosgradoFields({
           name={`${path}.modalidad`}
           label="Modalidad en que cursó o cursa el posgrado"
           options={MODALIDAD_OPTIONS}
-          onChangeExtra={(modalidad) => {
+          onChangeExtra={async (modalidad) => {
             if (modalidad !== "OTRA") setValue(`${path}.modalidadOtra`, null);
+            //await trigger(`${path}.modalidadOtra`);
           }}
         />
         {row?.modalidad === "OTRA" ? (
@@ -412,6 +413,7 @@ export function PosgradoFields({
             if (v !== "OTRO") setValue(`${path}.estadoCivilInicioOtro`, null);
           }}
         />
+
         {row?.estadoCivilInicio === "OTRO" ? (
           <TextFormField
             control={control}
@@ -420,17 +422,19 @@ export function PosgradoFields({
           />
         ) : null}
 
-        <RadioEnumField
-          control={control}
-          name={`${path}.estadoCivilConclusion`}
-          label="Estado civil al concluir el posgrado"
-          description="Puede dejarse vacío si aún no concluye"
-          options={ESTADO_CIVIL_OPTIONS}
-          onChangeExtra={(v) => {
-            if (v !== "OTRO")
-              setValue(`${path}.estadoCivilConclusionOtro`, null);
-          }}
-        />
+        {row?.actualmenteCursa === false ? (
+          <RadioEnumField
+            control={control}
+            name={`${path}.estadoCivilConclusion`}
+            label="Estado civil al concluir el posgrado"
+            options={ESTADO_CIVIL_OPTIONS}
+            onChangeExtra={(v) => {
+              if (v !== "OTRO")
+                setValue(`${path}.estadoCivilConclusionOtro`, null);
+            }}
+          />
+        ) : null}
+
         {row?.estadoCivilConclusion === "OTRO" ? (
           <TextFormField
             control={control}

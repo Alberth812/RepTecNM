@@ -188,19 +188,19 @@ export const posgrados = pgTable("posgrados", {
   anioEgreso: integer("anio_egreso"), // required: false, puede quedar vacío si actualmente_cursa = true
   actualmenteCursa: boolean("actualmente_cursa").notNull(),
 
-  modalidad: modalidadPosgradoEnum("modalidad"),
+  modalidad: modalidadPosgradoEnum("modalidad").notNull(),
   modalidadOtra: text("modalidad_otra"), // visible_when modalidad = OTRA
 
-  dedicacion: dedicacionPosgradoEnum("dedicacion"),
+  dedicacion: dedicacionPosgradoEnum("dedicacion").notNull(),
 
-  becado: boolean("becado"),
+  becado: boolean("becado").notNull(),
   // checkbox -> array de valores controlados (recommended_persistence_strategy)
   fuentesFinanciamiento: fuenteFinanciamientoPosgradoEnum(
     "fuentes_financiamiento",
   ).array(),
   fuentesFinanciamientoOtro: text("fuentes_financiamiento_otro"), // visible_when fuentes_financiamiento contiene OTRO
 
-  tieneGrado: boolean("tiene_grado"),
+  tieneGrado: boolean("tiene_grado").notNull(),
   anioObtencionGrado: integer("anio_obtencion_grado"), // visible_when tiene_grado = true
   mesesObtencionGrado: integer("meses_obtencion_grado"), // visible_when tiene_grado = true
 
@@ -211,7 +211,7 @@ export const posgrados = pgTable("posgrados", {
 
   // Datos históricos conservados por compatibilidad con el formulario original
   // (data_model_notes: son contextuales, no propiedades académicas intrínsecas).
-  estadoCivilInicio: estadoCivilEnum("estado_civil_inicio").notNull(),
+  estadoCivilInicio: estadoCivilEnum("estado_civil_inicio"),
   estadoCivilInicioOtro: text("estado_civil_inicio_otro"), // visible_when estado_civil_inicio = OTRO
   estadoCivilConclusion: estadoCivilEnum("estado_civil_conclusion"),
   estadoCivilConclusionOtro: text("estado_civil_conclusion_otro"), // visible_when estado_civil_conclusion = OTRO

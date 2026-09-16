@@ -160,7 +160,6 @@ export function CheckboxGroupField<
                       id={id}
                       checked={selected.includes(option.value)}
                       disabled={disabled}
-                      onBlur={field.onBlur}
                       onCheckedChange={(checked) =>
                         toggle(option.value, checked === true)
                       }
@@ -243,7 +242,6 @@ export function RadioOptionsField<
             <RadioGroup
               value={fieldValue}
               onValueChange={field.onChange}
-              onBlur={field.onBlur}
               disabled={disabled}
             >
               <FieldGroup>
@@ -317,7 +315,6 @@ export function BooleanRadioField<
           <RadioGroup
             className="flex flex-row gap-6"
             disabled={disabled}
-            onBlur={field.onBlur}
             value={
               field.value === true ? "si" : field.value === false ? "no" : ""
             }

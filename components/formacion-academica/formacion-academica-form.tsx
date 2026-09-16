@@ -67,7 +67,7 @@ const emptyPosgrado = {
   },
   anioIngreso: null,
   anioEgreso: null,
-  actualmenteCursa: false,
+  actualmenteCursa: null,
   modalidad: null,
   modalidadOtra: null,
   dedicacion: null,
@@ -165,6 +165,7 @@ export function FormacionAcademicaForm({
   const hasErrorIn = (tab: TabValue) => Boolean(errors[SECTION_BY_TAB[tab]]);
 
   function onInvalid(formErrors: FieldErrors<FormacionAcademicaInput>) {
+    //console.log("❌ Errores de validación:", formErrors);
     const firstTabWithError = (Object.keys(SECTION_BY_TAB) as TabValue[]).find(
       (tab) => formErrors[SECTION_BY_TAB[tab]],
     );

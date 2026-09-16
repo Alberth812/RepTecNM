@@ -54,7 +54,7 @@ export const posgradoSchema = z
     institucionId: z.uuid({ message: "Selecciona una institución válida." }),
     programa: z.string().min(1, "El programa es requerido."),
     disciplina: z.string().min(1, "La disciplina es requerida."),
-    lineaInvestigacion: z.string().nullish(),
+    lineaInvestigacion: z.string().nullish(), // opcional
 
     motivosEleccionInstitucion: motivoEleccionInstitucionSchema,
 
@@ -62,18 +62,18 @@ export const posgradoSchema = z
     anioEgreso: anioAcademicoOpcionalSchema, // required: false, puede faltar si actualmente_cursa
     actualmenteCursa: z.boolean(),
 
-    modalidad: z.enum(modalidadPosgradoEnum.enumValues).nullish(),
+    modalidad: z.enum(modalidadPosgradoEnum.enumValues),
     modalidadOtra: z.string().nullish(), // visible_when modalidad = OTRA
 
-    dedicacion: z.enum(dedicacionPosgradoEnum.enumValues).nullish(),
+    dedicacion: z.enum(dedicacionPosgradoEnum.enumValues),
 
-    becado: z.boolean().nullish(),
+    becado: z.boolean(),
     fuentesFinanciamiento: z
       .array(z.enum(fuenteFinanciamientoPosgradoEnum.enumValues))
       .nullish(), // visible_when becado = true
     fuentesFinanciamientoOtro: z.string().nullish(), // visible_when fuentes_financiamiento contiene OTRO
 
-    tieneGrado: z.boolean().nullish(),
+    tieneGrado: z.boolean(),
     anioObtencionGrado: anioAcademicoOpcionalSchema, // visible_when tiene_grado = true
     mesesObtencionGrado: z
       .number()
@@ -87,9 +87,9 @@ export const posgradoSchema = z
     motivoNoObtencionGradoOtro: z.string().nullish(), // visible_when motivo_no_obtencion_grado = OTRO
 
     // Datos históricos conservados por compatibilidad con el formulario original.
-    estadoCivilInicio: z.enum(estadoCivilEnum.enumValues),
+    estadoCivilInicio: z.enum(estadoCivilEnum.enumValues).nullish(),
     estadoCivilInicioOtro: z.string().nullish(), // visible_when estado_civil_inicio = OTRO
-    estadoCivilConclusion: z.enum(estadoCivilEnum.enumValues).nullish(),
+    estadoCivilConclusion: z.enum(estadoCivilEnum.enumValues).nullish(), // visible_when actualmente_cursa = false
     estadoCivilConclusionOtro: z.string().nullish(), // visible_when estado_civil_conclusion = OTRO
   })
   .superRefine((data, ctx) => {

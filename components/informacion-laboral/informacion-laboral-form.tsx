@@ -61,6 +61,7 @@ import {
 // Lo que el formulario acepta mientras el usuario escribe (antes de que Zod
 // aplique `.default(...)` / coerciones). Ej.: los arrays con `.default([])`
 // son opcionales aquí.
+
 export type InformacionLaboralFormValues = z.input<
   typeof informacionLaboralSeccionSchema
 >;
@@ -131,11 +132,11 @@ function buildDefaultValues(
   // el único cast al final de la función.
   const result = {
     informacionLaboral: {
-      tiempoPrimerEmpleo: info?.tiempoPrimerEmpleo,
+      tiempoPrimerEmpleo: info?.tiempoPrimerEmpleo ?? null,
       factoresEmpleo: info?.factoresEmpleo ?? [],
       // Los campos "Otro" son `null` por defecto (ver nota en `emptyEmpleo`).
       factoresEmpleoOtro: info?.factoresEmpleoOtro ?? null,
-      laboraActualmente: info?.laboraActualmente ?? false,
+      laboraActualmente: info?.laboraActualmente ?? null,
       causasDesempleo: info?.causasDesempleo ?? [],
       causasDesempleoOtro: info?.causasDesempleoOtro ?? null,
       estrategiaPostgrado: info?.estrategiaPostgrado ?? [],
@@ -186,8 +187,7 @@ export function InformacionLaboralForm({
     mode: "onBlur",
   });
 
-  const { control, handleSubmit, formState, setValue, resetField, trigger } =
-    form;
+  const { control, handleSubmit, formState, setValue, resetField } = form;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -203,12 +203,21 @@ export function InformacionLaboralForm({
     name: "informacionLaboral.laboraActualmente",
   });
 
-  const consiguioEmpleo = tiempoPrimerEmpleo !== "sin_empleo";
+  // `tiempoPrimerEmpleo` es el activador de toda la sección: mientras no
+  // tenga un valor (null → aún no respondido), no debe mostrarse ninguna
+  // pregunta dependiente. Una vez respondido, se bifurca igual que el
+  // `superRefine` del esquema:
+  //  - sinEmpleo: nunca consiguió un primer empleo.
+  //  - haConseguidoEmpleo: cualquier otro valor, sí lo consiguió en algún
+  //    momento (independientemente de si labora actualmente o no).
+  const sinEmpleo = tiempoPrimerEmpleo === "sin_empleo";
+  const haConseguidoEmpleo = tiempoPrimerEmpleo != null && !sinEmpleo;
 
-  // Si nunca consiguió empleo: no aplican factores/estrategia, y tampoco
-  // puede estar laborando actualmente.
+  // Rama "sin empleo": factoresEmpleo/estrategiaPostgrado no aplican (el
+  // esquema rechaza que vengan con elementos), y tampoco puede estar
+  // laborando actualmente.
   useEffect(() => {
-    if (!consiguioEmpleo) {
+    if (sinEmpleo) {
       resetField("informacionLaboral.factoresEmpleo", { defaultValue: [] });
       resetField("informacionLaboral.factoresEmpleoOtro", {
         defaultValue: null,
@@ -222,20 +231,21 @@ export function InformacionLaboralForm({
       setValue("informacionLaboral.laboraActualmente", false, {
         shouldDirty: false,
       });
-      trigger();
     }
-  }, [consiguioEmpleo, resetField, setValue, trigger]);
+  }, [sinEmpleo, resetField, setValue]);
 
-  // Si labora actualmente, "causas de desempleo" no aplica.
+  // Rama "consiguió empleo": causasDesempleo no aplica. Esto depende solo de
+  // haConseguidoEmpleo, no de laboraActualmente: el esquema bifurca
+  // únicamente por tiempoPrimerEmpleo, así que "causas de desempleo" es
+  // exclusiva de quien nunca ha tenido un primer empleo.
   useEffect(() => {
-    if (laboraActualmente) {
+    if (haConseguidoEmpleo) {
       resetField("informacionLaboral.causasDesempleo", { defaultValue: [] });
       resetField("informacionLaboral.causasDesempleoOtro", {
         defaultValue: null,
       });
-      trigger();
     }
-  }, [laboraActualmente, resetField, trigger]);
+  }, [haConseguidoEmpleo, resetField]);
 
   const submit = handleSubmit(
     async (data) => {
@@ -262,6 +272,7 @@ export function InformacionLaboralForm({
       {/* --------------------------------------------------------------- */}
       {/* Situación laboral general                                       */}
       {/* --------------------------------------------------------------- */}
+
       <FieldSet>
         <FieldLegend>Información laboral</FieldLegend>
         <FieldDescription>
@@ -279,7 +290,7 @@ export function InformacionLaboralForm({
             options={TIEMPO_PRIMER_EMPLEO_OPTIONS}
           />
 
-          {consiguioEmpleo && (
+          {haConseguidoEmpleo && (
             <CheckboxGroupField
               control={control}
               name="informacionLaboral.factoresEmpleo"
@@ -289,7 +300,7 @@ export function InformacionLaboralForm({
             />
           )}
 
-          {consiguioEmpleo && (
+          {haConseguidoEmpleo && (
             <CheckboxGroupField
               control={control}
               name="informacionLaboral.estrategiaPostgrado"
@@ -301,21 +312,21 @@ export function InformacionLaboralForm({
 
           <FieldSeparator />
 
-          {consiguioEmpleo && (
+          {haConseguidoEmpleo && (
             <BooleanRadioField
               control={control}
               name="informacionLaboral.laboraActualmente"
               label="¿Labora actualmente?"
             />
           )}
-          {!consiguioEmpleo && (
+          {sinEmpleo && (
             <FieldDescription>
               Como aún no ha conseguido empleo, se considerará que no labora
               actualmente.
             </FieldDescription>
           )}
 
-          {laboraActualmente === false && (
+          {sinEmpleo && (
             <CheckboxGroupField
               control={control}
               name="informacionLaboral.causasDesempleo"
@@ -346,9 +357,7 @@ export function InformacionLaboralForm({
             <EmpleoFieldset
               key={field.id}
               control={control}
-              setValue={setValue}
               resetField={resetField}
-              trigger={trigger}
               index={index}
               onRemove={() => remove(index)}
               canRemove={fields.length > 0}

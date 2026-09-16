@@ -4,12 +4,21 @@ import { obtenerSolicitudActualParaAfiliado } from "@/lib/db/solicitudes/queries
 import { getFileUrl } from "@/lib/storage";
 import RegistroForm from "@/components/afilliate/registro/RegistroFormv2";
 import { mapSnapshotToFormInput } from "@/lib/db/solicitudes/mapSnapshotToFormInput";
+import RegistroEnviado from "@/components/afilliate/registro/ui/RegistroEnviado";
 
 export default async function Page() {
-  const { afiliado } = await requireAfiliado();
+  const { afiliado } = await requireAfiliado([
+    "NO_INICIADA",
+    "PENDIENTE_APROBACION",
+    "REQUIERE_CORRECCION",
+  ]);
 
   if (afiliado.membershipStatus === "NO_INICIADA") {
     return <RegistroForm />;
+  }
+
+  if (afiliado.membershipStatus === "PENDIENTE_APROBACION") {
+    return <RegistroEnviado />;
   }
 
   if (afiliado.membershipStatus === "REQUIERE_CORRECCION") {

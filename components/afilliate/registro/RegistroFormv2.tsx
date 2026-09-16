@@ -30,6 +30,7 @@ import Step4PerfilProfesional from "./steps/Step4PerfilProfesional";
 import Step5ServiciosProfesionales from "./steps/Step5ServiciosProfesionales";
 import Step6DatosEmergencia from "./steps/Step6DatosEmergencia";
 import Step7Visibilidad from "./steps/Step7Visibilidad";
+import RegistroEnviado from "./ui/RegistroEnviado";
 
 const STEP_COMPONENTS = [
   Step1DatosGenerales,
@@ -258,19 +259,7 @@ export default function RegistroForm({
   const StepComponent = STEP_COMPONENTS[currentStep];
 
   if (submitStatus === "success") {
-    return (
-      <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-[#004B87]" />
-        <h2 className="mt-4 text-lg font-semibold text-slate-900">
-          {esCorreccion ? "¡Solicitud reenviada!" : "¡Registro enviado!"}
-        </h2>
-        <p className="mt-2 text-sm text-slate-500">
-          {esCorreccion
-            ? "Gracias por enviar tus correcciones. Un administrador revisará tu solicitud nuevamente."
-            : "Gracias por afiliarte a la Red de Egresados de Posgrado del TecNM. Revisaremos tu información y te contactaremos por correo electrónico."}
-        </p>
-      </div>
-    );
+    return <RegistroEnviado />;
   }
 
   return (

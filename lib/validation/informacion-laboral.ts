@@ -61,7 +61,7 @@ const baseInformacionLaboralSchema = z.object({
 
   factoresEmpleoOtro: z.string().trim().min(1).max(500).nullable().optional(),
 
-  laboraActualmente: z.boolean().default(false),
+  laboraActualmente: z.boolean(),
 
   causasDesempleo: z.array(causaDesempleoSchema).optional().default([]),
 

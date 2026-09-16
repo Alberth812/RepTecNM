@@ -5,8 +5,6 @@
 import {
   Controller,
   UseFormResetField,
-  UseFormSetValue,
-  UseFormTrigger,
   useWatch,
   type Control,
 } from "react-hook-form";
@@ -60,9 +58,7 @@ const anioActual = new Date().getFullYear();
 
 interface EmpleoFieldsetProps {
   control: Control<InformacionLaboralFormValues>;
-  setValue: UseFormSetValue<InformacionLaboralFormValues>;
   resetField: UseFormResetField<InformacionLaboralFormValues>;
-  trigger: UseFormTrigger<InformacionLaboralFormValues>;
   index: number;
   onRemove: () => void;
   canRemove: boolean;
@@ -101,9 +97,7 @@ function empleoField<K extends keyof Empleo>(
 
 export function EmpleoFieldset({
   control,
-  setValue,
   resetField,
-  trigger,
   index,
   onRemove,
   canRemove,
@@ -111,7 +105,20 @@ export function EmpleoFieldset({
 }: EmpleoFieldsetProps) {
   const esActual = useWatch({ control, name: empleoField(index, "esActual") });
 
-  // Sincroniza los campos que dependen de esActual.
+  // Si dejó de "laborar actualmente" a nivel de sección (o nunca consiguió
+  // empleo), ningún empleo del historial puede quedar marcado como actual.
+  // Este efecto fuerza esActual a false en ese caso; el efecto de abajo se
+  // encarga de limpiar los campos dependientes cuando esActual cambia.
+  useEffect(() => {
+    if (!permiteEmpleoActual) {
+      resetField(empleoField(index, "esActual"), { defaultValue: false });
+    }
+  }, [permiteEmpleoActual, resetField, index]);
+
+  // Sincroniza los campos que dependen de esActual. `resetField` ya limpia
+  // el error de cada campo que resetea, así que no hace falta un trigger()
+  // manual después (y evita validar el formulario completo apenas se monta
+  // o se agrega un empleo nuevo, cuando todavía está vacío).
   useEffect(() => {
     if (esActual) {
       resetField(empleoField(index, "fechaFinAnio"), { defaultValue: null });
@@ -151,8 +158,7 @@ export function EmpleoFieldset({
         defaultValue: null,
       });
     }
-    trigger();
-  }, [esActual, resetField, trigger, index]);
+  }, [esActual, resetField, index]);
 
   return (
     <Card>
