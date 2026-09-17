@@ -15,6 +15,7 @@ import {
   afiliadosEmpleos,
   afiliadosInformacionLaboral,
 } from "./informacion-laboral";
+import { afiliadosInvestigacion } from "./afiliados-investigacion";
 
 export const relations = defineRelations(
   {
@@ -37,6 +38,7 @@ export const relations = defineRelations(
 
     afiliadosInformacionLaboral,
     afiliadosEmpleos,
+    afiliadosInvestigacion,
   },
   (r) => ({
     // -------------------------------------------------------------------------
@@ -161,6 +163,11 @@ export const relations = defineRelations(
       empleos: r.many.afiliadosEmpleos({
         from: r.afiliados.userId,
         to: r.afiliadosEmpleos.afiliadoUserId,
+      }),
+
+      investigacion: r.one.afiliadosInvestigacion({
+        from: r.afiliados.userId,
+        to: r.afiliadosInvestigacion.userId,
       }),
     },
 
@@ -324,6 +331,18 @@ export const relations = defineRelations(
     afiliadosEmpleos: {
       afiliado: r.one.afiliados({
         from: r.afiliadosEmpleos.afiliadoUserId,
+        to: r.afiliados.userId,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // INVESTIGACIÓN
+    // -------------------------------------------------------------------------
+
+    afiliadosInvestigacion: {
+      afiliado: r.one.afiliados({
+        from: r.afiliadosInvestigacion.userId,
         to: r.afiliados.userId,
         optional: false,
       }),

@@ -149,7 +149,7 @@ function buildDefaultValues(
       : [],
   };
 
-  return result as InformacionLaboralFormValues;
+  return result;
 }
 
 /* -------------------------------------------------------------------------- */

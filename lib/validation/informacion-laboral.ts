@@ -55,13 +55,13 @@ const valoracionImpactoSchema = z.enum(valoracionImpactoEnum.enumValues);
 /* -------------------------------------------------------------------------- */
 
 const baseInformacionLaboralSchema = z.object({
-  tiempoPrimerEmpleo: tiempoPrimerEmpleoSchema,
+  tiempoPrimerEmpleo: tiempoPrimerEmpleoSchema.nullable(),
 
   factoresEmpleo: z.array(factorEmpleoSchema).optional().default([]),
 
   factoresEmpleoOtro: z.string().trim().min(1).max(500).nullable().optional(),
 
-  laboraActualmente: z.boolean(),
+  laboraActualmente: z.boolean().nullable(),
 
   causasDesempleo: z.array(causaDesempleoSchema).optional().default([]),
 
@@ -81,8 +81,30 @@ const baseInformacionLaboralSchema = z.object({
     .optional(),
 });
 
-export const informacionLaboralSchema =
-  baseInformacionLaboralSchema.superRefine((data, ctx) => {
+export const informacionLaboralSchema = baseInformacionLaboralSchema
+  .superRefine((data, ctx) => {
+    if (data.tiempoPrimerEmpleo === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["tiempoPrimerEmpleo"],
+        message: "Debe seleccionar una opción.",
+      });
+      return;
+    }
+
+    if (data.laboraActualmente === null) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["laboraActualmente"],
+        message: "Debe indicar si labora actualmente.",
+      });
+    }
+
+    // Si todavía no respondió alguno, no podemos evaluar las reglas
+    // dependientes.
+    if (data.tiempoPrimerEmpleo === null || data.laboraActualmente === null) {
+      return;
+    }
     const sinEmpleo =
       data.tiempoPrimerEmpleo === tiempoPrimerEmpleoSchema.enum.sin_empleo;
 
@@ -177,7 +199,12 @@ export const informacionLaboralSchema =
         });
       }
     }
-  });
+  })
+  .transform((data) => ({
+    ...data,
+    tiempoPrimerEmpleo: data.tiempoPrimerEmpleo!,
+    laboraActualmente: data.laboraActualmente!,
+  }));
 
 export type InformacionLaboralInput = z.infer<typeof informacionLaboralSchema>;
 

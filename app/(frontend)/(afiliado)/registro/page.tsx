@@ -53,8 +53,8 @@ export default async function Page() {
     );
   }
 
-  // PENDIENTE_APROBACION, ACTIVO, RECHAZADO, INACTIVO, SUSPENDIDO, BAJA:
+  // ACTIVO, RECHAZADO, INACTIVO, SUSPENDIDO, BAJA:
   // ya los manejas en otro lado según comentaste — deja aquí tu
   // componente/mensaje correspondiente para esos casos.
-  return <p>No puedes hacer un registro</p>;
+  return <p>No puedes hacer un registro debido a tu estado de membresía</p>;
 }
