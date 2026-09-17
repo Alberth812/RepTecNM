@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, User } from "lucide-react";
+import { FileText, Home, User, BookOpen } from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -30,6 +30,11 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Seguimiento",
         href: "/afiliado/seguimiento",
         icon: FileText,
+      },
+      {
+        label: "Catálogo Profesional",
+        href: "/catalogo",
+        icon: BookOpen,
       },
     ],
   },

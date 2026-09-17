@@ -6,6 +6,7 @@ import {
   Image as ImageIcon,
   Globe,
   User,
+  BookOpen,
 } from "lucide-react";
 
 export type NavItem = {
@@ -53,6 +54,16 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Página de inicio",
         href: "/contenido/globals/home",
         icon: Globe,
+      },
+    ],
+  },
+  {
+    title: "Comunidad",
+    items: [
+      {
+        label: "Catálogo Profesional",
+        href: "/catalogo",
+        icon: BookOpen,
       },
     ],
   },
