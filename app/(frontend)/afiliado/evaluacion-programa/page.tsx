@@ -1,17 +1,17 @@
-// app/afiliado/evaluacion-programa-estudios/page.tsx
-
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { requireAfiliado } from "@/lib/auth/session";
 import { EvaluacionProgramaEstudiosForm } from "@/components/evaluacion-programa/evaluacion-programa-estudios-form";
-import { evaluacionProgramaEstudios } from "@/lib/db/schema";
+import { evaluacionProgramaEstudios } from "@/lib/db/schema/evaluacion-programa-estudios";
 
 export default async function EvaluacionProgramaEstudiosPage() {
   const { afiliado } = await requireAfiliado();
 
-  const evaluacion = await db.query.evaluacionProgramaEstudios.findFirst({
-    where: eq(evaluacionProgramaEstudios.userId, afiliado.userId),
-  });
+  const [evaluacion] = await db
+    .select()
+    .from(evaluacionProgramaEstudios)
+    .where(eq(evaluacionProgramaEstudios.userId, afiliado.userId))
+    .limit(1);
 
   return (
     <div className="mx-auto max-w-2xl py-10">

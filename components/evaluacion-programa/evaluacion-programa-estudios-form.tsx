@@ -1,4 +1,5 @@
 // components/forms/evaluacion-programa-estudios-form.tsx
+
 "use client";
 
 import { useEffect } from "react";
@@ -26,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/components/ui/use-toast"; // cambia si usas sonner u otro sistema
+import { toast } from "sonner";
 
 import {
   valoracionSchema,
@@ -339,7 +340,6 @@ export function EvaluacionProgramaEstudiosForm({
   initialData,
   onSuccess,
 }: EvaluacionProgramaEstudiosFormProps) {
-  const { toast } = useToast();
   const router = useRouter();
 
   const form = useForm<FormValues>({
@@ -372,16 +372,16 @@ export function EvaluacionProgramaEstudiosForm({
         throw new Error(body?.error ?? "No se pudo guardar la evaluación");
       }
 
-      toast({ title: "Evaluación guardada correctamente" });
-      // Refresca los datos del Server Component (page.tsx) para que la
-      // próxima carga de esta página ya traiga la versión guardada.
+      toast.success("Evaluación guardada correctamente");
+
       router.refresh();
       onSuccess?.();
     } catch (error) {
-      toast({
-        title: "Error al guardar",
-        description: error instanceof Error ? error.message : undefined,
-        variant: "destructive",
+      toast.error("Error al guardar", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "No se pudo guardar la evaluación",
       });
     }
   };
