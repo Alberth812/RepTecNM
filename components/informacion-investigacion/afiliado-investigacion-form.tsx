@@ -2,6 +2,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, type Control } from "react-hook-form";
 
@@ -28,24 +29,11 @@ import {
 } from "@/lib/validation/afiliados-investigacion/investigacion-options";
 import {
   afiliadoInvestigacionSchema,
+  toAfiliadoInvestigacionFormValues,
   type AfiliadoInvestigacionFormInput,
   type AfiliadoInvestigacionFormOutput,
+  type AfiliadoInvestigacionRow,
 } from "@/lib/validation/afiliados-investigacion/investigacion";
-
-const DEFAULT_VALUES: AfiliadoInvestigacionFormInput = {
-  participacionProduccionConocimiento: null,
-  produccionAcademica: null,
-  otrosProductosAcademicos: null,
-  situacionSni: null,
-  sniPeriodoAnterior: null,
-  sniPeriodoActual: null,
-  redTematicaConacyt: null,
-  nombreRed: null,
-  haRecibidoPremiosReconocimientos: null,
-  detalleReconocimiento: null,
-  perteneceAcademiaSociedad: null,
-  nombreOrganizacion: null,
-};
 
 type BooleanFieldName =
   | "participacionProduccionConocimiento"
@@ -203,17 +191,30 @@ function ConditionalTextField({
 // ---------------------------------------------------------------------------
 
 export interface AfiliadoInvestigacionFormProps {
+  /**
+   * Fila cruda tal como la devuelve `db.query.afiliadosInvestigacion.findFirst(...)`
+   * desde el Server Component (page.tsx). `null` si el afiliado todavía no
+   * ha llenado esta sección.
+   */
+  initialData: AfiliadoInvestigacionRow | null;
   /** Se llama con los datos ya guardados tras un submit exitoso. */
   onSaved?: (data: AfiliadoInvestigacionFormOutput) => void;
 }
 
 export function AfiliadoInvestigacionForm({
+  initialData,
   onSaved,
 }: AfiliadoInvestigacionFormProps) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [loadError, setLoadError] = React.useState<string | null>(null);
+  const router = useRouter();
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = React.useState(false);
+
+  // El mapeo fila-de-BD -> valores-de-formulario vive en validations.ts para
+  // poder reusarlo también desde otro Server Component si hiciera falta.
+  const defaultValues = React.useMemo(
+    () => toAfiliadoInvestigacionFormValues(initialData),
+    [initialData],
+  );
 
   // z.input como TFieldValues (lo que RHF guarda mientras se llena el form)
   // y z.output como TTransformedValues (lo que recibe onSubmit, ya validado
@@ -224,60 +225,17 @@ export function AfiliadoInvestigacionForm({
     AfiliadoInvestigacionFormOutput
   >({
     resolver: zodResolver(afiliadoInvestigacionSchema),
-    defaultValues: DEFAULT_VALUES,
+    defaultValues,
     mode: "onBlur",
   });
 
   const { control, handleSubmit, watch, setValue, reset, formState } = form;
 
-  // --- Cargar los datos existentes, si el afiliado ya llenó esta sección ---
+  // Si `initialData` cambia (p. ej. tras `router.refresh()` luego de
+  // guardar), sincroniza el form con lo que realmente quedó persistido.
   React.useEffect(() => {
-    let cancelled = false;
-
-    async function loadExisting() {
-      try {
-        const response = await fetch("/api/afiliados/investigacion");
-        if (!response.ok) {
-          throw new Error("No se pudo cargar la información de investigación.");
-        }
-
-        const { data } = (await response.json()) as {
-          data:
-            | (AfiliadoInvestigacionFormOutput & {
-                userId: string;
-                createdAt: string;
-                updatedAt: string;
-              })
-            | null;
-        };
-
-        if (!cancelled && data) {
-          const {
-            userId: _userId,
-            createdAt: _createdAt,
-            updatedAt: _updatedAt,
-            ...formValues
-          } = data;
-          reset(formValues);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setLoadError(
-            error instanceof Error
-              ? error.message
-              : "No se pudo cargar la información.",
-          );
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    }
-
-    void loadExisting();
-    return () => {
-      cancelled = true;
-    };
-  }, [reset]);
+    reset(defaultValues);
+  }, [defaultValues, reset]);
 
   // --- Visibilidad condicional (visible_when de la especificación) ---
   const participacion = watch("participacionProduccionConocimiento");
@@ -350,6 +308,9 @@ export function AfiliadoInvestigacionForm({
       };
       setSubmitSuccess(true);
       onSaved?.(saved);
+      // Vuelve a ejecutar el Server Component (page.tsx): re-consulta la BD
+      // y baja el registro ya persistido como `initialData` actualizado.
+      router.refresh();
     } catch (error) {
       setSubmitError(
         error instanceof Error
@@ -359,23 +320,8 @@ export function AfiliadoInvestigacionForm({
     }
   }
 
-  if (isLoading) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Cargando tu información de investigación…
-      </p>
-    );
-  }
-
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {loadError ? (
-        <Alert variant="destructive">
-          <AlertTitle>No se pudo cargar tu información</AlertTitle>
-          <AlertDescription>{loadError}</AlertDescription>
-        </Alert>
-      ) : null}
-
       {submitError ? (
         <Alert variant="destructive">
           <AlertTitle>No se pudo guardar</AlertTitle>
@@ -606,7 +552,11 @@ export function AfiliadoInvestigacionForm({
       </FieldGroup>
 
       <Field orientation="horizontal">
-        <Button type="button" variant="outline" onClick={() => reset()}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => reset(defaultValues)}
+        >
           Cancelar
         </Button>
         <Button type="submit" disabled={formState.isSubmitting}>

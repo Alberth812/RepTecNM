@@ -16,6 +16,7 @@ import {
   afiliadosInformacionLaboral,
 } from "./informacion-laboral";
 import { afiliadosInvestigacion } from "./afiliados-investigacion";
+import { evaluacionProgramaEstudios } from "./evaluacion-programa-estudios";
 
 export const relations = defineRelations(
   {
@@ -39,6 +40,7 @@ export const relations = defineRelations(
     afiliadosInformacionLaboral,
     afiliadosEmpleos,
     afiliadosInvestigacion,
+    evaluacionProgramaEstudios,
   },
   (r) => ({
     // -------------------------------------------------------------------------
@@ -168,6 +170,11 @@ export const relations = defineRelations(
       investigacion: r.one.afiliadosInvestigacion({
         from: r.afiliados.userId,
         to: r.afiliadosInvestigacion.userId,
+      }),
+
+      evaluacionProgramaEstudios: r.one.evaluacionProgramaEstudios({
+        from: r.afiliados.userId,
+        to: r.evaluacionProgramaEstudios.userId,
       }),
     },
 
@@ -343,6 +350,18 @@ export const relations = defineRelations(
     afiliadosInvestigacion: {
       afiliado: r.one.afiliados({
         from: r.afiliadosInvestigacion.userId,
+        to: r.afiliados.userId,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // EVALUACIÓN DEL PROGRAMA DE ESTUDIOS
+    // -------------------------------------------------------------------------
+
+    evaluacionProgramaEstudios: {
+      afiliado: r.one.afiliados({
+        from: r.evaluacionProgramaEstudios.userId,
         to: r.afiliados.userId,
         optional: false,
       }),

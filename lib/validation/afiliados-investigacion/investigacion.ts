@@ -1,9 +1,14 @@
 // @/lib/validations/afiliados-investigacion.ts
+
 import { z } from "zod";
 import {
   PRODUCCION_ACADEMICA_VALUES,
   SITUACION_SNI_VALUES,
 } from "./investigacion-options";
+// Solo se usa como tipo (`$inferSelect`); no arrastra código de Drizzle al
+// bundle del cliente si este schema de validación también se importa desde
+// un componente "use client".
+import type { afiliadosInvestigacion } from "@/lib/db/schema/afiliados-investigacion";
 
 // ---------------------------------------------------------------------------
 // Helpers de campo — reglas que NO dependen de otros campos (self-contained).
@@ -326,4 +331,56 @@ export type AfiliadoInvestigacionFormOutput = z.output<
 export const afiliadoInvestigacionDraftSchema =
   afiliadoInvestigacionBaseSchema.partial();
 
+// ---------------------------------------------------------------------------
+// Puente BD -> formulario, para usar desde un Server Component.
 //
+// Nota: se importa el *tipo* de la tabla (import type), no runtime, así que
+// esto no crea una dependencia circular real entre schema/validations.
+// ---------------------------------------------------------------------------
+
+export const AFILIADO_INVESTIGACION_DEFAULT_VALUES: AfiliadoInvestigacionFormInput =
+  {
+    participacionProduccionConocimiento: null,
+    produccionAcademica: null,
+    otrosProductosAcademicos: null,
+    situacionSni: null,
+    sniPeriodoAnterior: null,
+    sniPeriodoActual: null,
+    redTematicaConacyt: null,
+    nombreRed: null,
+    haRecibidoPremiosReconocimientos: null,
+    detalleReconocimiento: null,
+    perteneceAcademiaSociedad: null,
+    nombreOrganizacion: null,
+  };
+
+export type AfiliadoInvestigacionRow =
+  typeof afiliadosInvestigacion.$inferSelect;
+
+/**
+ * Convierte la fila devuelta por `db.query.afiliadosInvestigacion.findFirst`
+ * en el shape que espera el formulario. Si no existe registro todavía
+ * (afiliado que no ha llenado esta sección), devuelve los valores por
+ * defecto (todo null).
+ */
+export function toAfiliadoInvestigacionFormValues(
+  row: AfiliadoInvestigacionRow | null | undefined,
+): AfiliadoInvestigacionFormInput {
+  if (!row) return AFILIADO_INVESTIGACION_DEFAULT_VALUES;
+
+  return {
+    participacionProduccionConocimiento:
+      row.participacionProduccionConocimiento,
+    produccionAcademica: row.produccionAcademica,
+    otrosProductosAcademicos: row.otrosProductosAcademicos,
+    situacionSni: row.situacionSni,
+    sniPeriodoAnterior: row.sniPeriodoAnterior,
+    sniPeriodoActual: row.sniPeriodoActual,
+    redTematicaConacyt: row.redTematicaConacyt,
+    nombreRed: row.nombreRed,
+    haRecibidoPremiosReconocimientos: row.haRecibidoPremiosReconocimientos,
+    detalleReconocimiento: row.detalleReconocimiento,
+    perteneceAcademiaSociedad: row.perteneceAcademiaSociedad,
+    nombreOrganizacion: row.nombreOrganizacion,
+  };
+}
