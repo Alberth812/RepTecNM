@@ -17,6 +17,11 @@ import {
 } from "./informacion-laboral";
 import { afiliadosInvestigacion } from "./afiliados-investigacion";
 import { evaluacionProgramaEstudios } from "./evaluacion-programa-estudios";
+import {
+  publicacionAutores,
+  publicaciones,
+  publicacionPalabrasClave,
+} from "./publicaciones";
 
 export const relations = defineRelations(
   {
@@ -41,6 +46,10 @@ export const relations = defineRelations(
     afiliadosEmpleos,
     afiliadosInvestigacion,
     evaluacionProgramaEstudios,
+
+    publicaciones,
+    publicacionAutores,
+    publicacionPalabrasClave,
   },
   (r) => ({
     // -------------------------------------------------------------------------
@@ -363,6 +372,57 @@ export const relations = defineRelations(
       afiliado: r.one.afiliados({
         from: r.evaluacionProgramaEstudios.userId,
         to: r.afiliados.userId,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // PUBLICACIONES
+    // -------------------------------------------------------------------------
+
+    publicaciones: {
+      afiliado: r.one.afiliados({
+        from: r.publicaciones.afiliadoId,
+        to: r.afiliados.userId,
+        optional: false,
+      }),
+
+      documento: r.one.archivos({
+        from: r.publicaciones.documentoArchivoId,
+        to: r.archivos.id,
+      }),
+
+      autores: r.many.publicacionAutores({
+        from: r.publicaciones.id,
+        to: r.publicacionAutores.publicacionId,
+      }),
+
+      palabrasClave: r.many.publicacionPalabrasClave({
+        from: r.publicaciones.id,
+        to: r.publicacionPalabrasClave.publicacionId,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // PUBLICACIÓN AUTORES
+    // -------------------------------------------------------------------------
+
+    publicacionAutores: {
+      publicacion: r.one.publicaciones({
+        from: r.publicacionAutores.publicacionId,
+        to: r.publicaciones.id,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // PUBLICACIÓN PALABRAS CLAVE
+    // -------------------------------------------------------------------------
+
+    publicacionPalabrasClave: {
+      publicacion: r.one.publicaciones({
+        from: r.publicacionPalabrasClave.publicacionId,
+        to: r.publicaciones.id,
         optional: false,
       }),
     },
