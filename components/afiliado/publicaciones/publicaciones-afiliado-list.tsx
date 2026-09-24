@@ -1,7 +1,8 @@
 // components/afiliado/publicaciones/publicaciones-afiliado-list.tsx
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -105,11 +106,22 @@ export function PublicacionesAfiliadoList() {
   if (isError) {
     return (
       <div className="space-y-6">
-        <PublicacionesSearchBar
-          valorActual={busquedaActiva}
-          onBuscar={handleBuscar}
-          onLimpiar={handleLimpiar}
-        />
+        <div className="flex items-center justify-between gap-4">
+          <PublicacionesSearchBar
+            valorActual={busquedaActiva}
+            onBuscar={handleBuscar}
+            onLimpiar={handleLimpiar}
+          />
+
+          <Link
+            href="/publicaciones/nueva/"
+            className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+          >
+            <Plus className="h-4 w-4" />
+            Crear Nueva
+          </Link>
+        </div>
+
         <div className="flex flex-col items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-8 text-center">
           <AlertTriangle className="h-8 w-8 text-destructive" />
           <p className="font-medium text-destructive">
@@ -127,12 +139,22 @@ export function PublicacionesAfiliadoList() {
 
   return (
     <div className="space-y-6">
-      <PublicacionesSearchBar
-        valorActual={busquedaActiva}
-        onBuscar={handleBuscar}
-        onLimpiar={handleLimpiar}
-        deshabilitado={isFetching}
-      />
+      <div className="flex items-center justify-between gap-4">
+        <PublicacionesSearchBar
+          valorActual={busquedaActiva}
+          onBuscar={handleBuscar}
+          onLimpiar={handleLimpiar}
+          deshabilitado={isFetching}
+        />
+
+        <Link
+          href="/publicaciones/nueva/"
+          className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+        >
+          <Plus className="h-4 w-4" />
+          Crear Nueva
+        </Link>
+      </div>
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
