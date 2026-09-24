@@ -67,8 +67,7 @@ export default function PublicLayout({
         </div>
       </FranjaSuperior>
 
-      <SoloNoAdmin>
-        <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
           <div className="flex h-16 w-full items-center justify-between px-4 lg:px-8">
             <Link href="/" className="flex items-center gap-2 text-primary">
               <img
@@ -81,26 +80,26 @@ export default function PublicLayout({
               </span>
             </Link>
 
-            <SoloVisitante>
-              <nav className="hidden items-center gap-5 text-sm font-medium text-zinc-700 lg:flex">
-                <Link href="/" className="hover:text-primary">
-                  Inicio
-                </Link>
-                <Link href="/#nosotros" className="hover:text-primary">
-                  Nosotros
-                </Link>
-                <Link href="/#que-hacemos" className="hover:text-primary">
-                  Servicios
-                </Link>
-                <Link href="/#afiliacion" className="hover:text-primary">
-                  Afiliación
-                </Link>
-
-                <Link href="/#contacto" className="hover:text-primary">
-                  Contacto
-                </Link>
-              </nav>
-            </SoloVisitante>
+                        <nav className="flex flex-wrap items-center gap-5 text-sm font-medium text-zinc-700 bg-red-200 p-2 rounded">
+                            <Link href="/" className="hover:text-primary">
+                              Inicio
+                            </Link>
+                            <Link href="/#nosotros" className="hover:text-primary">
+                              Nosotros
+                            </Link>
+                            <Link href="/#que-hacemos" className="hover:text-primary">
+                              Servicios
+                            </Link>
+                            <Link href="/catalogo" className="hover:text-primary">
+                              Catálogo
+                            </Link>
+                            <Link href="/#afiliacion" className="hover:text-primary">
+                              Afiliación
+                            </Link>
+                            <Link href="/#contacto" className="hover:text-primary">
+                              Contacto
+                            </Link>
+                          </nav>
 
             <div className="flex items-center gap-2">
               <MenuMovilMiembro />
@@ -113,7 +112,6 @@ export default function PublicLayout({
             </div>
           </div>
         </header>
-      </SoloNoAdmin>
 
       <AvisosFlotantes />
 
