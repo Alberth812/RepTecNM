@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { soporteTickets, soporteMensajes } from "@/lib/db/schema/soporte";
-import { getCurrentSession, requireAfiliado } from "@/lib/auth/session";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
 import { eq, desc } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireAfiliado(["ACTIVO"]);
+    const headersList = await headers();
+    const { user, error } = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (error || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { asunto, descripcion, categoria } = body;
 
@@ -15,17 +24,17 @@ export async function POST(req: NextRequest) {
     }
 
     const [ticket] = await db.insert(soporteTickets).values({
-      afiliadoId: session.user.id,
+      afiliadoId: user.id,
       asunto,
       descripcion,
       categoria: categoria || "OTRO",
       estado: "PENDIENTE",
     }).returning();
 
-    // Crear el primer mensaje del hilo con la descripción inicial
+    // Crear el primer mensaje del hilo
     await db.insert(soporteMensajes).values({
       ticketId: ticket.id,
-      autorId: session.user.id,
+      autorId: user.id,
       autorRol: "AFILIADO",
       contenido: descripcion,
       esRespuestaOficial: false,
@@ -40,18 +49,25 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getCurrentSession();
-    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const headersList = await headers();
+    const { user, error } = await auth.api.getSession({
+      headers: headersList,
+    });
 
-    // Ajusta 'rol' o 'roles' según cómo esté estructurado tu objeto de sesión
-    const esAdmin = session.user.rol === 'ADMINISTRADOR' || session.user.roles?.includes('ADMINISTRADOR');
+    if (error || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
+    const esAdmin = user.role === 'ADMINISTRADOR';
 
     if (esAdmin) {
+      // Los admins ven todos los tickets
       const tickets = await db.select().from(soporteTickets).orderBy(desc(soporteTickets.createdAt));
       return NextResponse.json(tickets);
     } else {
+      // Los afiliados solo ven los suyos
       const tickets = await db.select().from(soporteTickets)
-        .where(eq(soporteTickets.afiliadoId, session.user.id))
+        .where(eq(soporteTickets.afiliadoId, user.id))
         .orderBy(desc(soporteTickets.createdAt));
       return NextResponse.json(tickets);
     }

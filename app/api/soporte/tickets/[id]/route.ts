@@ -1,34 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { soporteTickets, soporteMensajes } from "@/lib/db/schema/soporte";
-import { getCurrentSession, requireAdministrador } from "@/lib/auth/session";
+import { afiliados } from "@/lib/db/schema/afiliados";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
 import { eq, asc } from "drizzle-orm";
 
 // GET: Obtener detalle del ticket y sus mensajes
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getCurrentSession();
-    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-
-    const [ticket] = await db.select().from(soporteTickets).where(eq(soporteTickets.id, params.id));
+    const { id: ticketId } = await params;
     
-    if (!ticket) {
+    const headersList = await headers();
+    const { user, error } = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (error || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
+    // Unimos con la tabla de afiliados para obtener los datos del usuario
+    const [ticketData] = await db
+      .select({
+        id: soporteTickets.id,
+        asunto: soporteTickets.asunto,
+        estado: soporteTickets.estado,
+        categoria: soporteTickets.categoria,
+        createdAt: soporteTickets.createdAt,
+        afiliadoId: soporteTickets.afiliadoId,
+        afiliado: {
+          nombres: afiliados.nombres,
+          apellidoPaterno: afiliados.apellidoPaterno,
+          apellidoMaterno: afiliados.apellidoMaterno,
+          correoElectronico: afiliados.correoElectronico,
+        }
+      })
+      .from(soporteTickets)
+      .leftJoin(afiliados, eq(soporteTickets.afiliadoId, afiliados.userId))
+      .where(eq(soporteTickets.id, ticketId));
+    
+    if (!ticketData) {
       return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
     }
 
-    const esAdmin = session.user.rol === 'ADMINISTRADOR' || session.user.roles?.includes('ADMINISTRADOR');
-    if (!esAdmin && ticket.afiliadoId !== session.user.id) {
+    const esAdmin = user.role === 'ADMINISTRADOR';
+    if (!esAdmin && ticketData.afiliadoId !== user.id) {
       return NextResponse.json({ error: "No tienes permiso para ver este ticket" }, { status: 403 });
     }
 
     const mensajes = await db.select().from(soporteMensajes)
-      .where(eq(soporteMensajes.ticketId, params.id))
+      .where(eq(soporteMensajes.ticketId, ticketId))
       .orderBy(asc(soporteMensajes.createdAt));
 
-    return NextResponse.json({ ticket, mensajes });
+    // Eliminamos afiliadoId de la respuesta para mantener la estructura limpia
+    const { afiliadoId, ...ticketResponse } = ticketData;
+
+    return NextResponse.json({ ticket: ticketResponse, mensajes });
   } catch (error) {
     console.error("Error obteniendo detalle del ticket:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
@@ -38,10 +69,20 @@ export async function GET(
 // PATCH: Actualizar estado del ticket (Solo Admins)
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await requireAdministrador();
+    const { id: ticketId } = await params;
+    
+    const headersList = await headers();
+    const { user, error } = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (error || !user || user.role !== 'ADMINISTRADOR') {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { estado, adminAsignadoId } = body;
 
@@ -59,7 +100,7 @@ export async function PATCH(
 
     const [updated] = await db.update(soporteTickets)
       .set(updateData)
-      .where(eq(soporteTickets.id, params.id))
+      .where(eq(soporteTickets.id, ticketId))
       .returning();
 
     if (!updated) {

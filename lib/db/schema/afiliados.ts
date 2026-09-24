@@ -43,6 +43,7 @@ export const afiliados = pgTable("afiliados", {
   // Folio
   // REP-{año actual}-{6 digitos}
   folio: varchar("folio", { length: 15 }).unique(),
+  mostrarEnQr: boolean("mostrar_en_qr").notNull().default(false),
 
   // Contacto
   telefonoCelular: varchar("telefono_celular", { length: 10 }) /* .notNull() */,

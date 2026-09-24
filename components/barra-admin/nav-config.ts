@@ -1,13 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import {
-  Home,
-  FileText,
-  Megaphone,
-  Image as ImageIcon,
-  Globe,
-  User,
-  BookOpen,
-} from "lucide-react";
+import { FileText, Home, MessageSquare, LifeBuoy, Settings, User } from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -20,56 +12,29 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/**
- * Fuente única de verdad para los links del sidebar.
- * Cada grupo tiene un título opcional (si no lo lleva, no se renderiza nada
- * arriba de sus items, como en el grupo de "Inicio").
- *
- * Para agregar/quitar/mover un link, solo edita este arreglo: BarraAdmin.tsx
- * no necesita tocarse.
- */
+// Estructura de grupos que espera BarraAdmin
 export const NAV_GROUPS: NavGroup[] = [
   {
-    items: [{ label: "Inicio", href: "/admin/inicio", icon: Home }],
-  },
-  {
-    title: "Contenido",
     items: [
-      {
-        label: "Publicaciones",
-        href: "/contenido/collections/posts",
-        icon: FileText,
-      },
-      {
-        label: "Avisos",
-        href: "/contenido/collections/avisos",
-        icon: Megaphone,
-      },
-      {
-        label: "Media",
-        href: "/contenido/collections/media",
-        icon: ImageIcon,
-      },
-      {
-        label: "Página de inicio",
-        href: "/contenido/globals/home",
-        icon: Globe,
-      },
+      { label: "Inicio", href: "/admin/inicio", icon: Home },
     ],
   },
   {
-    title: "Comunidad",
+    title: "Gestión",
     items: [
-      {
-        label: "Catálogo Profesional",
-        href: "/catalogo",
-        icon: BookOpen,
-      },
+      { label: "Solicitudes", href: "/admin/solicitudes", icon: FileText },
+      { label: "Tickets de Soporte", href: "/admin/soporte", icon: LifeBuoy },
+      { label: "Avisos", href: "/admin/avisos", icon: MessageSquare },
+    ],
+  },
+  {
+    title: "Sistema",
+    items: [
+      { label: "Configuración", href: "/admin/configuracion", icon: Settings },
     ],
   },
 ];
 
-// Item fijo al fondo del sidebar (arriba del botón de cerrar sesión).
 export const ACCOUNT_ITEM: NavItem = {
   label: "Cuenta",
   href: "/account",

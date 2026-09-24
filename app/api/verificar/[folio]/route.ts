@@ -1,104 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { afiliados } from "@/lib/db/schema/afiliados";
+import { afiliados, datosEmergencia } from "@/lib/db/schema/afiliados";
 import { eq } from "drizzle-orm";
-import { isValidFolioFormat } from "@/lib/utils/sanitize";
-
-// Rate limiting simple en memoria para verificación
-const verificationLimits = new Map<string, { count: number; resetAt: number }>();
-const MAX_VERIFICATIONS_PER_HOUR = 30;
-const HOUR_MS = 60 * 60 * 1000;
-
-function checkVerificationLimit(ip: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const entry = verificationLimits.get(ip);
-
-  if (!entry || now > entry.resetAt) {
-    verificationLimits.set(ip, { count: 1, resetAt: now + HOUR_MS });
-    return { allowed: true, remaining: MAX_VERIFICATIONS_PER_HOUR - 1 };
-  }
-
-  if (entry.count >= MAX_VERIFICATIONS_PER_HOUR) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  entry.count += 1;
-  return { allowed: true, remaining: MAX_VERIFICATIONS_PER_HOUR - entry.count };
-}
 
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ folio: string }> }
 ) {
   try {
     const { folio } = await params;
 
-    // 1. Validar formato de folio
-    if (!folio || !isValidFolioFormat(folio)) {
-      return NextResponse.json(
-        { error: "Formato de folio inválido" },
-        { status: 400 }
-      );
-    }
-
-    // 2. Rate limiting por IP
-    const ip = request.headers.get("x-forwarded-for") || 
-               request.headers.get("x-real-ip") || 
-               "unknown";
-    
-    const limit = checkVerificationLimit(ip);
-    if (!limit.allowed) {
-      return NextResponse.json(
-        { error: "Demasiadas solicitudes. Intenta más tarde." },
-        { status: 429 }
-      );
-    }
-
-    // 3. Consultar afiliado
-    const resultado = await db
+    // 1. Buscar afiliado por folio (RF-CRED-003, RF-CRED-010)
+    const [afiliado] = await db
       .select({
-        userId: afiliados.userId,
-        folio: afiliados.folio,
+        id: afiliados.userId,
         nombres: afiliados.nombres,
         apellidoPaterno: afiliados.apellidoPaterno,
         apellidoMaterno: afiliados.apellidoMaterno,
+        fotografiaArchivoId: afiliados.fotografiaArchivoId,
         membershipStatus: afiliados.membershipStatus,
-        autorizaPublicacion: afiliados.autorizaPublicacion,
-        areaConocimiento: afiliados.areaConocimiento,
+        mostrarEnQr: afiliados.mostrarEnQr,
       })
       .from(afiliados)
-      .where(eq(afiliados.folio, folio))
-      .limit(1);
-
-    const afiliado = resultado[0];
+      .where(eq(afiliados.folio, folio));
 
     if (!afiliado) {
-      return NextResponse.json({
-        encontrado: false,
-        folio,
-      });
+      return NextResponse.json({ error: "Credencial no encontrada" }, { status: 404 });
     }
 
-    const nombreCompleto = `${afiliado.nombres} ${afiliado.apellidoPaterno} ${afiliado.apellidoMaterno}`.trim();
+    let datosEmergenciaPublicos = null;
 
+    // 2. Solo incluir datos de emergencia si el afiliado lo autorizó explícitamente (RF-CRED-008)
+    if (afiliado.mostrarEnQr) {
+      const [emergencia] = await db
+        .select({
+          nombreContacto: datosEmergencia.nombreContacto,
+          parentesco: datosEmergencia.parentesco,
+          parentescoOtro: datosEmergencia.parentescoOtro,
+          telefono: datosEmergencia.telefono,
+          tipoSanguineo: datosEmergencia.tipoSanguineo,
+          alergiasCondicionesMedicas: datosEmergencia.alergiasCondicionesMedicas,
+        })
+        .from(datosEmergencia)
+        .where(eq(datosEmergencia.afiliadoId, afiliado.id));
+      
+      datosEmergenciaPublicos = emergencia || null;
+    }
+
+    // 3. Responder con la estructura mínima y segura (RF-CRED-009)
     return NextResponse.json({
-      encontrado: true,
-      folio: afiliado.folio,
-      nombre: nombreCompleto,
-      numero: afiliado.folio,
-      posgrado: Array.isArray(afiliado.areaConocimiento) && afiliado.areaConocimiento.length > 0 
-        ? afiliado.areaConocimiento.join(", ") 
-        : "Profesional TecNM",
-      instituto: "Tecnológico Nacional de México",
-      estado: afiliado.membershipStatus,
-      idAfiliado: afiliado.userId,
-      contactoPublico: afiliado.autorizaPublicacion,
-      rateLimit: {
-        remaining: limit.remaining
-      }
+      afiliado: {
+        nombreCompleto: `${afiliado.nombres} ${afiliado.apellidoPaterno} ${afiliado.apellidoMaterno}`.trim(),
+        membershipStatus: afiliado.membershipStatus,
+        fotografiaArchivoId: afiliado.fotografiaArchivoId,
+        datosEmergencia: datosEmergenciaPublicos,
+      },
     });
   } catch (error) {
-    console.error("Error en verificación de folio:", error);
+    console.error("Error verificando folio:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

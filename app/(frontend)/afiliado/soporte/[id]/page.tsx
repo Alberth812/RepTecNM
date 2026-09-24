@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Send, User, ShieldCheck } from "lucide-react";
 
@@ -19,7 +19,12 @@ function getEstadoBadge(estado: string) {
   return <Badge className={`${estilos[estado] || "bg-gray-100"} border`}>{estado}</Badge>;
 }
 
-export default function TicketDetallePage({ params }: { params: { id: string } }) {
+// En Next.js 15+, params es una Promise
+export default function TicketDetallePage({ params }: { params: Promise<{ id: string }> }) {
+  // Desenrollar la promesa de params
+  const resolvedParams = use(params);
+  const ticketId = resolvedParams.id;
+
   const router = useRouter();
   const [ticket, setTicket] = useState<any>(null);
   const [mensajes, setMensajes] = useState<any[]>([]);
@@ -30,7 +35,7 @@ export default function TicketDetallePage({ params }: { params: { id: string } }
 
   const cargarDetalle = async () => {
     try {
-      const res = await fetch(`/api/soporte/tickets/${params.id}`);
+      const res = await fetch(`/api/soporte/tickets/${ticketId}`);
       if (res.ok) {
         const data = await res.json();
         setTicket(data.ticket);
@@ -45,7 +50,7 @@ export default function TicketDetallePage({ params }: { params: { id: string } }
     }
   };
 
-  useEffect(() => { cargarDetalle(); }, [params.id]);
+  useEffect(() => { cargarDetalle(); }, [ticketId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -59,7 +64,7 @@ export default function TicketDetallePage({ params }: { params: { id: string } }
 
     setEnviando(true);
     try {
-      const res = await fetch(`/api/soporte/tickets/${params.id}/mensajes`, {
+      const res = await fetch(`/api/soporte/tickets/${ticketId}/mensajes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contenido: nuevoMensaje }),
@@ -67,7 +72,7 @@ export default function TicketDetallePage({ params }: { params: { id: string } }
 
       if (res.ok) {
         setNuevoMensaje("");
-        cargarDetalle(); // Recargar para ver el nuevo mensaje
+        cargarDetalle();
       }
     } catch (error) {
       console.error("Error:", error);

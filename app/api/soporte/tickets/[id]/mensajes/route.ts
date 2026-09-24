@@ -1,39 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { soporteTickets, soporteMensajes } from "@/lib/db/schema/soporte";
-import { getCurrentSession } from "@/lib/auth/session";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getCurrentSession();
-    if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    // 1. DESENVOLVER LA PROMESA DE PARAMS (Obligatorio en Next.js 15+)
+    const { id: ticketId } = await params;
+    
+    const headersList = await headers();
+    const { user, error } = await auth.api.getSession({
+      headers: headersList,
+    });
+
+    if (error || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
     const body = await req.json();
     const { contenido, esRespuestaOficial } = body;
 
-    if (!contenido || contenido.trim().length < 5) {
+    // 2. Validación más flexible: mínimo 2 caracteres
+    if (!contenido || contenido.trim().length < 2) {
       return NextResponse.json({ error: "El contenido del mensaje es muy corto" }, { status: 400 });
     }
 
-    const [ticket] = await db.select().from(soporteTickets).where(eq(soporteTickets.id, params.id));
+    const [ticket] = await db.select().from(soporteTickets).where(eq(soporteTickets.id, ticketId));
     if (!ticket) {
       return NextResponse.json({ error: "Ticket no encontrado" }, { status: 404 });
     }
 
-    const esAdmin = session.user.rol === 'ADMINISTRADOR' || session.user.roles?.includes('ADMINISTRADOR');
-    if (!esAdmin && ticket.afiliadoId !== session.user.id) {
+    const esAdmin = user.role === 'ADMINISTRADOR';
+    if (!esAdmin && ticket.afiliadoId !== user.id) {
       return NextResponse.json({ error: "No tienes permiso para acceder a este ticket" }, { status: 403 });
     }
 
     const autorRol = esAdmin ? "ADMINISTRADOR" : "AFILIADO";
 
     const [mensaje] = await db.insert(soporteMensajes).values({
-      ticketId: params.id,
-      autorId: session.user.id,
+      ticketId,
+      autorId: user.id,
       autorRol,
       contenido,
       esRespuestaOficial: esRespuestaOficial || false,
@@ -43,7 +54,7 @@ export async function POST(
     if (esRespuestaOficial && esAdmin) {
       await db.update(soporteTickets)
         .set({ estado: "SOLUCIONADO", resolvedAt: new Date() })
-        .where(eq(soporteTickets.id, params.id));
+        .where(eq(soporteTickets.id, ticketId));
     }
 
     return NextResponse.json({ success: true, mensaje }, { status: 201 });
