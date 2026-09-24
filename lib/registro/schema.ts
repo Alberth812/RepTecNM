@@ -4,12 +4,15 @@ import { emergenciaSchema } from "./schemas/datos-emergencia";
 import { perfilProfesionalSchema } from "./schemas/perfil-profesional";
 import { serviciosProfesionalesSchema } from "./schemas/servicios-profesionales";
 import { ubicacionSchema } from "./schemas/ubicacion";
-import { comprobanteSchema, fotografiaSchema, ImageDimensionChecker, requiredSelect, requiredText } from "./schemas/util";
-import { visibilidadSchema } from "./schemas/visibilidad";
 import {
-  GENERO_OPTIONS,
-  RegistroFormValues
-} from "./types";
+  comprobanteSchema,
+  fotografiaSchema,
+  ImageDimensionChecker,
+  requiredSelect,
+  requiredText,
+} from "./schemas/util";
+import { visibilidadSchema } from "./schemas/visibilidad";
+import { GENERO_OPTIONS, RegistroFormValues } from "./types";
 
 const OTRO_ESPECIFIQUE = "Otro (especifique)";
 
@@ -22,10 +25,7 @@ export function buildRegistroSchema(options?: {
     nombres: requiredText("El nombre"),
     fotografia: fotografiaSchema(options?.checkImageDimensions),
     comprobante_membresia: comprobanteSchema(),
-    genero: requiredSelect(
-      GENERO_OPTIONS,
-      "Selecciona una opción de género.",
-    ),
+    genero: requiredSelect(GENERO_OPTIONS, "Selecciona una opción de género."),
   });
 
   return datosGenerales
@@ -74,11 +74,7 @@ export function buildRegistroSchema(options?: {
         "tipo_servicios_otro",
       );
 
-      requireOtro(
-        data.sectores,
-        data.sectores_otro ?? "",
-        "sectores_otro",
-      );
+      requireOtro(data.sectores, data.sectores_otro ?? "", "sectores_otro");
 
       requireOtro(
         data.interesado_en,
