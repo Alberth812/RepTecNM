@@ -61,6 +61,6 @@ export const NAV_GROUPS: NavGroup[] = [
 // Item fijo al fondo del sidebar (arriba del botón de cerrar sesión).
 export const ACCOUNT_ITEM: NavItem = {
   label: "Cuenta",
-  href: "/account",
+  href: "/admin/cuenta",
   icon: User,
 };

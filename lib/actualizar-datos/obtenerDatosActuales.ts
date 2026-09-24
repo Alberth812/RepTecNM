@@ -1,5 +1,3 @@
-// lib/actualizar-datos/obtenerDatosActuales.ts
-
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import {
@@ -7,11 +5,9 @@ import {
   datosEmergencia,
   proyectosRelevantes,
 } from "@/lib/db/schema/afiliados";
-import { registroClientSchema, RegistroFormInput } from "./schema";
+import { RegistroFormOutput } from "./schema";
 
-export async function obtenerDatosActuales(
-  userId: string,
-): Promise<RegistroFormInput> {
+export async function obtenerDatosActuales(userId: string) {
   const [afiliado] = await db
     .select()
     .from(afiliados)
@@ -29,11 +25,17 @@ export async function obtenerDatosActuales(
     .limit(1);
 
   const proyectos = await db
-    .select()
+    .select({
+      id: proyectosRelevantes.id,
+      nombre: proyectosRelevantes.nombre,
+      descripcion: proyectosRelevantes.descripcion,
+      rol: proyectosRelevantes.rol,
+      anio: proyectosRelevantes.anio,
+    })
     .from(proyectosRelevantes)
     .where(eq(proyectosRelevantes.afiliadoId, userId));
 
-  const data = {
+  return {
     apellido_paterno: afiliado.apellidoPaterno ?? "",
     apellido_materno: afiliado.apellidoMaterno ?? "",
     nombres: afiliado.nombres ?? "",
@@ -56,13 +58,7 @@ export async function obtenerDatosActuales(
     palabras_clave: afiliado.palabrasClave ?? [],
     habilidades_tecnologicas: afiliado.habilidadesTecnologicas ?? "",
 
-    proyectos_relevantes: proyectos.map((proyecto) => ({
-      id: proyecto.id,
-      nombre: proyecto.nombre,
-      descripcion: proyecto.descripcion,
-      rol: proyecto.rol,
-      anio: proyecto.anio,
-    })),
+    proyectos_relevantes: proyectos,
 
     tipo_servicios: afiliado.tipoServicios ?? [],
     tipo_servicios_otro: afiliado.tipoServiciosOtro ?? "",
@@ -79,21 +75,9 @@ export async function obtenerDatosActuales(
     telefono_contacto_emergencia: emergencia?.telefono ?? "",
     tipo_sanguineo: emergencia?.tipoSanguineo ?? "",
     alergias_condiciones_medicas: emergencia?.alergiasCondicionesMedicas ?? "",
-    privacidad_datos_emergencia: emergencia?.mostrarEnQr ?? false,
+    privacidad_datos_emergencia: emergencia?.mostrarEnQr ?? true,
 
-    autoriza_publicacion: afiliado.autorizaPublicacion ?? false,
+    autoriza_publicacion: afiliado.autorizaPublicacion ?? true,
     datos_publicos: afiliado.datosPublicos ?? [],
-  };
-
-  const result = registroClientSchema.safeParse(data);
-
-  if (!result.success) {
-    console.error("Datos inválidos del afiliado:", result.error.flatten());
-
-    throw new Error(
-      "Los datos actuales del afiliado no tienen un formato válido.",
-    );
-  }
-
-  return result.data;
+  } as RegistroFormOutput;
 }
