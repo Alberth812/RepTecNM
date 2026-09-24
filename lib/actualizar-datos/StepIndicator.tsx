@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, Check } from "lucide-react";
+import { AlertCircle, Check, Pencil } from "lucide-react";
 import { cn } from "@/lib/registro/cn";
 
 type StepStatus = "current" | "error" | "complete" | "pending";
@@ -122,7 +122,7 @@ export default function StepIndicator({
                   )}
                 >
                   {isCompleted ? (
-                    <Check className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   ) : hasError ? (
                     <AlertCircle className="h-4 w-4" />
                   ) : (

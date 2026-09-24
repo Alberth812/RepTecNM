@@ -3,6 +3,7 @@ import { ChevronRight, UserRound } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+//
 export default function MiCuenta() {
   return (
     <Card className="w-full">
@@ -31,6 +32,20 @@ export default function MiCuenta() {
               <p className="text-sm font-medium">Actualizar mis datos</p>
               <p className="text-sm text-muted-foreground">
                 Modifica tu información personal
+              </p>
+            </div>
+
+            <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground" />
+          </Link>
+
+          <Link
+            href="/cambiar-password"
+            className="group flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-muted/50"
+          >
+            <div>
+              <p className="text-sm font-medium">Cambiar contraseña</p>
+              <p className="text-sm text-muted-foreground">
+                Actualiza la contraseña de tu cuenta
               </p>
             </div>
 

@@ -1,359 +1,306 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "sonner";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 import { passwordSchema } from "@/lib/validation/password";
-
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Alert,
+  AlertDescription,
+} from "@/components/ui/alert";
 
-type FieldErrors = {
-  currentPassword?: string;
-  newPassword?: string;
-  confirmPassword?: string;
+const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, "Debes proporcionar tu contraseña actual."),
+    newPassword: passwordSchema,
+    confirmPassword: z
+      .string()
+      .min(1, "Debes confirmar tu nueva contraseña."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contraseñas no coinciden.",
+    path: ["confirmPassword"],
+  });
+
+type ChangePasswordFormValues = z.infer<
+  typeof changePasswordSchema
+>;
+
+type ApiError = {
+  code?: string;
+  message?: string;
 };
 
-type ApiErrorResponse = {
-  error?: {
-    code?: string;
-    message?: string;
-    issues?: Array<{
-      path?: (string | number)[];
-      message?: string;
-    }>;
+function PasswordInput({
+  field,
+  placeholder,
+  disabled,
+  autoComplete,
+  invalid,
+}: {
+  field: {
+    name: string;
+    value: string;
+    onChange: (...event: unknown[]) => void;
+    onBlur: () => void;
+    ref: (element: HTMLInputElement | null) => void;
   };
-};
+  placeholder?: string;
+  disabled?: boolean;
+  autoComplete?: string;
+  invalid?: boolean;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="relative">
+      <Input
+        {...field}
+        ref={field.ref}
+        id={field.name}
+        type={visible ? "text" : "password"}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        disabled={disabled}
+        aria-invalid={invalid}
+        className="pr-10"
+      />
+
+      <button
+        type="button"
+        tabIndex={-1}
+        onClick={() => setVisible((value) => !value)}
+        disabled={disabled}
+        aria-label={
+          visible
+            ? "Ocultar contraseña"
+            : "Mostrar contraseña"
+        }
+        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {visible ? (
+          <EyeOff className="size-4" />
+        ) : (
+          <Eye className="size-4" />
+        )}
+      </button>
+    </div>
+  );
+}
 
 export function ChangePasswordForm() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
 
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [serverError, setServerError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(
+    null,
+  );
 
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const form = useForm<ChangePasswordFormValues>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
 
-  function clearErrors() {
-    setFieldErrors({});
+  const isSubmitting = form.formState.isSubmitting;
+
+  async function onSubmit(values: ChangePasswordFormValues) {
     setServerError(null);
-    setSuccess(null);
-  }
-
-  function validateForm(): boolean {
-    const errors: FieldErrors = {};
-
-    if (!currentPassword) {
-      errors.currentPassword = "Introduce tu contraseña actual";
-    }
-
-    const passwordResult = passwordSchema.safeParse(newPassword);
-
-    if (!passwordResult.success) {
-      errors.newPassword =
-        passwordResult.error.issues[0]?.message ?? "La contraseña no es válida";
-    }
-
-    if (!confirmPassword) {
-      errors.confirmPassword = "Confirma tu nueva contraseña";
-    } else if (newPassword !== confirmPassword) {
-      errors.confirmPassword = "Las contraseñas no coinciden";
-    }
-
-    setFieldErrors(errors);
-
-    return Object.keys(errors).length === 0;
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    setServerError(null);
-    setSuccess(null);
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/password/reset", {
-        method: "POST",
+      const response = await fetch("/api/password/change", {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          currentPassword,
-          newPassword,
+          currentPassword: values.currentPassword,
+          newPassword: values.newPassword,
         }),
       });
 
-      const data: ApiErrorResponse = await response.json();
+      const data = (await response.json().catch(() => null)) as
+        | ApiError
+        | null;
 
       if (!response.ok) {
-        const issues = data.error?.issues;
+        const message =
+          data?.message ??
+          "No se pudo actualizar la contraseña.";
 
-        if (issues?.length) {
-          const errors: FieldErrors = {};
+        setServerError(message);
+        toast.error(message);
 
-          for (const issue of issues) {
-            const field = issue.path?.[0];
+        switch (data?.code) {
+          case "INVALID_PASSWORD":
+            form.setError("currentPassword", {
+              type: "server",
+              message:
+                "La contraseña actual es incorrecta.",
+            });
+            break;
 
-            if (
-              field === "currentPassword" ||
-              field === "newPassword" ||
-              field === "confirmPassword"
-            ) {
-              errors[field] = issue.message ?? "Valor inválido";
-            }
-          }
+          case "CREDENTIAL_ACCOUNT_NOT_FOUND":
+            form.setError("currentPassword", {
+              type: "server",
+              message:
+                "Esta cuenta no tiene una contraseña configurada.",
+            });
+            break;
 
-          if (Object.keys(errors).length > 0) {
-            setFieldErrors(errors);
-          } else {
-            setServerError(
-              data.error?.message ?? "No se pudo cambiar la contraseña.",
-            );
-          }
-        } else {
-          setServerError(
-            data.error?.message ?? "No se pudo cambiar la contraseña.",
-          );
+          case "SESSION_EXPIRED":
+            form.setError("root.server", {
+              type: "server",
+              message,
+            });
+            break;
         }
 
         return;
       }
 
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setFieldErrors({});
-      setSuccess(
-        data.error?.message ?? "Tu contraseña se actualizó correctamente.",
+      toast.success(
+        data?.message ??
+          "Contraseña actualizada correctamente.",
       );
+
+      form.reset();
+
+      router.push("/afiliado/cuenta");
+      router.refresh();
     } catch {
-      setServerError("No se pudo conectar con el servidor. Intenta de nuevo.");
-    } finally {
-      setIsSubmitting(false);
+      const message =
+        "No se pudo conectar con el servidor. Inténtalo nuevamente.";
+
+      setServerError(message);
+      toast.error(message);
     }
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Cambiar contraseña</CardTitle>
-        <CardDescription>
-          Introduce tu contraseña actual y elige una nueva contraseña segura.
-        </CardDescription>
-      </CardHeader>
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="space-y-6"
+      noValidate
+    >
+      {serverError && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {serverError}
+          </AlertDescription>
+        </Alert>
+      )}
 
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-          {serverError && (
-            <Alert variant="destructive" role="alert">
-              <AlertDescription>{serverError}</AlertDescription>
-            </Alert>
-          )}
+      <FieldGroup>
+        <Controller
+          name="currentPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>
+                Contraseña actual
+              </FieldLabel>
 
-          {success && (
-            <Alert role="status">
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="current-password">Contraseña actual</Label>
-
-            <div className="relative">
-              <Input
-                id="current-password"
-                name="currentPassword"
-                type={showCurrentPassword ? "text" : "password"}
-                value={currentPassword}
-                onChange={(event) => {
-                  setCurrentPassword(event.target.value);
-                  clearErrors();
-                }}
-                aria-invalid={Boolean(fieldErrors.currentPassword)}
-                aria-describedby={
-                  fieldErrors.currentPassword
-                    ? "current-password-error"
-                    : undefined
-                }
+              <PasswordInput
+                field={field}
+                placeholder="Ingresa tu contraseña actual"
+                disabled={isSubmitting}
                 autoComplete="current-password"
-                disabled={isSubmitting}
-                className="pr-10"
+                invalid={fieldState.invalid}
               />
 
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword((visible) => !visible)}
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="newPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>
+                Nueva contraseña
+              </FieldLabel>
+
+              <PasswordInput
+                field={field}
+                placeholder="Ingresa tu nueva contraseña"
                 disabled={isSubmitting}
-                aria-label={
-                  showCurrentPassword
-                    ? "Ocultar contraseña actual"
-                    : "Mostrar contraseña actual"
-                }
-                className="absolute right-0 top-0 flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
-                {showCurrentPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-
-            {fieldErrors.currentPassword && (
-              <p
-                id="current-password-error"
-                className="text-sm text-destructive"
-                role="alert"
-              >
-                {fieldErrors.currentPassword}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="new-password">Nueva contraseña</Label>
-
-            <div className="relative">
-              <Input
-                id="new-password"
-                name="newPassword"
-                type={showNewPassword ? "text" : "password"}
-                value={newPassword}
-                onChange={(event) => {
-                  setNewPassword(event.target.value);
-                  clearErrors();
-                }}
-                aria-invalid={Boolean(fieldErrors.newPassword)}
-                aria-describedby={
-                  fieldErrors.newPassword
-                    ? "new-password-error"
-                    : "new-password-help"
-                }
                 autoComplete="new-password"
-                disabled={isSubmitting}
-                className="pr-10"
+                invalid={fieldState.invalid}
               />
 
-              <button
-                type="button"
-                onClick={() => setShowNewPassword((visible) => !visible)}
+              <FieldDescription>
+                Debe tener al menos 8 caracteres, una
+                mayúscula, un número y un símbolo.
+              </FieldDescription>
+
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
+
+        <Controller
+          name="confirmPassword"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>
+                Confirmar nueva contraseña
+              </FieldLabel>
+
+              <PasswordInput
+                field={field}
+                placeholder="Repite tu nueva contraseña"
                 disabled={isSubmitting}
-                aria-label={
-                  showNewPassword
-                    ? "Ocultar nueva contraseña"
-                    : "Mostrar nueva contraseña"
-                }
-                className="absolute right-0 top-0 flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
-                {showNewPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-
-            {!fieldErrors.newPassword && (
-              <p
-                id="new-password-help"
-                className="text-xs text-muted-foreground"
-              >
-                Mínimo 8 caracteres, una mayúscula, un número y un símbolo.
-              </p>
-            )}
-
-            {fieldErrors.newPassword && (
-              <p
-                id="new-password-error"
-                className="text-sm text-destructive"
-                role="alert"
-              >
-                {fieldErrors.newPassword}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirmar nueva contraseña</Label>
-
-            <div className="relative">
-              <Input
-                id="confirm-password"
-                name="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(event) => {
-                  setConfirmPassword(event.target.value);
-                  clearErrors();
-                }}
-                aria-invalid={Boolean(fieldErrors.confirmPassword)}
-                aria-describedby={
-                  fieldErrors.confirmPassword
-                    ? "confirm-password-error"
-                    : undefined
-                }
                 autoComplete="new-password"
-                disabled={isSubmitting}
-                className="pr-10"
+                invalid={fieldState.invalid}
               />
 
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((visible) => !visible)}
-                disabled={isSubmitting}
-                aria-label={
-                  showConfirmPassword
-                    ? "Ocultar confirmación"
-                    : "Mostrar confirmación"
-                }
-                className="absolute right-0 top-0 flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
+              {fieldState.invalid && (
+                <FieldError errors={[fieldState.error]} />
+              )}
+            </Field>
+          )}
+        />
+      </FieldGroup>
 
-            {fieldErrors.confirmPassword && (
-              <p
-                id="confirm-password-error"
-                className="text-sm text-destructive"
-                role="alert"
-              >
-                {fieldErrors.confirmPassword}
-              </p>
-            )}
-          </div>
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full"
+      >
+        {isSubmitting && (
+          <Loader2 className="mr-2 size-4 animate-spin" />
+        )}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-
-            {isSubmitting ? "Actualizando..." : "Cambiar contraseña"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        {isSubmitting
+          ? "Actualizando..."
+          : "Cambiar contraseña"}
+      </Button>
+    </form>
   );
 }

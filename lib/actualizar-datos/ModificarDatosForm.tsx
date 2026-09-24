@@ -1,6 +1,5 @@
 "use client";
 
-import RegistroEnviado from "@/components/afilliate/registro/ui/RegistroEnviado";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -43,7 +42,7 @@ interface RegistroFormProps {
 
 export default function ModificarDatosForm({ initialData }: RegistroFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [furthestStep, setFurthestStep] = useState(0);
+  const [furthestStep, setFurthestStep] = useState(LAST_STEP);
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
@@ -103,6 +102,10 @@ export default function ModificarDatosForm({ initialData }: RegistroFormProps) {
     }
   }, [currentStep, trigger]);
 
+  useEffect(() => {
+    trigger();
+  }, []);
+
   const onInvalid = () => {
     const stepWithError = STEP_FIELDS.findIndex((fields) =>
       fields.some((field) => getFieldState(field, formState).invalid),
@@ -153,10 +156,6 @@ export default function ModificarDatosForm({ initialData }: RegistroFormProps) {
 
   const StepComponent = STEP_COMPONENTS[currentStep];
 
-  if (submitStatus === "success") {
-    return <RegistroEnviado />;
-  }
-
   return (
     <div ref={topRef} className="mx-auto max-w-2xl">
       <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
@@ -200,27 +199,46 @@ export default function ModificarDatosForm({ initialData }: RegistroFormProps) {
               Anterior
             </button>
 
-            {currentStep < LAST_STEP ? (
+            <div className="flex items-center justify-between gap-3">
               <button
                 type="button"
-                onClick={handleNext}
-                className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68]"
+                onClick={handleBack}
+                disabled={currentStep === 0 || submitStatus === "submitting"}
+                className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Siguiente
-                <ArrowRight className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" />
+                Anterior
               </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={submitStatus === "submitting" || !isValid}
-                className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {submitStatus === "submitting" && (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+
+              <div className="flex items-center gap-3">
+                {/* Guardar datos */}
+                <button
+                  type="submit"
+                  disabled={submitStatus === "submitting" || !isValid}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitStatus === "submitting" && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+
+                  {submitStatus === "submitting"
+                    ? "Guardando..."
+                    : "Guardar datos"}
+                </button>
+                {/* Siguiente solamente si no estamos en el último paso */}
+                {currentStep < LAST_STEP && (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={submitStatus === "submitting"}
+                    className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Siguiente
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
                 )}
-                {submitStatus === "submitting" ? "Guardando" : "Guarda datos"}
-              </button>
-            )}
+              </div>
+            </div>
           </div>
         </form>
       </FormProvider>
