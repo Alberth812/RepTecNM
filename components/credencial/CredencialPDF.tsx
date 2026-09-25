@@ -1,247 +1,244 @@
 import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
-import QRCode from "qrcode";
 
-// Colores institucionales
 const COLORS = {
   primary: "#004B87",
   primaryDark: "#003a6b",
   secondary: "#C9A227",
   emergency: "#DC2626",
-  emergencyLight: "#FEF2F2",
+  lightBlue: "#E6F0FA",
   white: "#FFFFFF",
-  gray: {
-    50: "#F9FAFB",
-    100: "#F3F4F6",
-    200: "#E5E7EB",
-    300: "#D1D5DB",
-    400: "#9CA3AF",
-    500: "#6B7280",
-    600: "#4B5563",
-    700: "#374151",
-    800: "#1F2937",
-    900: "#111827",
-  },
+  gray: "#6B7280",
+  darkGray: "#2B2B2B",
 };
 
-// Estilos para tamaño carnet (252x396 puntos = 3.5" x 5.5")
+// Dimensiones estándar ID-1 (ISO/IEC 7810): 85.60mm × 53.98mm
+// En puntos: 242.6pt × 153.3pt
+const CARD_WIDTH = 242.6;
+const CARD_HEIGHT = 153.3;
+
+// Margen de seguridad interno: 3mm = 8.5pt
+// Todo el contenido importante debe estar dentro de este margen
+const SAFE_MARGIN = 8.5;
+
 const styles = StyleSheet.create({
   page: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
     backgroundColor: COLORS.white,
+    fontFamily: "Helvetica",
   },
-  // FRENTE
-  frente: {
-    width: 252,
-    height: 396,
-    padding: 0,
-    position: "relative",
-    overflow: "hidden",
-  },
-  header: {
+  // ===== FRENTE =====
+  frontHeader: {
     backgroundColor: COLORS.primary,
-    padding: "12 10",
+    height: 32,
+    paddingHorizontal: SAFE_MARGIN,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  headerLogo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  logoCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: COLORS.white,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logoText: {
-    color: COLORS.primary,
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  headerTitle: {
+  headerText: {
     color: COLORS.white,
     fontSize: 9,
     fontWeight: "bold",
   },
-  headerSubtitle: {
+  headerSubtext: {
     color: COLORS.white,
-    fontSize: 7,
-    opacity: 0.9,
+    fontSize: 5.5,
   },
   statusBadge: {
     backgroundColor: COLORS.secondary,
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 7,
+  },
+  statusText: {
     color: COLORS.white,
-    padding: "3 8",
-    borderRadius: 3,
-    fontSize: 7,
+    fontSize: 5.5,
     fontWeight: "bold",
   },
-  body: {
-    padding: "10 10",
+  frontBody: {
+    paddingHorizontal: SAFE_MARGIN,
+    paddingTop: 6,
+    paddingBottom: 4,
     flexDirection: "row",
     gap: 10,
   },
-  photoContainer: {
-    width: 70,
-    height: 90,
-    backgroundColor: COLORS.gray[100],
-    borderRadius: 4,
-    overflow: "hidden",
-    border: `1 solid ${COLORS.gray[200]}`,
-  },
-  photoPlaceholder: {
-    flex: 1,
+  photoBox: {
+    width: 50,
+    height: 67,
+    backgroundColor: COLORS.lightBlue,
+    border: "1.5 solid " + COLORS.primary,
+    borderRadius: 3,
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 7,
-    color: COLORS.gray[400],
   },
-  photo: {
-    width: 70,
-    height: 90,
+  photoText: {
+    fontSize: 4.5,
+    color: COLORS.gray,
+    textAlign: "center",
+    paddingHorizontal: 2,
   },
-  infoContainer: {
+  infoSection: {
     flex: 1,
     justifyContent: "space-between",
   },
   infoRow: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
-  label: {
-    fontSize: 6,
-    color: COLORS.gray[500],
+  infoLabel: {
+    fontSize: 4,
+    color: COLORS.gray,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
     marginBottom: 1,
+    letterSpacing: 0.3,
   },
-  value: {
-    fontSize: 9,
-    color: COLORS.gray[800],
+  infoValue: {
+    fontSize: 6.5,
+    color: COLORS.darkGray,
     fontWeight: "bold",
   },
-  valueLarge: {
-    fontSize: 11,
+  infoValueLarge: {
+    fontSize: 9,
     color: COLORS.primary,
     fontWeight: "bold",
   },
-  footer: {
+  frontFooter: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    padding: "8 10",
-    borderTop: `1 solid ${COLORS.gray[200]}`,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingHorizontal: SAFE_MARGIN,
+    paddingBottom: SAFE_MARGIN,
+    borderTop: "0.5 solid #E5E7EB",
   },
-  folioContainer: {
+  folioBox: {
     flex: 1,
+    paddingRight: 4,
   },
-  qrContainer: {
-    width: 60,
-    height: 60,
+  folioLabel: {
+    fontSize: 4,
+    color: COLORS.gray,
+    textTransform: "uppercase",
+    marginBottom: 1,
+  },
+  folioValue: {
+    fontSize: 5.5,
+    color: COLORS.primary,
+    fontWeight: "bold",
+    fontFamily: "Courier",
+  },
+  qrBox: {
+    width: 42,
+    height: 42,
     backgroundColor: COLORS.white,
+    border: "0.5 solid #E5E7EB",
     padding: 2,
-    borderRadius: 3,
-    border: `1 solid ${COLORS.gray[200]}`,
+    borderRadius: 2,
   },
   qrImage: {
-    width: 56,
-    height: 56,
+    width: 38,
+    height: 38,
   },
-  footerText: {
-    fontSize: 5,
-    color: COLORS.gray[500],
-    marginTop: 2,
-  },
-  // REVERSO
-  reverso: {
-    width: 252,
-    height: 396,
-    padding: 0,
-    position: "relative",
-    overflow: "hidden",
-    backgroundColor: COLORS.white,
-  },
-  emergencyHeader: {
+  // ===== REVERSO =====
+  backHeader: {
     backgroundColor: COLORS.emergency,
-    padding: "10 10",
+    height: 22,
     alignItems: "center",
     justifyContent: "center",
   },
-  emergencyTitle: {
+  backHeaderText: {
     color: COLORS.white,
-    fontSize: 12,
+    fontSize: 7.5,
     fontWeight: "bold",
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
-  emergencyBody: {
-    padding: "10 10",
+  backContent: {
+    paddingHorizontal: SAFE_MARGIN,
+    paddingTop: 5,
+    paddingBottom: SAFE_MARGIN,
     flex: 1,
   },
-  bloodTypeContainer: {
-    backgroundColor: COLORS.emergencyLight,
-    border: `1 solid ${COLORS.emergency}`,
-    borderRadius: 4,
-    padding: 8,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  bloodTypeLabel: {
-    fontSize: 6,
-    color: COLORS.emergency,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  bloodTypeValue: {
-    fontSize: 20,
-    color: COLORS.emergency,
+  sectionTitle: {
+    fontSize: 5,
+    color: COLORS.primary,
     fontWeight: "bold",
-    marginTop: 2,
+    textTransform: "uppercase",
+    borderBottom: "0.5 solid #E5E7EB",
+    paddingBottom: 2,
+    marginBottom: 4,
   },
-  emergencySection: {
-    marginBottom: 10,
+  emergencyGrid: {
+    flexDirection: "row",
+    gap: 4,
+    marginBottom: 4,
+  },
+  emergencyCard: {
+    flex: 1,
+    backgroundColor: COLORS.lightBlue,
+    padding: 3,
+    borderRadius: 2,
+    borderLeft: "1.5 solid " + COLORS.primary,
   },
   emergencyLabel: {
-    fontSize: 6,
-    color: COLORS.gray[500],
+    fontSize: 3.5,
+    color: COLORS.gray,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 2,
+    marginBottom: 1,
   },
   emergencyValue: {
-    fontSize: 9,
-    color: COLORS.gray[800],
+    fontSize: 5.5,
+    color: COLORS.darkGray,
     fontWeight: "bold",
   },
-  emergencyValueNormal: {
-    fontSize: 8,
-    color: COLORS.gray[700],
-  },
-  emergencyPhone: {
-    fontSize: 10,
+  bloodType: {
     color: COLORS.emergency,
+    fontSize: 7,
+  },
+  contactBox: {
+    backgroundColor: COLORS.lightBlue,
+    padding: 4,
+    borderRadius: 2,
+    border: "0.5 solid #E5E7EB",
+    marginBottom: 4,
+  },
+  contactRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 2,
+    fontSize: 4.5,
+  },
+  contactKey: {
+    color: COLORS.gray,
     fontWeight: "bold",
-    marginTop: 2,
   },
-  disclaimer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: "6 10",
-    borderTop: `1 solid ${COLORS.gray[200]}`,
-    backgroundColor: COLORS.gray[50],
+  contactValue: {
+    color: COLORS.darkGray,
+    fontWeight: "bold",
   },
-  disclaimerText: {
-    fontSize: 5,
-    color: COLORS.gray[500],
+  legalText: {
+    fontSize: 3.5,
+    color: COLORS.gray,
     textAlign: "center",
     lineHeight: 1.3,
+    marginTop: "auto",
+    paddingTop: 3,
+    borderTop: "0.5 solid #D1D5DB",
+  },
+  websiteText: {
+    fontSize: 4,
+    color: COLORS.primary,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 1.5,
+  },
+  noDataText: {
+    fontSize: 5,
+    color: COLORS.gray,
+    textAlign: "center",
+    marginTop: 20,
   },
 });
 
@@ -251,14 +248,15 @@ interface CredencialPDFProps {
   instituto: string;
   anioAprobacion: number;
   folio: string;
+  logoUrl: string;
   fotografiaUrl?: string;
   datosEmergencia?: {
     tipoSanguineo: string;
     alergiasCondiciones: string;
     nombreContacto: string;
     parentesco: string;
-    telefonoContacto: string;
-  };
+    telefono: string;
+  } | null;
 }
 
 export const CredencialPDF = ({
@@ -267,158 +265,125 @@ export const CredencialPDF = ({
   instituto,
   anioAprobacion,
   folio,
+  logoUrl,
   fotografiaUrl,
   datosEmergencia,
 }: CredencialPDFProps) => {
-  // Generar QR como base64
-  const qrCodeDataUrl = QRCode.toDataURL(
-    `https://reptecnm.org.mx/verificar/${folio}`,
-    {
-      width: 200,
-      margin: 1,
-      color: {
-        dark: "#000000",
-        light: "#FFFFFF",
-      },
-    }
-  );
+  const qrUrl = `https://reptecnm.org.mx/verificar/${folio}`;
+  const qrImageSrc = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrUrl)}`;
 
   return (
     <Document>
-      {/* FRENTE */}
-      <Page size={[252, 396]} style={styles.page}>
-        <View style={styles.frente}>
-          {/* Header */}
-          <View style={styles.header}>
-            <View style={styles.headerLogo}>
-              <View style={styles.logoCircle}>
-                <Text style={styles.logoText}>R</Text>
-              </View>
-              <View>
-                <Text style={styles.headerTitle}>REP-TecNM</Text>
-                <Text style={styles.headerSubtitle}>Red de Egresados de Posgrado</Text>
-              </View>
-            </View>
-            <Text style={styles.statusBadge}>ACTIVO</Text>
+      {/* FRENTE - Tarjeta horizontal ID-1 */}
+      <Page size={[CARD_WIDTH, CARD_HEIGHT]} style={styles.page} wrap={false}>
+        {/* Header con degradado azul institucional */}
+        <View style={styles.frontHeader}>
+          <View>
+            <Text style={styles.headerText}>REP-TecNM</Text>
+            <Text style={styles.headerSubtext}>Red de Egresados de Posgrado</Text>
+          </View>
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>ACTIVO</Text>
+          </View>
+        </View>
+
+        {/* Cuerpo: Foto + Información */}
+        <View style={styles.frontBody}>
+          <View style={styles.photoBox}>
+            {fotografiaUrl ? (
+              <Image src={fotografiaUrl} style={{ width: 50, height: 67 }} />
+            ) : (
+              <Text style={styles.photoText}>Sin{"\n"}foto</Text>
+            )}
           </View>
 
-          {/* Body */}
-          <View style={styles.body}>
-            {/* Foto */}
-            <View style={styles.photoContainer}>
-              {fotografiaUrl ? (
-                <Image src={fotografiaUrl} style={styles.photo} />
-              ) : (
-                <View style={styles.photoPlaceholder}>
-                  <Text>Sin fotografía</Text>
-                </View>
-              )}
-            </View>
-
-            {/* Información */}
-            <View style={styles.infoContainer}>
-              <View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Número de Afiliado</Text>
-                  <Text style={styles.valueLarge}>{numeroAfiliado}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Nombre Completo</Text>
-                  <Text style={styles.value}>{nombreCompleto}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Instituto de Procedencia</Text>
-                  <Text style={styles.value}>{instituto}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                  <Text style={styles.label}>Año de Aprobación</Text>
-                  <Text style={styles.value}>{anioAprobacion}</Text>
-                </View>
+          <View style={styles.infoSection}>
+            <View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>NÚMERO DE AFILIADO</Text>
+                <Text style={styles.infoValueLarge}>{numeroAfiliado}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>NOMBRE COMPLETO</Text>
+                <Text style={styles.infoValue}>{nombreCompleto}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>INSTITUTO</Text>
+                <Text style={styles.infoValue}>{instituto}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>AÑO</Text>
+                <Text style={styles.infoValue}>{anioAprobacion}</Text>
               </View>
             </View>
           </View>
+        </View>
 
-          {/* Footer con QR y Folio */}
-          <View style={styles.footer}>
-            <View style={styles.folioContainer}>
-              <Text style={styles.label}>Folio de Verificación</Text>
-              <Text style={styles.value}>{folio}</Text>
-              <Text style={styles.footerText}>
-                Escanea el QR para verificar
-              </Text>
-            </View>
-            <View style={styles.qrContainer}>
-              <Image src={qrCodeDataUrl} style={styles.qrImage} />
-            </View>
+        {/* Footer: Folio + QR */}
+        <View style={styles.frontFooter}>
+          <View style={styles.folioBox}>
+            <Text style={styles.folioLabel}>FOLIO DE VERIFICACIÓN</Text>
+            <Text style={styles.folioValue}>{folio}</Text>
+          </View>
+          <View style={styles.qrBox}>
+            <Image src={qrImageSrc} style={styles.qrImage} />
           </View>
         </View>
       </Page>
 
-      {/* REVERSO */}
-      <Page size={[252, 396]} style={styles.page}>
-        <View style={styles.reverso}>
-          {/* Header de Emergencia */}
-          <View style={styles.emergencyHeader}>
-            <Text style={styles.emergencyTitle}>⚠ EN CASO DE EMERGENCIA</Text>
-          </View>
+      {/* REVERSO - Tarjeta horizontal ID-1 */}
+      <Page size={[CARD_WIDTH, CARD_HEIGHT]} style={styles.page} wrap={false}>
+        {/* Header rojo de emergencia */}
+        <View style={styles.backHeader}>
+          <Text style={styles.backHeaderText}>EN CASO DE EMERGENCIA</Text>
+        </View>
 
-          {/* Contenido de Emergencia */}
-          <View style={styles.emergencyBody}>
-            {datosEmergencia ? (
-              <>
-                {/* Tipo Sanguíneo */}
-                <View style={styles.bloodTypeContainer}>
-                  <Text style={styles.bloodTypeLabel}>Tipo Sanguíneo</Text>
-                  <Text style={styles.bloodTypeValue}>
+        <View style={styles.backContent}>
+          {datosEmergencia ? (
+            <>
+              <Text style={styles.sectionTitle}>Información Médica</Text>
+              <View style={styles.emergencyGrid}>
+                <View style={styles.emergencyCard}>
+                  <Text style={styles.emergencyLabel}>Tipo Sanguíneo</Text>
+                  <Text style={[styles.emergencyValue, styles.bloodType]}>
                     {datosEmergencia.tipoSanguineo}
                   </Text>
                 </View>
-
-                {/* Alergias */}
-                {datosEmergencia.alergiasCondiciones && (
-                  <View style={styles.emergencySection}>
-                    <Text style={styles.emergencyLabel}>
-                      Alergias / Condiciones Médicas
-                    </Text>
-                    <Text style={styles.emergencyValueNormal}>
-                      {datosEmergencia.alergiasCondiciones}
-                    </Text>
-                  </View>
-                )}
-
-                {/* Contacto de Emergencia */}
-                <View style={styles.emergencySection}>
-                  <Text style={styles.emergencyLabel}>Contacto de Emergencia</Text>
+                <View style={styles.emergencyCard}>
+                  <Text style={styles.emergencyLabel}>Alergias</Text>
                   <Text style={styles.emergencyValue}>
-                    {datosEmergencia.nombreContacto}
-                  </Text>
-                  <Text style={styles.emergencyValueNormal}>
-                    {datosEmergencia.parentesco}
-                  </Text>
-                  <Text style={styles.emergencyPhone}>
-                     {datosEmergencia.telefonoContacto}
+                    {datosEmergencia.alergiasCondiciones || "Ninguna"}
                   </Text>
                 </View>
-              </>
-            ) : (
-              <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                <Text style={{ fontSize: 8, color: COLORS.gray[400], textAlign: "center" }}>
-                  El afiliado no ha configurado{"\n"}datos de emergencia
-                </Text>
               </View>
-            )}
-          </View>
 
-          {/* Disclaimer */}
-          <View style={styles.disclaimer}>
-            <Text style={styles.disclaimerText}>
-              Esta credencial es propiedad de REP-TecNM. Si la encuentra, por favor
-              devuélvala al afiliado o contacte a la asociación. Los datos de emergencia
-              son confidenciales y solo deben usarse en situaciones de urgencia médica.
+              <Text style={styles.sectionTitle}>Contacto de Emergencia</Text>
+              <View style={styles.contactBox}>
+                <View style={styles.contactRow}>
+                  <Text style={styles.contactKey}>Nombre:</Text>
+                  <Text style={styles.contactValue}>{datosEmergencia.nombreContacto}</Text>
+                </View>
+                <View style={styles.contactRow}>
+                  <Text style={styles.contactKey}>Parentesco:</Text>
+                  <Text style={styles.contactValue}>{datosEmergencia.parentesco}</Text>
+                </View>
+                <View style={styles.contactRow}>
+                  <Text style={styles.contactKey}>Teléfono:</Text>
+                  <Text style={styles.contactValue}>{datosEmergencia.telefono}</Text>
+                </View>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.noDataText}>
+              El afiliado no ha configurado{"\n"}datos de emergencia
             </Text>
-            <Text style={[styles.disclaimerText, { marginTop: 2 }]}>
-              Folio: {folio} • reptecnm.org.mx
+          )}
+
+          <View style={styles.legalText}>
+            <Text>
+              Esta credencial es propiedad de REP-TecNM. Datos confidenciales para uso en emergencias.
             </Text>
+            <Text style={styles.websiteText}>www.reptecnm.org.mx</Text>
           </View>
         </View>
       </Page>
