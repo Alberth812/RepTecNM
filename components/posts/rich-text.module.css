@@ -1,43 +1,287 @@
-@reference "../../app/globals.css";
-
-/* Caso más común: Payload renderiza un <input type="checkbox" disabled> real. */
-.richText :global(li) input[type="checkbox"] {
-  @apply mr-2 h-[1.05rem] w-[1.05rem] rounded-[0.3rem] border-border align-middle accent-primary;
+.richText {
+  color: var(--foreground);
+  font-size: 1.0625rem;
+  line-height: 1.85;
 }
 
-/* Alternativa: el <li> lleva role="checkbox" / aria-checked en vez de un <input>. */
-.richText :global(li[role="checkbox"]) {
-  @apply relative cursor-default;
-  list-style: none;
-  padding-left: 1.6rem;
+/* -------------------------------------------------------------------------- */
+/* Paragraphs                                                                 */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(p) {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.richText :global(li[role="checkbox"])::before {
-  @apply absolute rounded-[0.3rem] border-[1.5px] border-border bg-background transition-colors;
-  content: "";
-  left: 0;
-  top: 0.35em;
-  width: 1.05rem;
-  height: 1.05rem;
+.richText :global(p:first-child) {
+  margin-top: 0;
 }
 
-.richText :global(li[aria-checked="true"])::before {
-  @apply border-primary bg-primary;
+/* -------------------------------------------------------------------------- */
+/* Headings                                                                   */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(h1),
+.richText :global(h2),
+.richText :global(h3),
+.richText :global(h4),
+.richText :global(h5),
+.richText :global(h6) {
+  color: var(--foreground);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  scroll-margin-top: 6rem;
 }
 
-.richText :global(li[aria-checked="true"])::after {
-  @apply absolute border-primary-foreground;
-  content: "";
-  left: 0.34rem;
-  top: 0.52em;
-  width: 0.3rem;
-  height: 0.55rem;
-  border-right-width: 2px;
-  border-bottom-width: 2px;
-  border-style: solid;
-  transform: rotate(45deg);
+.richText :global(h1) {
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  line-height: 1.15;
 }
 
-.richText :global(li[aria-checked="true"]) {
-  @apply text-muted-foreground line-through decoration-border decoration-[1.5px];
+.richText :global(h2) {
+  margin-top: 4rem;
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.625rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.richText :global(h3) {
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  font-size: 1.375rem;
+  line-height: 1.3;
+}
+
+.richText :global(h4) {
+  margin-top: 2.5rem;
+  margin-bottom: 0.875rem;
+  font-size: 1.125rem;
+  line-height: 1.4;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Inline formatting                                                          */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(strong) {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.richText :global(em) {
+  font-style: italic;
+}
+
+.richText :global(u) {
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.richText :global(s) {
+  color: color-mix(
+    in oklab,
+    var(--foreground) 55%,
+    transparent
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Links                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(a) {
+  color: var(--foreground);
+  font-weight: 550;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--primary) 45%,
+    transparent
+  );
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  transition:
+    color 150ms ease,
+    text-decoration-color 150ms ease;
+}
+
+.richText :global(a:hover) {
+  text-decoration-color: var(--primary);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Lists                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(ul),
+.richText :global(ol) {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.richText :global(ul) {
+  list-style-type: disc;
+}
+
+.richText :global(ol) {
+  list-style-type: decimal;
+}
+
+.richText :global(li) {
+  margin-top: 0.5rem;
+  padding-left: 0.25rem;
+}
+
+.richText :global(li::marker) {
+  color: var(--muted-foreground);
+}
+
+/* Nested lists */
+
+.richText :global(li > ul),
+.richText :global(li > ol) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Blockquote                                                                 */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(blockquote) {
+  margin: 2.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 0.75rem 0.75rem 0;
+  background: color-mix(
+    in oklab,
+    var(--muted) 65%,
+    transparent
+  );
+  color: color-mix(
+    in oklab,
+    var(--foreground) 88%,
+    transparent
+  );
+  font-size: 1.08em;
+  font-style: italic;
+}
+
+.richText :global(blockquote p) {
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Inline code                                                                */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(:not(pre) > code) {
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--muted);
+  padding: 0.15em 0.4em;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    "Courier New",
+    monospace;
+  font-size: 0.88em;
+  font-weight: 500;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Code blocks                                                                */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(pre) {
+  margin: 2rem 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--muted);
+  padding: 1.25rem 1.35rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.richText :global(pre code) {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+  font-weight: 400;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Horizontal rule                                                            */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(hr) {
+  margin: 4rem auto;
+  width: 5rem;
+  border: 0;
+  border-top: 2px solid var(--border);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Images                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.mediaFigure {
+  margin: 3rem 0;
+}
+
+.mediaFrame {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--muted);
+}
+
+.mediaImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tables                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(table) {
+  width: 100%;
+  margin: 2rem 0;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.richText :global(th),
+.richText :global(td) {
+  border: 1px solid var(--border);
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+}
+
+.richText :global(th) {
+  background: var(--muted);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Selection / readability                                                    */
+/* -------------------------------------------------------------------------- */
+
+.richText :global(::selection) {
+  background: color-mix(
+    in oklab,
+    var(--primary) 20%,
+    transparent
+  );
 }

@@ -29,7 +29,6 @@
     "@payloadcms/richtext-lexical": "^3.88.0",
     "@payloadcms/storage-s3": "^3.88.0",
     "@payloadcms/translations": "^3.88.0",
-    "@tailwindcss/typography": "^0.5.20",
     "@tanstack/react-query": "^5.101.4",
     "@types/pg": "^8.23.1",
     "@wrksz/themes": "^1.2.0",
@@ -64,6 +63,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.24",
     "@types/react": "^19",
