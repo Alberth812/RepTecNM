@@ -20,15 +20,25 @@ export type NavGroup = {
  * Para agregar/quitar/mover un link, solo edita este arreglo: BarraAfiliado.tsx
  * no necesita tocarse.
  */
+
+//
 export const NAV_GROUPS: NavGroup[] = [
   {
-    items: [{ label: "Inicio", href: "/afiliado/inicio", icon: Home }],
+    items: [
+      { label: "Inicio", href: "/afiliado/inicio", icon: Home },
+      { label: "Seguimiento", href: "/afiliado/seguimiento", icon: Home },
+    ],
   },
   {
     items: [
       {
-        label: "Seguimiento",
-        href: "/afiliado/seguimiento",
+        label: "Mis publicaciones",
+        href: "/afiliado/publicaciones",
+        icon: FileText,
+      },
+      {
+        label: "Repositorio",
+        href: "/publicaciones",
         icon: FileText,
       },
     ],

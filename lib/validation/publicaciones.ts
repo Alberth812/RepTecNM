@@ -462,7 +462,7 @@ export const publicacionIdParamSchema = z.object({
 export type PublicacionIdParam = z.infer<typeof publicacionIdParamSchema>;
 
 // --------------------------------------------------------------------------
-// 5.4 GET /api/afiliado/publicaciones (Consulta "Mis publicaciones") (RF-DOC-008)
+// 5.4 GET /api/afiliados/publicaciones (Consulta "Mis publicaciones") (RF-DOC-008)
 // --------------------------------------------------------------------------
 
 export const misPublicacionesQuerySchema = z.object({
@@ -579,7 +579,7 @@ export type PublicacionListItemResponse = z.infer<
   typeof publicacionListItemResponseSchema
 >;
 
-/** Respuesta paginada para GET /api/afiliado/publicaciones */
+/** Respuesta paginada para GET /api/afiliados/publicaciones */
 export const misPublicacionesPaginatedResponseSchema = z.object({
   items: z.array(publicacionListItemResponseSchema),
   page: z.number().int().min(1),

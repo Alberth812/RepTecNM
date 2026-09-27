@@ -1,4 +1,4 @@
-// app/api/afiliado/publicaciones/route.ts
+// app/api/afiliados/publicaciones/route.ts
 import type { NextRequest } from "next/server";
 
 import { handleRouteError, jsonResponse } from "@/lib/api/http";
@@ -67,7 +67,7 @@ function parseQuery(searchParams: URLSearchParams): MisPublicacionesQuery {
 }
 
 /**
- * GET /api/afiliado/publicaciones?q=&page=&pageSize=
+ * GET /api/afiliados/publicaciones?q=&page=&pageSize=
  *
  * Solo AFILIADO. El propietario se obtiene de la sesión del servidor; el
  * endpoint no acepta ni interpreta ningún identificador de propietario.
@@ -87,6 +87,6 @@ export async function GET(request: NextRequest) {
 
     return jsonResponse(resultado);
   } catch (error) {
-    return handleRouteError(error, "GET /api/afiliado/publicaciones");
+    return handleRouteError(error, "GET /api/afiliados/publicaciones");
   }
 }

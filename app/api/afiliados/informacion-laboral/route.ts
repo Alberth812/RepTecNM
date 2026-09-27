@@ -1,7 +1,7 @@
 // @/app/api/informacion-laboral/route.ts
 //
 // Ajusta la ruta del archivo a tu convención si ya tienes, p. ej.,
-// app/api/afiliado/informacion-laboral/route.ts.
+// app/api/afiliados/informacion-laboral/route.ts.
 //
 // GET  -> devuelve la Sección 3 del afiliado autenticado (o `null` /
 //         arreglo vacío si aún no la ha llenado). Pensado para alimentar

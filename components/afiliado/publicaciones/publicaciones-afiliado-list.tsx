@@ -114,7 +114,7 @@ export function PublicacionesAfiliadoList() {
           />
 
           <Link
-            href="/publicaciones/nueva/"
+            href="/afiliado/publicaciones/nueva/"
             className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" />
@@ -140,15 +140,17 @@ export function PublicacionesAfiliadoList() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
-        <PublicacionesSearchBar
-          valorActual={busquedaActiva}
-          onBuscar={handleBuscar}
-          onLimpiar={handleLimpiar}
-          deshabilitado={isFetching}
-        />
+        <div className="flex-1">
+          <PublicacionesSearchBar
+            valorActual={busquedaActiva}
+            onBuscar={handleBuscar}
+            onLimpiar={handleLimpiar}
+            deshabilitado={isFetching}
+          />
+        </div>
 
         <Link
-          href="/publicaciones/nueva/"
+          href="/afiliado/publicaciones/nueva/"
           className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />

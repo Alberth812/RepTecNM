@@ -3,7 +3,6 @@ import { Search } from "lucide-react";
 import Link from "next/link";
 
 import { BarraSesionInicio } from "@/components/auth/barra-session-inicio";
-import { MenuMovilMiembro } from "@/components/public/menu-movil-miembro";
 import HomePage from "@/components/home/home-page";
 
 export default function PublicLayout({

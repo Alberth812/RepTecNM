@@ -127,6 +127,7 @@ export function PublicacionCard({
         <Button
           variant="outline"
           size="sm"
+          nativeButton={false}
           render={
             <Link href={`/afiliado/publicaciones/${publicacion.id}/editar`} />
           }

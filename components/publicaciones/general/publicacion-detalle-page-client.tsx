@@ -40,6 +40,7 @@ export function PublicacionDetallePageClient({
         variant="ghost"
         size="sm"
         className="w-fit"
+        nativeButton={false}
         render={<Link href="/publicaciones" />}
       >
         <ArrowLeftIcon className="size-4" aria-hidden="true" />

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { formatBytes } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
+//
+//
 export interface PdfFileFieldProps {
   id?: string;
   /** El archivo actual, o `null`/`undefined` si no hay ninguno seleccionado. */
@@ -119,6 +121,7 @@ export function PdfFileField({
                 type="button"
                 variant="ghost"
                 size="sm"
+                nativeButton={false}
                 render={
                   <a
                     href={previewUrl}

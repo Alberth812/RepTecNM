@@ -342,7 +342,7 @@ export async function generarUrlDocumento(
 }
 
 /* ==========================================================================
-   GET /api/afiliado/publicaciones
+   GET /api/afiliados/publicaciones
    ========================================================================== */
 
 /** Colapsa espacios internos; una cadena vacía equivale a "sin búsqueda". */

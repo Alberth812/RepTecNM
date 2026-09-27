@@ -112,6 +112,7 @@ export function PublicacionMetadataFields<
                   <Select
                     value={field.value as string}
                     onValueChange={field.onChange}
+                    items={TIPO_PUBLICACION_OPTIONS}
                   >
                     <SelectTrigger
                       id={field.name}

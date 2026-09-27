@@ -1,4 +1,4 @@
-// app/api/afiliado/evaluacion-programa-estudios/route.ts
+// app/api/afiliados/evaluacion-programa-estudios/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 

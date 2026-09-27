@@ -10,7 +10,7 @@ export interface ListarMisPublicacionesParams {
 }
 
 /**
- * GET /api/afiliado/publicaciones
+ * GET /api/afiliados/publicaciones
  *
  * NOTA: se asume que `jsonResponse()` en el backend devuelve el objeto de
  * resultado directamente como cuerpo JSON (sin envolver en `{ data: ... }`).
@@ -30,7 +30,7 @@ export async function fetchMisPublicaciones(
   }
 
   const response = await fetch(
-    `/api/afiliado/publicaciones?${searchParams.toString()}`,
+    `/api/afiliados/publicaciones?${searchParams.toString()}`,
     {
       method: "GET",
       signal,

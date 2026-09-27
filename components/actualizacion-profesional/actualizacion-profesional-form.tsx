@@ -38,7 +38,7 @@ import {
   actualizacionProfesionalSchema,
 } from "@/lib/validation/actualizacion-profesional/actualizacion-profesional";
 
-const API_URL = "/api/afiliado/actualizacion-profesional";
+const API_URL = "/api/afiliados/actualizacion-profesional";
 
 type Respuesta = { data: Valores | null; updatedAt: string | null };
 type Aviso = { tipo: "ok" | "error"; texto: string };

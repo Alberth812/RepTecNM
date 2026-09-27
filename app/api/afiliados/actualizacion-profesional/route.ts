@@ -1,4 +1,4 @@
-// app/api/afiliado/actualizacion-profesional/route.ts
+// app/api/afiliados/actualizacion-profesional/route.ts
 // Sección 6 · ACTUALIZACIÓN PROFESIONAL
 //   GET → devuelve la respuesta vigente del afiliado (o null si aún no hay)
 //   PUT → registra la respuesta; reemplaza por completo a la anterior (upsert)

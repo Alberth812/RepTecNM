@@ -362,7 +362,7 @@ export function EvaluacionProgramaEstudiosForm({
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     try {
-      const res = await fetch("/api/afiliado/evaluacion-programa-estudios", {
+      const res = await fetch("/api/afiliados/evaluacion-programa-estudios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),

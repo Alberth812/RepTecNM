@@ -3,7 +3,7 @@ import { ChevronRight, UserRound } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-//
+// MiCuenta
 export default function MiCuenta() {
   return (
     <Card className="w-full">
