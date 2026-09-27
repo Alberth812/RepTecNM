@@ -15,6 +15,7 @@ export const administradores = pgTable("administradores", {
   nombreCompleto: text("nombre_completo").notNull(),
 
   subtype: adminSubtypeEnum("subtype").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
 
   // RF-AUTH-013: solo puede ser true para el administrador raíz creado por
   // el seed inicial. Nunca se expone como campo asignable en la API.
