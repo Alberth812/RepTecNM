@@ -12,15 +12,43 @@ export type NavGroup = {
   items: NavItem[];
 };
 
+/**
+ * Fuente única de verdad para los links del sidebar.
+ * Cada grupo tiene un título opcional (si no lo lleva, no se renderiza nada
+ * arriba de sus items, como en el grupo de "Inicio").
+ *
+ * Para agregar/quitar/mover un link, solo edita este arreglo: BarraAfiliado.tsx
+ * no necesita tocarse.
+ */
+
+//
+
 export const NAV_GROUPS: NavGroup[] = [
   {
-    items: [{ label: "Inicio", href: "/afiliado/inicio", icon: Home }],
+    items: [
+      { label: "Inicio", href: "/afiliado/inicio", icon: Home },
+      { label: "Seguimiento", href: "/afiliado/seguimiento", icon: Home },
+    ],
   },
   {
     title: "Mi Perfil",
     items: [
       { label: "Seguimiento", href: "/afiliado/seguimiento", icon: FileText },
       { label: "Credencial Digital", href: "/afiliado/credencial", icon: CreditCard },
+      {
+        label: "Mis publicaciones",
+        href: "/afiliado/publicaciones",
+        icon: FileText,
+      },
+      {
+        label: "Repositorio",
+        href: "/repositorio",
+        icon: BookOpen,
+      },
+        href: "/publicaciones",
+        icon: FileText,
+      },
+
     ],
   },
   {
@@ -38,6 +66,6 @@ export const NAV_GROUPS: NavGroup[] = [
 
 export const ACCOUNT_ITEM: NavItem = {
   label: "Cuenta",
-  href: "/account",
+  href: "/afiliado/cuenta",
   icon: User,
 };

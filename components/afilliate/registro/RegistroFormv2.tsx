@@ -375,31 +375,47 @@ export default function RegistroForm({
               Anterior
             </button>
 
-            {currentStep < LAST_STEP ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68]"
-              >
-                Siguiente
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={submitStatus === "submitting" || !isValid}
-                className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {submitStatus === "submitting" && (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                )}
-                {submitStatus === "submitting"
-                  ? "Enviando…"
-                  : esCorreccion
-                    ? "Reenviar solicitud"
-                    : "Enviar registro"}
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {esCorreccion && currentStep < LAST_STEP && (
+                <button
+                  type="submit"
+                  disabled={submitStatus === "submitting" || !isValid}
+                  className="flex items-center gap-1.5 rounded-lg border border-[#004B87] px-4 py-2.5 text-sm font-medium text-[#004B87] transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitStatus === "submitting" && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  Reenviar solicitud
+                </button>
+              )}
+
+              {currentStep < LAST_STEP ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={submitStatus === "submitting"}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Siguiente
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={submitStatus === "submitting" || !isValid}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#004B87] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#003A68] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitStatus === "submitting" && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  {submitStatus === "submitting"
+                    ? "Enviando…"
+                    : esCorreccion
+                      ? "Reenviar solicitud"
+                      : "Enviar registro"}
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </FormProvider>

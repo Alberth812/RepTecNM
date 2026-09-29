@@ -14,7 +14,19 @@ export type NavGroup = {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    items: [{ label: "Inicio", href: "/admin/inicio", icon: Home }],
+    items: [
+      { label: "Inicio", href: "/admin/inicio", icon: Home },
+      {
+        label: "Solicitudes",
+        href: "/admin/solicitudes",
+        icon: FileText,
+      },
+      {
+        label: "Repositorio",
+        href: "/publicaciones",
+        icon: FileText,
+      },
+    ],
   },
   {
     title: "Gestión",
@@ -40,6 +52,6 @@ export const NAV_GROUPS: NavGroup[] = [
 
 export const ACCOUNT_ITEM: NavItem = {
   label: "Cuenta",
-  href: "/account",
+  href: "/admin/cuenta",
   icon: User,
 };

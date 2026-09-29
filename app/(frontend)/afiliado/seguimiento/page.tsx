@@ -2,12 +2,17 @@
 
 import {
   ArrowRight,
+  Award,
+  BookOpenCheck,
   BriefcaseBusiness,
   CheckCircle2,
   ClipboardList,
   GraduationCap,
+  Microscope,
 } from "lucide-react";
 import Link from "next/link";
+
+// Formularios de seguimiento
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -42,6 +47,36 @@ const formularios = [
     color: "text-emerald-600",
     iconBackground: "bg-emerald-50 dark:bg-emerald-950/40",
   },
+  {
+    title: "Información de investigación",
+    description:
+      "Actualiza la información sobre tu producción académica, tu situación ante el SNI, redes temáticas y reconocimientos.",
+    href: "/afiliado/informacion-investigacion",
+    icon: Microscope,
+    status: "Disponible",
+    color: "text-violet-600",
+    iconBackground: "bg-violet-50 dark:bg-violet-950/40",
+  },
+  {
+    title: "Evaluación del programa",
+    description:
+      "Comparte tu evaluación y experiencia sobre el programa de estudios que cursaste.",
+    href: "/afiliado/evaluacion-programa",
+    icon: BookOpenCheck,
+    status: "Disponible",
+    color: "text-amber-600",
+    iconBackground: "bg-amber-50 dark:bg-amber-950/40",
+  },
+  {
+    title: "Actualización profesional",
+    description:
+      "Actualiza información sobre tu formación profesional, actividades de actualización, experiencia laboral, emprendimiento y cargos de elección popular.",
+    href: "/afiliado/actualizacion-profesional",
+    icon: Award,
+    status: "Disponible",
+    color: "text-rose-600",
+    iconBackground: "bg-rose-50 dark:bg-rose-950/40",
+  },
 ];
 
 export default function Page() {
@@ -65,8 +100,8 @@ export default function Page() {
 
             <p className="text-base leading-7 text-muted-foreground sm:text-lg">
               Ayúdanos a mantener actualizada tu información como egresado.
-              Completa los siguientes formularios para que podamos conocer mejor
-              tu trayectoria académica y profesional.
+              Completa los siguientes formularios para mantener tu perfil
+              académico y profesional actualizado.
             </p>
           </div>
         </section>
@@ -82,15 +117,15 @@ export default function Page() {
               <div>
                 <h2 className="font-medium">Tu información es importante</h2>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Completa los formularios disponibles. Esta sección irá
-                  creciendo conforme agreguemos nuevos aspectos de tu
-                  trayectoria como egresado.
+                  Completa los formularios disponibles para mantener actualizada
+                  tu información académica, profesional y de investigación
+                  dentro de la red de egresados.
                 </p>
               </div>
             </div>
 
             <Badge variant="outline" className="w-fit shrink-0">
-              2 formularios disponibles
+              {formularios.length} formularios disponibles
             </Badge>
           </div>
         </section>
@@ -118,9 +153,12 @@ export default function Page() {
                   <CardHeader>
                     <div className="mb-3 flex items-start justify-between gap-4">
                       <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-xl ${formulario.iconBackground}`}
+                        className={cn(
+                          "flex h-12 w-12 items-center justify-center rounded-xl",
+                          formulario.iconBackground,
+                        )}
                       >
-                        <Icon className={`h-6 w-6 ${formulario.color}`} />
+                        <Icon className={cn("h-6 w-6", formulario.color)} />
                       </div>
 
                       <Badge variant="secondary" className="rounded-full">

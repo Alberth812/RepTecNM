@@ -29,8 +29,10 @@ import {
 } from "@/lib/validation/afiliados-investigacion/investigacion-options";
 import {
   afiliadoInvestigacionSchema,
+  toAfiliadoInvestigacionFormValues,
   type AfiliadoInvestigacionFormInput,
   type AfiliadoInvestigacionFormOutput,
+  type AfiliadoInvestigacionRow,
 } from "@/lib/validation/afiliados-investigacion/investigacion";
 
 const DEFAULT_VALUES: AfiliadoInvestigacionFormInput = {

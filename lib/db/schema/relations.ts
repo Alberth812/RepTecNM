@@ -16,6 +16,12 @@ import {
   afiliadosInformacionLaboral,
 } from "./informacion-laboral";
 import { afiliadosInvestigacion } from "./afiliados-investigacion";
+import { evaluacionProgramaEstudios } from "./evaluacion-programa-estudios";
+import {
+  publicacionAutores,
+  publicaciones,
+  publicacionPalabrasClave,
+} from "./publicaciones";
 
 export const relations = defineRelations(
   {
@@ -39,6 +45,11 @@ export const relations = defineRelations(
     afiliadosInformacionLaboral,
     afiliadosEmpleos,
     afiliadosInvestigacion,
+    evaluacionProgramaEstudios,
+
+    publicaciones,
+    publicacionAutores,
+    publicacionPalabrasClave,
   },
   (r) => ({
     // -------------------------------------------------------------------------
@@ -168,6 +179,11 @@ export const relations = defineRelations(
       investigacion: r.one.afiliadosInvestigacion({
         from: r.afiliados.userId,
         to: r.afiliadosInvestigacion.userId,
+      }),
+
+      evaluacionProgramaEstudios: r.one.evaluacionProgramaEstudios({
+        from: r.afiliados.userId,
+        to: r.evaluacionProgramaEstudios.userId,
       }),
     },
 
@@ -344,6 +360,69 @@ export const relations = defineRelations(
       afiliado: r.one.afiliados({
         from: r.afiliadosInvestigacion.userId,
         to: r.afiliados.userId,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // EVALUACIÓN DEL PROGRAMA DE ESTUDIOS
+    // -------------------------------------------------------------------------
+
+    evaluacionProgramaEstudios: {
+      afiliado: r.one.afiliados({
+        from: r.evaluacionProgramaEstudios.userId,
+        to: r.afiliados.userId,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // PUBLICACIONES
+    // -------------------------------------------------------------------------
+
+    publicaciones: {
+      afiliado: r.one.afiliados({
+        from: r.publicaciones.afiliadoId,
+        to: r.afiliados.userId,
+        optional: false,
+      }),
+
+      documento: r.one.archivos({
+        from: r.publicaciones.documentoArchivoId,
+        to: r.archivos.id,
+      }),
+
+      autores: r.many.publicacionAutores({
+        from: r.publicaciones.id,
+        to: r.publicacionAutores.publicacionId,
+      }),
+
+      palabrasClave: r.many.publicacionPalabrasClave({
+        from: r.publicaciones.id,
+        to: r.publicacionPalabrasClave.publicacionId,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // PUBLICACIÓN AUTORES
+    // -------------------------------------------------------------------------
+
+    publicacionAutores: {
+      publicacion: r.one.publicaciones({
+        from: r.publicacionAutores.publicacionId,
+        to: r.publicaciones.id,
+        optional: false,
+      }),
+    },
+
+    // -------------------------------------------------------------------------
+    // PUBLICACIÓN PALABRAS CLAVE
+    // -------------------------------------------------------------------------
+
+    publicacionPalabrasClave: {
+      publicacion: r.one.publicaciones({
+        from: r.publicacionPalabrasClave.publicacionId,
+        to: r.publicaciones.id,
         optional: false,
       }),
     },
