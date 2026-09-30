@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, MessageSquare, LifeBuoy, Settings, CreditCard, User } from "lucide-react";
+import { FileText, Home, MessageSquare, LifeBuoy, CreditCard, User } from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -42,12 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Avisos", href: "/admin/avisos", icon: MessageSquare },
     ],
   },
-  {
-    title: "Sistema",
-    items: [
-      { label: "Configuración", href: "/admin/configuracion", icon: Settings },
-    ],
-  },
+  // ✅ Se eliminó el grupo "Sistema" y la opción "Configuración"
 ];
 
 export const ACCOUNT_ITEM: NavItem = {

@@ -108,7 +108,7 @@ export function BarraAdmin({ children }: BarraAdminProps) {
 
       <aside className="ba-sidebar" aria-label="Navegación principal">
         <div className="ba-header">
-          {!collapsed && <span className="ba-logo">REP TecNM</span>}
+          {!collapsed && <img src="/logo.png" alt="REP-TecNM" className="h-9 w-auto object-contain" />}
           <button
             type="button"
             className="ba-toggle"

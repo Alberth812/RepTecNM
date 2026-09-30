@@ -1,286 +1,193 @@
-import { useState, useMemo } from "react";
-import { X } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { X, Send, Loader2, User, Mail, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 interface ModalEnviarMensajeProps {
-  destinatarioId: string;
-  destinatarioNombre: string;
   isOpen: boolean;
   onClose: () => void;
+  destinatarioId: string;
+  destinatarioNombre: string;
 }
 
-const MAX_PALABRAS = 600;
-const MIN_DIGITOS_TELEFONO = 10;
-const MAX_DIGITOS_TELEFONO = 12;
-
-export function ModalEnviarMensaje({
-  destinatarioId,
-  destinatarioNombre,
-  isOpen,
-  onClose,
-}: ModalEnviarMensajeProps) {
-  const [enviando, setEnviando] = useState(false);
-  const [errores, setErrores] = useState<Record<string, string>>({});
+export function ModalEnviarMensaje({ isOpen, onClose, destinatarioId, destinatarioNombre }: ModalEnviarMensajeProps) {
+  const [cargando, setCargando] = useState(false);
   const [formData, setFormData] = useState({
-    motivo: "",
-    contenido: "",
-    nombreParaRespuesta: "",
-    correoParaRespuesta: "",
-    telefonoParaRespuesta: "",
+    nombreRemitente: "",
+    correoContacto: "",
+    telefonoContacto: "",
+    motivo: "Consulta profesional",
+    mensaje: "",
   });
 
-  const conteoPalabras = useMemo(() => {
-    if (!formData.contenido.trim()) return 0;
-    return formData.contenido.trim().split(/\s+/).filter((p) => p.length > 0).length;
-  }, [formData.contenido]);
-
-  const excedePalabras = conteoPalabras > MAX_PALABRAS;
-
-  const handleTelefonoChange = (valor: string) => {
-    let limpio = valor;
-    if (limpio.startsWith("+")) {
-      const resto = limpio.slice(1).replace(/\D/g, "");
-      limpio = "+" + resto;
-    } else {
-      limpio = limpio.replace(/\D/g, "");
-    }
-
-    const digitos = limpio.replace("+", "");
-    if (digitos.length > MAX_DIGITOS_TELEFONO) {
-      limpio = (limpio.startsWith("+") ? "+" : "") + digitos.slice(0, MAX_DIGITOS_TELEFONO);
-    }
-
-    setFormData({ ...formData, telefonoParaRespuesta: limpio });
-  };
-
-  const validarFormulario = (): boolean => {
-    const nuevosErrores: Record<string, string> = {};
-
-    if (formData.motivo.trim().length < 5) {
-      nuevosErrores.motivo = "El motivo debe tener al menos 5 caracteres";
-    }
-    if (formData.motivo.length > 150) {
-      nuevosErrores.motivo = "El motivo no puede exceder 150 caracteres";
-    }
-
-    if (formData.contenido.trim().length < 10) {
-      nuevosErrores.contenido = "El mensaje debe tener al menos 10 caracteres";
-    }
-    if (excedePalabras) {
-      nuevosErrores.contenido = `El mensaje no puede exceder ${MAX_PALABRAS} palabras`;
-    }
-
-    // Nombre: OBLIGATORIO
-    if (formData.nombreParaRespuesta.trim().length < 2) {
-      nuevosErrores.nombreParaRespuesta = "El nombre es obligatorio";
-    }
-
-    // Correo: OBLIGATORIO
-    if (!formData.correoParaRespuesta.trim()) {
-      nuevosErrores.correoParaRespuesta = "El correo electrónico es obligatorio";
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.correoParaRespuesta)) {
-        nuevosErrores.correoParaRespuesta = "Correo no válido";
-      }
-    }
-
-    // Teléfono: OPCIONAL (pero si se ingresa, debe ser válido)
-    if (formData.telefonoParaRespuesta) {
-      const telRegex = /^\+?\d{10,12}$/;
-      if (!telRegex.test(formData.telefonoParaRespuesta)) {
-        nuevosErrores.telefonoParaRespuesta = `Teléfono debe tener 10-12 dígitos (ej: 5512345678 o +525512345678)`;
-      }
-    }
-
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
-  };
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrores({});
-
-    if (!validarFormulario()) return;
-
-    setEnviando(true);
+    setCargando(true);
 
     try {
-      const response = await fetch("/api/mensajes", {
+      const res = await fetch("/api/mensajes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           destinatarioId,
-          ...formData,
+          nombreRemitente: formData.nombreRemitente,
+          datosContacto: {
+            correo: formData.correoContacto,
+            telefono: formData.telefonoContacto,
+          },
+          motivo: formData.motivo,
+          cuerpo: formData.mensaje,
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Error al enviar mensaje");
+      if (!res.ok) {
+        throw new Error(data.error || "Error al enviar el mensaje");
       }
 
       toast.success("Mensaje enviado correctamente");
-      setFormData({
-        motivo: "",
-        contenido: "",
-        nombreParaRespuesta: "",
-        correoParaRespuesta: "",
-        telefonoParaRespuesta: "",
-      });
       onClose();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error al enviar mensaje");
+      setFormData({ nombreRemitente: "", correoContacto: "", telefonoContacto: "", motivo: "Consulta profesional", mensaje: "" });
+    } catch (error: any) {
+      toast.error(error.message || "No se pudo enviar el mensaje. Intenta de nuevo.");
     } finally {
-      setEnviando(false);
+      setCargando(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 sticky top-0 bg-white rounded-t-lg z-10">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Enviar mensaje</h2>
-            <p className="text-sm text-slate-600">
-              Para: <span className="font-medium">{destinatarioNombre}</span>
-            </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header con gradiente sutil */}
+        <div className="bg-gradient-to-r from-[#004B87] to-[#0066b3] px-6 py-5 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                <MessageCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold">Enviar Mensaje</h2>
+                <p className="text-sm text-white/80">Para: <span className="font-semibold text-white">{destinatarioNombre}</span></p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-            aria-label="Cerrar"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
-            <p className="font-medium mb-1">Importante:</p>
-            <p>
-              El destinatario no podrá responder desde la plataforma. Proporciona tus datos de
-              contacto para que pueda comunicarse contigo por medios externos.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="motivo">
-              Motivo del mensaje <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="motivo"
-              placeholder="Ej: Consulta sobre servicios profesionales"
-              value={formData.motivo}
-              onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
-              maxLength={150}
-            />
-            <p className="text-xs text-slate-500 text-right">{formData.motivo.length}/150</p>
-            {errores.motivo && <p className="text-sm text-red-500">{errores.motivo}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="contenido">
-              Mensaje <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="contenido"
-              placeholder="Escribe tu mensaje aquí..."
-              rows={6}
-              value={formData.contenido}
-              onChange={(e) => setFormData({ ...formData, contenido: e.target.value })}
-              className={excedePalabras ? "border-red-500" : ""}
-            />
-            <p
-              className={`text-xs text-right ${
-                excedePalabras ? "text-red-500 font-medium" : "text-slate-500"
-              }`}
-            >
-              {conteoPalabras}/{MAX_PALABRAS} palabras
-            </p>
-            {errores.contenido && <p className="text-sm text-red-500">{errores.contenido}</p>}
-          </div>
-
-          <div className="space-y-3 pt-2 border-t border-slate-200">
-            <Label className="text-sm font-semibold">
-              Tus datos de contacto <span className="text-red-500">*</span>
-            </Label>
-            <p className="text-xs text-slate-600">Nombre y correo son obligatorios</p>
-
+        {/* Formulario */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+          {/* Información del remitente */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <User className="h-4 w-4 text-[#004B87]" />
+              Tus datos de contacto
+            </div>
+            
             <div className="space-y-3">
-              <div className="space-y-1">
-                <Label htmlFor="nombre">
-                  Nombre para que te respondan <span className="text-red-500">*</span>
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="nombreRemitente" className="text-sm">Nombre completo *</Label>
                 <Input
-                  id="nombre"
-                  placeholder="Tu nombre completo"
-                  value={formData.nombreParaRespuesta}
-                  onChange={(e) =>
-                    setFormData({ ...formData, nombreParaRespuesta: e.target.value })
-                  }
+                  id="nombreRemitente"
+                  required
+                  value={formData.nombreRemitente}
+                  onChange={(e) => setFormData({ ...formData, nombreRemitente: e.target.value })}
+                  placeholder="Ej. Juan Pérez García"
+                  className="h-10"
                 />
-                {errores.nombreParaRespuesta && (
-                  <p className="text-sm text-red-500">{errores.nombreParaRespuesta}</p>
-                )}
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="correo">
-                  Correo electrónico <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="correo"
-                  type="email"
-                  placeholder="ejemplo@correo.com"
-                  value={formData.correoParaRespuesta}
-                  onChange={(e) =>
-                    setFormData({ ...formData, correoParaRespuesta: e.target.value })
-                  }
-                />
-                {errores.correoParaRespuesta && (
-                  <p className="text-sm text-red-500">{errores.correoParaRespuesta}</p>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                <Label htmlFor="telefono">Teléfono (opcional)</Label>
-                <Input
-                  id="telefono"
-                  type="tel"
-                  placeholder="5512345678 o +525512345678"
-                  value={formData.telefonoParaRespuesta}
-                  onChange={(e) => handleTelefonoChange(e.target.value)}
-                  inputMode="numeric"
-                />
-                <p className="text-xs text-slate-500">
-                  Solo números. 10-12 dígitos (con o sin +52).
-                </p>
-                {errores.telefonoParaRespuesta && (
-                  <p className="text-sm text-red-500">{errores.telefonoParaRespuesta}</p>
-                )}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="correoContacto" className="text-sm">Correo electrónico *</Label>
+                  <Input
+                    id="correoContacto"
+                    type="email"
+                    required
+                    value={formData.correoContacto}
+                    onChange={(e) => setFormData({ ...formData, correoContacto: e.target.value })}
+                    placeholder="correo@ejemplo.com"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="telefonoContacto" className="text-sm">Teléfono</Label>
+                  <Input
+                    id="telefonoContacto"
+                    type="tel"
+                    value={formData.telefonoContacto}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d+]/g, '');
+                      setFormData({ ...formData, telefonoContacto: val });
+                    }}
+                    placeholder="55 1234 5678"
+                    className="h-10"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Motivo */}
+          <div className="space-y-2">
+            <Label htmlFor="motivo" className="text-sm font-semibold text-slate-700">Motivo del mensaje *</Label>
+            <select
+              id="motivo"
+              required
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#004B87]"
+              value={formData.motivo}
+              onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
+            >
+              <option value="Consulta profesional">Consulta profesional</option>
+              <option value="Solicitud de servicios">Solicitud de servicios</option>
+              <option value="Oferta de empleo">Oferta de empleo</option>
+              <option value="Colaboración académica">Colaboración académica</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          {/* Mensaje */}
+          <div className="space-y-2">
+            <Label htmlFor="mensaje" className="text-sm font-semibold text-slate-700">Mensaje *</Label>
+            <Textarea
+              id="mensaje"
+              required
+              rows={5}
+              value={formData.mensaje}
+              onChange={(e) => setFormData({ ...formData, mensaje: e.target.value })}
+              placeholder="Describe brevemente el motivo de tu contacto..."
+              className="resize-none"
+            />
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Mail className="h-3 w-3" />
+              El destinatario usará tus datos de contacto para responderte
+            </div>
+          </div>
+
+          {/* Botones */}
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <Button type="button" variant="outline" onClick={onClose} disabled={enviando}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={cargando} className="h-10 px-6">
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={enviando || excedePalabras}
-              className="bg-[#004B87] hover:bg-[#003a68]"
-            >
-              {enviando ? "Enviando..." : "Enviar mensaje"}
+            <Button type="submit" className="h-10 px-6 bg-[#004B87] hover:bg-[#003a6b]" disabled={cargando}>
+              {cargando ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enviando...</>
+              ) : (
+                <><Send className="mr-2 h-4 w-4" /> Enviar Mensaje</>
+              )}
             </Button>
           </div>
         </form>

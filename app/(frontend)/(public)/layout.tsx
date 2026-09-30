@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BarraSesion } from "@/components/public/barra-sesion";
 import { LogoResponsivo } from "@/components/public/logo-responsivo";
 import { MenuMovilMiembro } from "@/components/public/menu-movil-miembro";
+import { MenuMovilPublico } from "@/components/public/menu-movil-publico";
 import { GuardiaPublica } from "@/components/public/guardia-publica";
 import { SoloNoAdmin } from "@/components/public/solo-no-admin";
 import { SoloVisitante } from "@/components/public/solo-visitante";
@@ -69,18 +70,22 @@ export default function PublicLayout({
 
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
           <div className="flex h-16 w-full items-center justify-between px-4 lg:px-8">
-            <Link href="/" className="flex items-center gap-2 text-primary">
-              <img
-                src="/logo.png"
-                alt="REP-TecNM"
-                className="h-9 w-9 rounded-lg object-cover object-[center_15%] ring-1 ring-border"
-              />
-              <span className="text-xl font-bold tracking-tight">
-                REP-<span className="font-light">TecNM</span>
-              </span>
-            </Link>
+            <Link href="/" className="flex items-center">
+            {/* 
+              CAMBIO: Logo profesional REP-TecNM
+              - Imagen sin fondo (PNG transparente)
+              - Sin marco ni bordes para preservar el diseño
+              - Sin texto duplicado (la imagen ya incluye el texto)
+              - Altura 32px (h-8) para proporción correcta en header
+            */}
+            <img
+              src="/logo.png"
+              alt="REP-TecNM - Red de Egresados de Posgrado del Tecnológico Nacional de México"
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
 
-                        <nav className="flex flex-wrap items-center gap-5 text-sm font-medium text-zinc-700 bg-red-200 p-2 rounded">
+                        <nav className="hidden lg:flex flex-wrap items-center gap-5 text-sm font-medium text-zinc-700">
                             <Link href="/" className="hover:text-primary">
                               Inicio
                             </Link>
@@ -102,6 +107,7 @@ export default function PublicLayout({
                           </nav>
 
             <div className="flex items-center gap-2">
+              <MenuMovilPublico />
               <MenuMovilMiembro />
               <Link href="/catalogo" aria-label="Buscar en el catálogo">
                 <Button variant="ghost" size="icon">

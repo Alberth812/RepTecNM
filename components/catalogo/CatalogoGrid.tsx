@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { MapPin, Briefcase, MessageSquare, Eye, User } from "lucide-react";
+import { useState } from "react";
+import { MapPin, Briefcase, MessageSquare, User, GraduationCap, Mail, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ModalEnviarMensaje } from "@/components/mensajes/ModalEnviarMensaje";
 
 interface AfiliadoCatalogo {
-  id: string;
+  userId: string;
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
@@ -24,103 +25,185 @@ interface CatalogoGridProps {
 }
 
 export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
-  const getNombreCompleto = (a: AfiliadoCatalogo) =>
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [destinatarioActual, setDestinatarioActual] = useState<{ id: string; nombre: string } | null>(null);
+
+  const nombre = (a: AfiliadoCatalogo) =>
     `${a.nombres} ${a.apellidoPaterno} ${a.apellidoMaterno}`.trim();
+
+  const handleAbrirModal = (afiliado: AfiliadoCatalogo) => {
+    setDestinatarioActual({ id: afiliado.userId, nombre: nombre(afiliado) });
+    setModalAbierto(true);
+  };
 
   if (afiliados.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>No se encontraron perfiles.</p>
+      <div className="text-center py-20">
+        <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 mb-5">
+          <User className="h-10 w-10 text-slate-400" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">No se encontraron perfiles</h3>
+        <p className="text-slate-500 text-sm max-w-md mx-auto">
+          Intenta ajustar los filtros o los términos de búsqueda para encontrar más profesionales.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {afiliados.map((afiliado) => (
-        <Card key={afiliado.id} className="overflow-hidden hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            {/* Foto: solo afiliados y admins */}
-            {(rolUsuario === "afiliado" || rolUsuario === "admin") && afiliado.fotografiaUrl && (
-              <div className="mb-4 flex justify-center">
-                <img
-                  src={afiliado.fotografiaUrl}
-                  alt={getNombreCompleto(afiliado)}
-                  className="h-24 w-24 rounded-full object-cover ring-2 ring-[#004B87]/20"
-                />
-              </div>
-            )}
+    <>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {afiliados.map((a) => {
+          const tieneFoto = a.fotografiaUrl && (rolUsuario === "afiliado" || rolUsuario === "admin");
+          const tieneAreas = a.areaConocimiento?.length > 0;
+          const tieneServicios = a.tipoServicios?.length > 0;
+          const tieneInfo = tieneAreas || tieneServicios;
 
-            {/* Nombre */}
-            <h3 className="text-lg font-semibold text-center mb-2">
-              {getNombreCompleto(afiliado)}
-            </h3>
-
-            {/* Estado */}
-            <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mb-3">
-              <MapPin className="h-4 w-4" />
-              <span>{afiliado.estadoResidencia}</span>
-            </div>
-
-            {/* Áreas */}
-            {afiliado.areaConocimiento?.length > 0 && (
-              <div className="mb-3">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Áreas:</p>
-                <div className="flex flex-wrap gap-1 justify-center">
-                  {afiliado.areaConocimiento.slice(0, 3).map((area, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">{area}</Badge>
-                  ))}
+          return (
+            <Card key={a.userId} className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200/60 group bg-white">
+              {/* Header con avatar y nombre */}
+              <div className="bg-gradient-to-br from-slate-50 via-white to-slate-50 p-6 pb-5">
+                <div className="flex items-start gap-4">
+                  {tieneFoto ? (
+                    <div className="relative">
+                      <img
+                        src={a.fotografiaUrl}
+                        alt={nombre(a)}
+                        className="h-16 w-16 rounded-2xl object-cover ring-4 ring-white shadow-lg"
+                      />
+                      <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-green-500 rounded-full ring-2 ring-white"></div>
+                    </div>
+                  ) : (
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#004B87] to-[#0066b3] flex items-center justify-center ring-4 ring-white shadow-lg">
+                      <span className="text-xl font-bold text-white">
+                        {a.nombres?.[0]}{a.apellidoPaterno?.[0]}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold text-slate-900 line-clamp-2 leading-tight mb-1">
+                      {nombre(a)}
+                    </h3>
+                    {a.estadoResidencia && (
+                      <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                        <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-[#004B87]" />
+                        <span className="truncate">{a.estadoResidencia}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* Servicios */}
-            {afiliado.tipoServicios?.length > 0 && (
-              <div className="mb-4">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Servicios:</p>
-                <div className="flex flex-wrap gap-1 justify-center">
-                  {afiliado.tipoServicios.slice(0, 3).map((s, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      <Briefcase className="h-3 w-3 mr-1" />{s}
-                    </Badge>
-                  ))}
+              {/* Contenido */}
+              <CardContent className="p-6 pt-5 space-y-4">
+                {tieneInfo ? (
+                  <>
+                    {/* Áreas de conocimiento */}
+                    {tieneAreas && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <Award className="h-3.5 w-3.5 text-[#004B87]" />
+                          Áreas de conocimiento
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {a.areaConocimiento.slice(0, 3).map((area, i) => (
+                            <Badge key={i} variant="secondary" className="text-xs bg-blue-50 text-[#004B87] hover:bg-blue-100 border-0 font-medium px-2.5 py-1">
+                              {area}
+                            </Badge>
+                          ))}
+                          {a.areaConocimiento.length > 3 && (
+                            <Badge variant="outline" className="text-xs font-medium">+{a.areaConocimiento.length - 3}</Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Servicios */}
+                    {tieneServicios && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                          <Briefcase className="h-3.5 w-3.5 text-[#004B87]" />
+                          Servicios profesionales
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {a.tipoServicios.slice(0, 3).map((s, i) => (
+                            <Badge key={i} variant="outline" className="text-xs border-slate-300 text-slate-700 font-medium px-2.5 py-1">
+                              <Briefcase className="h-3 w-3 mr-1" />{s}
+                            </Badge>
+                          ))}
+                          {a.tipoServicios.length > 3 && (
+                            <Badge variant="outline" className="text-xs font-medium">+{a.tipoServicios.length - 3}</Badge>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  /* Estado vacío más compacto */
+                  <div className="text-center py-6 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                    <GraduationCap className="h-10 w-10 mx-auto mb-2 text-slate-400" />
+                    <p className="text-sm text-slate-500 font-medium">Perfil en construcción</p>
+                    <p className="text-xs text-slate-400 mt-1">Este afiliado aún no ha completado su información</p>
+                  </div>
+                )}
+
+                {/* Botones de acción */}
+                <div className="pt-4 border-t border-slate-100">
+                  {(rolUsuario === "afiliado" || rolUsuario === "admin") && (
+                    <Button
+                      size="sm"
+                      className="w-full h-10 bg-gradient-to-r from-[#004B87] to-[#005a9e] hover:from-[#003a6b] hover:to-[#004B87] text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                      onClick={() => handleAbrirModal(a)}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Enviar Mensaje
+                    </Button>
+                  )}
+
+                  {rolUsuario === "admin" && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full h-10 mt-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+                      onClick={() => window.location.href = `/admin/afiliados/${a.userId}`}
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      Gestionar perfil
+                    </Button>
+                  )}
+
+                  {rolUsuario === "visitante" && (
+                    <div className="text-center space-y-2">
+                      <p className="text-xs text-slate-500">
+                        <Mail className="h-3 w-3 inline mr-1" />
+                        Inicia sesión para contactar a este profesional
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full h-10 border-[#004B87] text-[#004B87] hover:bg-[#004B87]/5 font-semibold"
+                        onClick={() => window.location.href = "/login"}
+                      >
+                        Iniciar sesión
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-            {/* Botones según rol */}
-            <div className="flex gap-2 justify-center">
-              <Link href={`/catalogo/${afiliado.id}`}>
-                <Button variant="outline" size="sm" className="w-full">
-                  <Eye className="h-4 w-4 mr-2" />Ver perfil
-                </Button>
-              </Link>
-
-              {rolUsuario === "afiliado" && (
-                <Link href={`/afiliado/mensajeria?destinatario=${afiliado.id}`}>
-                  <Button size="sm" className="bg-[#004B87] hover:bg-[#003a6b]">
-                    <MessageSquare className="h-4 w-4 mr-2" />Contactar
-                  </Button>
-                </Link>
-              )}
-
-              {rolUsuario === "admin" && (
-                <Link href={`/admin/afiliados/${afiliado.id}`}>
-                  <Button size="sm" variant="secondary">
-                    <User className="h-4 w-4 mr-2" />Gestionar
-                  </Button>
-                </Link>
-              )}
-            </div>
-
-            {rolUsuario === "visitante" && (
-              <p className="text-xs text-center text-muted-foreground mt-3">
-                Inicia sesión para ver el perfil completo y contactar.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+      {/* Modal de Mensaje */}
+      {modalAbierto && destinatarioActual && (
+        <ModalEnviarMensaje
+          isOpen={modalAbierto}
+          onClose={() => { setModalAbierto(false); setDestinatarioActual(null); }}
+          destinatarioId={destinatarioActual.id}
+          destinatarioNombre={destinatarioActual.nombre}
+        />
+      )}
+    </>
   );
 }

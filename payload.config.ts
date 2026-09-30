@@ -12,6 +12,7 @@ import { Posts } from "./payload/collections/Posts";
 import { es } from "@payloadcms/translations/languages/es";
 import { Avisos } from "./payload/collections/Avisos";
 import Home from "./payload/globals/home";
+import LoginConfig from "./payload/globals/LoginConfig";
 
 //const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,7 +24,7 @@ export default buildConfig({
 
   collections: [CmsAdmins, Posts, Media, Avisos],
 
-  globals: [Home],
+  globals: [Home, LoginConfig],
 
   localization: {
     locales: ["es"],

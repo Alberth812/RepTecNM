@@ -1,16 +1,9 @@
 /**
  * API del Catálogo Profesional de Afiliados
- * GET /api/catalogo - Obtener lista de afiliados ACTIVOS con filtros avanzados
- * 
- * Filtros disponibles:
- * - search: Búsqueda libre por nombre, apellido o perfil profesional
- * - estado: Estado de residencia (texto exacto)
- * - tipoPosgrado: Tipo de posgrado (maestria, doctorado) - consulta tabla relacionada
- * - areaConocimiento: Áreas de conocimiento (array, superposición)
- * - tipoServicios: Tipos de servicios profesionales (array, superposición)
- * - page: Número de página (default: 1)
- * - limit: Resultados por página (default: 25)
- * - random: Orden aleatorio si no hay filtros activos (default: true)
+ * GET /api/catalogo - Lista afiliados ACTIVOS con filtros y facetas dinámicas
+ *
+ * Filtros: search, estado, tipoPosgrado, areaConocimiento[], tipoServicios[]
+ * Paginación: page (default 1), limit (default 25)
  */
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db/client";
@@ -22,89 +15,80 @@ import { ok, toErrorResponse } from "@/lib/http/responses";
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    
-    // 1. Obtener parámetros de filtro de la URL
-    const search = searchParams.get("search") || "";
-    const estado = searchParams.get("estado");
-    const tipoPosgradoParam = searchParams.get("tipoPosgrado"); // "maestria,doctorado" o "maestria"
-    const areas = searchParams.getAll("areaConocimiento");
-    const servicios = searchParams.getAll("tipoServicios");
-    
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "25");
-    const random = searchParams.get("random") !== "false";
+    const sp = request.nextUrl.searchParams;
+
+    // 1. Parámetros de filtro
+    const search = sp.get("search") || "";
+    const estado = sp.get("estado");
+    const tipoPosgradoParam = sp.get("tipoPosgrado");
+    const areas = sp.getAll("areaConocimiento");
+    const servicios = sp.getAll("tipoServicios");
+    const page = parseInt(sp.get("page") || "1");
+    const limit = parseInt(sp.get("limit") || "25");
+    const random = sp.get("random") !== "false";
     const offset = (page - 1) * limit;
 
-    // 2. Condiciones base obligatorias: solo afiliados ACTIVOS que autoricen publicación
-    const baseConditions = [
+    // 2. Condiciones base: solo ACTIVO + autoriza publicación
+    const conditions: any[] = [
       eq(afiliados.membershipStatus, "ACTIVO"),
       eq(afiliados.autorizaPublicacion, true),
     ];
 
-    // 3. Filtro por Estado de Residencia (campo directo en tabla afiliados)
-    if (estado) {
-      baseConditions.push(eq(afiliados.estadoResidencia, estado));
-    }
+    // 3. Filtro por Estado
+    if (estado) conditions.push(eq(afiliados.estadoResidencia, estado));
 
-    // 4. Filtro por Tipo de Posgrado (Relación 1:N con tabla posgrados)
-    // Necesitamos consultar la tabla posgrados para encontrar afiliados con ese tipo
+    // 4. Filtro por Tipo de Posgrado (relación 1:N con tabla posgrados)
     if (tipoPosgradoParam) {
-      const tiposSolicitados = tipoPosgradoParam.split(",").map(t => t.toUpperCase());
-      const afiliadosConPosgrado = await db
+      const tipos = tipoPosgradoParam.split(",").map((t) => t.toUpperCase());
+      const rows = await db
         .select({ userId: posgrados.afiliadoId })
         .from(posgrados)
-        .where(inArray(posgrados.tipoPosgrado, tiposSolicitados as any));
-      
-      const userIds = [...new Set(afiliadosConPosgrado.map(r => r.userId))];
-      if (userIds.length > 0) {
-        baseConditions.push(inArray(afiliados.userId, userIds));
-      } else {
-        baseConditions.push(sql`1 = 0`); // Fuerza resultado vacío si nadie cumple
-      }
+        .where(inArray(posgrados.tipoPosgrado, tipos as any));
+      const ids = [...new Set(rows.map((r) => r.userId))];
+      conditions.push(ids.length > 0 ? inArray(afiliados.userId, ids) : sql`1 = 0`);
     }
 
-    // 5. Filtro por Áreas de Conocimiento (Superposición de arreglos en PostgreSQL)
-    // Usa el operador && de PostgreSQL para encontrar coincidencias en arrays
+    // 5. Filtro por Áreas (operador && de PostgreSQL para arrays)
     if (areas.length > 0) {
-      const areaArray = sql.raw(`ARRAY[${areas.map(a => `'${a.replace(/'/g, "''")}'`).join(',')}]::text[]`);
-      baseConditions.push(sql`${afiliados.areaConocimiento} && ${areaArray}`);
+      const arr = sql.raw(
+        `ARRAY[${areas.map((a) => `'${a.replace(/'/g, "''")}'`).join(",")}]::text[]`
+      );
+      conditions.push(sql`${afiliados.areaConocimiento} && ${arr}`);
     }
 
-    // 6. Filtro por Tipos de Servicios (Superposición de arreglos en PostgreSQL)
+    // 6. Filtro por Servicios (operador && de PostgreSQL para arrays)
     if (servicios.length > 0) {
-      const servicioArray = sql.raw(`ARRAY[${servicios.map(s => `'${s.replace(/'/g, "''")}'`).join(',')}]::text[]`);
-      baseConditions.push(sql`${afiliados.tipoServicios} && ${servicioArray}`);
+      const arr = sql.raw(
+        `ARRAY[${servicios.map((s) => `'${s.replace(/'/g, "''")}'`).join(",")}]::text[]`
+      );
+      conditions.push(sql`${afiliados.tipoServicios} && ${arr}`);
     }
 
-    // 7. Filtro por Búsqueda Libre (nombre, apellido, perfil profesional, palabras clave)
-    let searchCondition = undefined;
+    // 7. Búsqueda libre (nombre, apellido, perfil, palabras clave)
+    let searchCond = undefined;
     if (search) {
-      const searchTerm = `%${search}%`;
-      searchCondition = or(
-        ilike(afiliados.nombres, searchTerm),
-        ilike(afiliados.apellidoPaterno, searchTerm),
-        ilike(afiliados.apellidoMaterno, searchTerm),
-        ilike(afiliados.perfilProfesional, searchTerm),
-        sql`${afiliados.palabrasClave}::text ILIKE ${searchTerm}`
+      const t = `%${search}%`;
+      searchCond = or(
+        ilike(afiliados.nombres, t),
+        ilike(afiliados.apellidoPaterno, t),
+        ilike(afiliados.apellidoMaterno, t),
+        ilike(afiliados.perfilProfesional, t),
+        sql`${afiliados.palabrasClave}::text ILIKE ${t}`
       );
     }
 
-    // 8. Evaluar si hay filtros activos para determinar el ordenamiento
-    const hasActiveFilters = Boolean(
-      search || estado || tipoPosgradoParam || areas.length > 0 || servicios.length > 0
-    );
+    const where = searchCond ? and(...conditions, searchCond) : and(...conditions);
+    const hasFilters = Boolean(search || estado || tipoPosgradoParam || areas.length || servicios.length);
 
-    // 9. Obtener total de resultados para la paginación
-    const countResult = await db
+    // 8. Total para paginación
+    const [{ count }] = await db
       .select({ count: sql<number>`count(*)` })
       .from(afiliados)
       .innerJoin(users, eq(afiliados.userId, users.id))
-      .where(searchCondition ? and(...baseConditions, searchCondition) : and(...baseConditions));
-    
-    const total = parseInt(countResult[0].count.toString());
+      .where(where);
+    const total = Number(count);
 
-    // 10. Construir la consulta principal con los campos necesarios
+    // 9. Consulta principal
     let query = db
       .select({
         userId: afiliados.userId,
@@ -121,51 +105,50 @@ export async function GET(request: NextRequest) {
       })
       .from(afiliados)
       .innerJoin(users, eq(afiliados.userId, users.id))
-      .where(searchCondition ? and(...baseConditions, searchCondition) : and(...baseConditions));
+      .where(where);
 
-    // 11. Lógica de ordenamiento: aleatorio si no hay filtros, alfabético si los hay
-    if (random && !hasActiveFilters) {
-      query = query.orderBy(sql`RANDOM()`);
-    } else {
-      query = query.orderBy(desc(afiliados.nombres));
-    }
-
+    query = random && !hasFilters ? query.orderBy(sql`RANDOM()`) : query.orderBy(desc(afiliados.nombres));
     query = query.limit(limit).offset(offset);
     const resultados = await query;
 
-    // 12. Obtener proyectos relevantes para los afiliados retornados
-    const afiliadosIds = resultados.map(r => r.userId);
-    let proyectosMap = new Map();
-    if (afiliadosIds.length > 0) {
-      const proyectos = await db
-        .select()
-        .from(proyectosRelevantes)
-        .where(inArray(proyectosRelevantes.afiliadoId, afiliadosIds));
-      
-      proyectos.forEach(p => {
-        if (!proyectosMap.has(p.afiliadoId)) {
-          proyectosMap.set(p.afiliadoId, []);
-        }
-        proyectosMap.get(p.afiliadoId).push(p);
+    // 10. Proyectos relevantes de los afiliados encontrados
+    const ids = resultados.map((r) => r.userId);
+    const proyectosMap = new Map<string, any[]>();
+    if (ids.length > 0) {
+      const proys = await db.select().from(proyectosRelevantes).where(inArray(proyectosRelevantes.afiliadoId, ids));
+      proys.forEach((p) => {
+        if (!proyectosMap.has(p.afiliadoId)) proyectosMap.set(p.afiliadoId, []);
+        proyectosMap.get(p.afiliadoId)!.push(p);
       });
     }
 
-    // 13. Formatear respuesta final con nombre completo y proyectos
-    const afiliadosConProyectos = resultados.map(afiliado => ({
-      ...afiliado,
-      nombreCompleto: `${afiliado.nombres} ${afiliado.apellidoPaterno} ${afiliado.apellidoMaterno}`.trim(),
-      proyectosRelevantes: proyectosMap.get(afiliado.userId) || [],
+    // 11. Formatear afiliados con nombre completo
+    const data = resultados.map((a) => ({
+      ...a,
+      nombreCompleto: `${a.nombres} ${a.apellidoPaterno} ${a.apellidoMaterno}`.trim(),
+      proyectosRelevantes: proyectosMap.get(a.userId) || [],
     }));
 
-    // 14. Retornar respuesta exitosa con paginación
+    // 12. FACETAS DINÁMICAS: extrae valores únicos reales de la BD
+    // Así los filtros siempre muestran solo opciones que existen de verdad
+    const raw = await db.execute(sql`
+      SELECT
+        (SELECT COALESCE(array_agg(DISTINCT v ORDER BY v), '{}'::text[])
+         FROM afiliados, unnest(area_conocimiento) AS v
+         WHERE membership_status='ACTIVO' AND autoriza_publicacion=true
+           AND v IS NOT NULL AND v!='') AS areas,
+        (SELECT COALESCE(array_agg(DISTINCT v ORDER BY v), '{}'::text[])
+         FROM afiliados, unnest(tipo_servicios) AS v
+         WHERE membership_status='ACTIVO' AND autoriza_publicacion=true
+           AND v IS NOT NULL AND v!='') AS servicios
+    `);
+    const row = (Array.isArray(raw) ? raw : (raw as any).rows)?.[0] as any || {};
+
+    // 13. Respuesta con datos + paginación + facetas
     return ok({
-      data: afiliadosConProyectos,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      data,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      facets: { areas: row.areas || [], servicios: row.servicios || [] },
     });
   } catch (error) {
     console.error("Error en GET /api/catalogo:", error);
