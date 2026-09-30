@@ -75,7 +75,7 @@ export function LoginForm({ loginImage }: LoginFormProps) {
       backLink="/"
       title="Inicia sesión"
       description="Ingresa tus credenciales para continuar"
-      loginImage={loginImage} // ✅ Pasamos la imagen al shell
+      loginImage={loginImage} //  Pasamos la imagen al shell
       footer={<>¿No tienes cuenta? <Link href="/register" className="font-medium text-[#004B87] hover:underline">Regístrate</Link></>}
     >
       {verified && (

@@ -1,7 +1,7 @@
 // app/api/afiliados/actualizacion-profesional/route.ts
-// Sección 6 · ACTUALIZACIÓN PROFESIONAL
-//   GET → devuelve la respuesta vigente del afiliado (o null si aún no hay)
-//   PUT → registra la respuesta; reemplaza por completo a la anterior (upsert)
+// Sección 6 · ACTUALIZACI�N PROFESIONAL
+//   GET � devuelve la respuesta vigente del afiliado (o null si aún no hay)
+//   PUT � registra la respuesta; reemplaza por completo a la anterior (upsert)
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -17,10 +17,10 @@ import {
 type Fila = typeof tabla.$inferSelect;
 
 /* -------------------------------------------------------------------------- */
-/* Mapeos fila ⇄ DTO                                                          */
+/* Mapeos fila �� DTO                                                          */
 /* -------------------------------------------------------------------------- */
 
-/** Fila de BD → cuerpo de respuesta (sin userId ni timestamps internos). */
+/** Fila de BD � cuerpo de respuesta (sin userId ni timestamps internos). */
 function aRespuesta(fila: Fila) {
   const data: ActualizacionProfesional = {
     haTomadoActualizacion: fila.haTomadoActualizacion,
@@ -38,8 +38,8 @@ function aRespuesta(fila: Fila) {
 }
 
 /**
- * Datos validados → columnas.
- * Todo campo opcional/condicional se fuerza a `null` de forma EXPLÍCITA:
+ * Datos validados � columnas.
+ * Todo campo opcional/condicional se fuerza a `null` de forma EXPL�CITA:
  * en Drizzle un `undefined` dentro de `set` no actualiza la columna, y el valor
  * anterior sobreviviría, rompiendo el "cada respuesta reemplaza a la anterior".
  */
@@ -66,7 +66,7 @@ function responderError(error: unknown) {
   if (error instanceof ApiError) {
     return NextResponse.json(
       { message: error.message },
-      { status: error.status }, // ⚠️ ajusta si tu ApiError usa otro nombre (p. ej. statusCode)
+      { status: error.status }, //  ajusta si tu ApiError usa otro nombre (p. ej. statusCode)
     );
   }
   console.error("[actualizacion-profesional]", error);
@@ -90,7 +90,7 @@ export async function GET() {
       .where(eq(tabla.userId, afiliado.userId))
       .limit(1);
 
-    // Sin respuesta previa: 200 con null → el formulario se muestra vacío.
+    // Sin respuesta previa: 200 con null � el formulario se muestra vacío.
     return NextResponse.json(
       fila ? aRespuesta(fila) : { data: null, updatedAt: null },
     );
@@ -114,7 +114,7 @@ export async function PUT(request: Request) {
       cuerpo = await request.json();
     } catch {
       return NextResponse.json(
-        { message: "El cuerpo de la solicitud no es un JSON válido." },
+        { message: "El cuerpo de la solicitud no es un JSON v�lido." },
         { status: 400 },
       );
     }
@@ -122,7 +122,7 @@ export async function PUT(request: Request) {
     // 3) Validación (Zod descarta llaves desconocidas, p. ej. un userId enviado)
     const resultado = actualizacionProfesionalSchema.safeParse(cuerpo);
     if (!resultado.success) {
-      // Un solo mensaje por campo (el primero, que es el más relevante).
+      // Un solo mensaje por campo (el primero, que es el m�s relevante).
       const errores = new Map<string, string>();
       for (const issue of resultado.error.issues) {
         const path = issue.path.map(String).join(".");
@@ -130,7 +130,7 @@ export async function PUT(request: Request) {
       }
       return NextResponse.json(
         {
-          message: "Los datos enviados no son válidos.",
+          message: "Los datos enviados no son v�lidos.",
           errors: [...errores].map(([path, message]) => ({ path, message })),
         },
         { status: 422 },
@@ -144,7 +144,7 @@ export async function PUT(request: Request) {
       .values({ userId: afiliado.userId, ...columnas })
       .onConflictDoUpdate({
         target: tabla.userId,
-        // $onUpdate no aplica en onConflictDoUpdate → updatedAt explícito.
+        // $onUpdate no aplica en onConflictDoUpdate � updatedAt explícito.
         set: { ...columnas, updatedAt: new Date() },
       })
       .returning();

@@ -5,7 +5,7 @@
 // POST -> reemplaza por completo la formación académica del afiliado con el
 //         payload validado por `formacionAcademicaSchema`.
 //
-// ⚠️ Dos supuestos que debes confirmar/ajustar (ver nota al final de mi respuesta):
+//  Dos supuestos que debes confirmar/ajustar (ver nota al final de mi respuesta):
 //   1. Rutas de import de `requireAfiliado` y `ApiError`.
 //   2. Forma de `ApiError` (asumo `.status: number` y `.message: string`,
 //      y que expone al menos `.forbidden()` y `.badRequest()`).
@@ -64,15 +64,15 @@ export async function POST(request: NextRequest) {
     try {
       json = await request.json();
     } catch {
-      throw ApiError.badRequest("El cuerpo de la petición no es JSON válido.");
+      throw ApiError.badRequest("El cuerpo de la petición no es JSON v�lido.");
     }
 
     const parsed = formacionAcademicaSchema.safeParse(json);
     if (!parsed.success) {
-      // 422: la petición es JSON válido pero no cumple las reglas de negocio.
+      // 422: la petición es JSON v�lido pero no cumple las reglas de negocio.
       return NextResponse.json(
         {
-          error: "Datos de formación académica inválidos.",
+          error: "Datos de formación académica inv�lidos.",
           issues: z.treeifyError(parsed.error),
         },
         { status: 422 },
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
 }
 
 // -----------------------------------------------------------------------
-// Manejo de errores local — sustitúyelo por tu wrapper central si ya existe.
+// Manejo de errores local  sustitúyelo por tu wrapper central si ya existe.
 // -----------------------------------------------------------------------
 function handleRouteError(error: unknown) {
   if (error instanceof ApiError) {

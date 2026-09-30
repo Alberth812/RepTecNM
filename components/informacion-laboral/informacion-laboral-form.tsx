@@ -5,7 +5,7 @@
 // - useForm + zodResolver, con los 3 genéricos de RHF (input / context /
 //   output) para que `handleSubmit` reciba el tipo ya parseado por Zod
 //   (con los `.default(...)` aplicados) mientras que los campos del form
-//   trabajan con el tipo "de entrada" (más permisivo, p.ej. arrays
+//   trabajan con el tipo "de entrada" (m�s permisivo, p.ej. arrays
 //   opcionales o números que llegan como string desde un <input>).
 // - <Controller /> para todos los campos controlados (Checkbox, RadioGroup,
 //   Input numéricos), siguiendo el patrón recomendado por shadcn/ui:
@@ -14,7 +14,7 @@
 //   `FieldGroup`, `FieldError`, ...) para accesibilidad y consistencia
 //   visual: https://ui.shadcn.com/docs/components/field
 // - `defaultValues` como prop para poder rellenar el formulario con una
-//   respuesta previa (edición) — se hace merge profundo con valores vacíos
+//   respuesta previa (edición)  se hace merge profundo con valores vacíos
 //   para que los campos no controlados/undefined no rompan el formulario.
 //
 // El endpoint de envío se deja pendiente: se expone a través del prop
@@ -172,7 +172,7 @@ export function InformacionLaboralForm({
   onCancel,
 }: InformacionLaboralFormProps) {
   // Solo se calcula una vez: cambios posteriores al prop `defaultValues` no
-  // deben resetear un formulario que el usuario ya está editando. Si se
+  // deben resetear un formulario que el usuario ya est� editando. Si se
   // necesita rehidratar el form tras un fetch async, usar `form.reset(...)`
   // en un `useEffect` desde el componente padre.
   const initialValues = useMemo(() => buildDefaultValues(defaultValues), []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -204,7 +204,7 @@ export function InformacionLaboralForm({
   });
 
   // `tiempoPrimerEmpleo` es el activador de toda la sección: mientras no
-  // tenga un valor (null → aún no respondido), no debe mostrarse ninguna
+  // tenga un valor (null � aún no respondido), no debe mostrarse ninguna
   // pregunta dependiente. Una vez respondido, se bifurca igual que el
   // `superRefine` del esquema:
   //  - sinEmpleo: nunca consiguió un primer empleo.
@@ -249,7 +249,7 @@ export function InformacionLaboralForm({
 
   const submit = handleSubmit(
     async (data) => {
-      console.log("✅ Formulario válido. Payload:", data);
+      console.log(" Formulario v�lido. Payload:", data);
 
       if (onSubmit) {
         await onSubmit(data);
@@ -259,10 +259,10 @@ export function InformacionLaboralForm({
       console.log("Información laboral", data);
     },
     (errors) => {
-      console.log("❌ Error de validación del formulario");
+      console.log(" Error de validación del formulario");
       console.log("Errores RHF/Zod:", errors);
 
-      // Para inspeccionar cada error de forma más legible:
+      // Para inspeccionar cada error de forma m�s legible:
       console.log("Errores serializados:", JSON.stringify(errors, null, 2));
     },
   );
@@ -286,7 +286,7 @@ export function InformacionLaboralForm({
           <RadioOptionsField
             control={control}
             name="informacionLaboral.tiempoPrimerEmpleo"
-            legend="¿Cuánto tiempo le llevó conseguir empleo después de haber egresado del programa (Maestría/Doctorado)?"
+            legend="¿Cu�nto tiempo le llevó conseguir empleo después de haber egresado del programa (Maestría/Doctorado)?"
             options={TIEMPO_PRIMER_EMPLEO_OPTIONS}
           />
 
@@ -305,7 +305,7 @@ export function InformacionLaboralForm({
               control={control}
               name="informacionLaboral.estrategiaPostgrado"
               otroName="informacionLaboral.estrategiaPostgradoOtro"
-              legend="¿Cuál fue la estrategia que lo llevó a conseguir el empleo después de estudiar el posgrado?"
+              legend="¿Cu�l fue la estrategia que lo llevó a conseguir el empleo después de estudiar el posgrado?"
               options={ESTRATEGIA_CONSECUCION_EMPLEO_OPTIONS}
             />
           )}
@@ -321,7 +321,7 @@ export function InformacionLaboralForm({
           )}
           {sinEmpleo && (
             <FieldDescription>
-              Como aún no ha conseguido empleo, se considerará que no labora
+              Como aún no ha conseguido empleo, se considerar� que no labora
               actualmente.
             </FieldDescription>
           )}
@@ -348,8 +348,8 @@ export function InformacionLaboralForm({
         <FieldDescription>
           Registre todos los empleos desempeñados desde el egreso del programa,
           incluyendo el empleo actual si corresponde. Se recomienda capturar
-          primero el empleo más antiguo y finalizar con el más reciente. Puede
-          registrar empleos simultáneos o con periodos solapados.
+          primero el empleo m�s antiguo y finalizar con el m�s reciente. Puede
+          registrar empleos simult�neos o con periodos solapados.
         </FieldDescription>
 
         <div className="space-y-6">
@@ -366,7 +366,7 @@ export function InformacionLaboralForm({
           ))}
         </div>
 
-        {/* Error a nivel de arreglo completo (p. ej. más de 50 empleos). Los
+        {/* Error a nivel de arreglo completo (p. ej. m�s de 50 empleos). Los
             errores de cada empleo individual se muestran dentro de su propio
             <EmpleoFieldset />. */}
         {typeof formState.errors.historialEmpleos?.message === "string" && (

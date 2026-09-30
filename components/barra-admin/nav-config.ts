@@ -42,7 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Avisos", href: "/admin/avisos", icon: MessageSquare },
     ],
   },
-  // ✅ Se eliminó el grupo "Sistema" y la opción "Configuración"
+  //  Se eliminó el grupo "Sistema" y la opción "Configuración"
 ];
 
 export const ACCOUNT_ITEM: NavItem = {

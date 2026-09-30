@@ -10,7 +10,7 @@ interface AuthShellProps {
   footer?: ReactNode;
   variant?: "default" | "split";
   backLink?: string;
-  loginImage?: string; // ✅ Nueva prop
+  loginImage?: string; //  Nueva prop
 }
 
 export function AuthShell({ title, description, children, footer, variant = "default", backLink, loginImage }: AuthShellProps) {
@@ -19,7 +19,7 @@ export function AuthShell({ title, description, children, footer, variant = "def
       <div className="min-h-screen w-full flex">
         {/* Panel Izquierdo */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#004B87] via-[#003a6b] to-[#002244] relative overflow-hidden items-center justify-center p-12">
-          {/* ✅ Si hay imagen de Payload, la usamos con un overlay. Si no, usamos el patrón por defecto */}
+          {/*  Si hay imagen de Payload, la usamos con un overlay. Si no, usamos el patrón por defecto */}
           {loginImage ? (
             <img src={loginImage} alt="Fondo login" className="absolute inset-0 w-full h-full object-cover opacity-40" />
           ) : (

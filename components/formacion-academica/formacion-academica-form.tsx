@@ -5,7 +5,7 @@
 // sección repetible (licenciaturas, posgrados, estanciasPosdoctorales).
 //
 // El envío a un endpoint real queda pendiente a propósito (ver `handleSubmit`
-// más abajo); por defecto solo hace console.log del payload ya validado.
+// m�s abajo); por defecto solo hace console.log del payload ya validado.
 
 "use client";
 
@@ -32,10 +32,10 @@ export type { Institucion };
 // ---------------------------------------------------------------------------
 // Filas vacías para cuando el usuario agrega una nueva entrada.
 // data_model_notes: "El formulario puede comenzar mostrando una sola
-// instancia de cada tipo, pero el modelo de datos debe permitir agregar más
+// instancia de cada tipo, pero el modelo de datos debe permitir agregar m�s
 // de una." Los campos requeridos quedan en null/"" hasta que el usuario los
-// completa; zodResolver los marcará como error solo si se intenta enviar así
-// (por eso el cast: son intencionalmente "inválidos" hasta que se completen).
+// completa; zodResolver los marcar� como error solo si se intenta enviar así
+// (por eso el cast: son intencionalmente "inv�lidos" hasta que se completen).
 // ---------------------------------------------------------------------------
 
 const emptyLicenciatura = {
@@ -116,7 +116,7 @@ function buildDefaultValues(
 }
 
 export type FormacionAcademicaFormProps = {
-  /** Catálogo de instituciones para los campos tipo "catalog". */
+  /** Cat�logo de instituciones para los campos tipo "catalog". */
   instituciones: Institucion[];
   /** Valores existentes, para editar un perfil ya capturado. */
   defaultValues?: Partial<FormacionAcademica>;
@@ -165,7 +165,7 @@ export function FormacionAcademicaForm({
   const hasErrorIn = (tab: TabValue) => Boolean(errors[SECTION_BY_TAB[tab]]);
 
   function onInvalid(formErrors: FieldErrors<FormacionAcademicaInput>) {
-    //console.log("❌ Errores de validación:", formErrors);
+    //console.log(" Errores de validación:", formErrors);
     const firstTabWithError = (Object.keys(SECTION_BY_TAB) as TabValue[]).find(
       (tab) => formErrors[SECTION_BY_TAB[tab]],
     );
