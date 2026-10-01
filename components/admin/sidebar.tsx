@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { GraduationCap, 
@@ -44,8 +45,7 @@ export function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     <div className={cn("flex h-full flex-col bg-background border-r", isMobile && "border-none")}>
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-          <Image
-          src="/logo.png"
+          <NextImage           src="/logo.png"
           alt="REP-TecNM - Red de Egresados de Posgrado del Tecnológico Nacional de México"
           width={150}
           height={40}

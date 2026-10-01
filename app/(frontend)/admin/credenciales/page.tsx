@@ -131,7 +131,7 @@ export default function AdminCredencialesPage() {
                 className="pl-10"
               />
             </div>
-            <Select value={estadoFiltro} onValueChange={setEstadoFiltro}>
+            <Select value={estadoFiltro} onValueChange={(val) => setEstadoFiltro(val ?? "")}>
               <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Filtrar por estado" />
               </SelectTrigger>

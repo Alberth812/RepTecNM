@@ -9,9 +9,11 @@ import { eq, ilike, or, and } from "drizzle-orm";
 export async function GET(req: NextRequest) {
   try {
     const headersList = await headers();
-    const { user, error } = await auth.api.getSession({ headers: headersList });
+    const sessionData = await auth.api.getSession({ headers: headersList });
+    if (!sessionData?.user) return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401, headers: { "Content-Type": "application/json" } });
+    const user = sessionData.user;
 
-    if (error || !user || user.role !== "ADMINISTRADOR") {
+    if (!user || user.role !== "ADMINISTRADOR") {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 

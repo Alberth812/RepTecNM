@@ -115,7 +115,7 @@ export default function AdminSoportePage() {
       {/* Filtros */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+          <Select value={filtroEstado} onValueChange={(val) => setFiltroEstado(val ?? "")}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>

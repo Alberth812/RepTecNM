@@ -106,7 +106,7 @@ export default function SoporteAfiliadoPage() {
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <label className="text-sm font-medium">Categoría</label>
-                  <Select value={categoria} onValueChange={setCategoria}>
+                  <Select value={categoria} onValueChange={(val) => setCategoria(val ?? "")}>
                     <SelectTrigger><SelectValue placeholder="Selecciona una categoría" /></SelectTrigger>
                     <SelectContent>
                       {CATEGORIAS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}

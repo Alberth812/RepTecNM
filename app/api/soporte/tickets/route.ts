@@ -8,11 +8,11 @@ import { eq, desc } from "drizzle-orm";
 export async function POST(req: NextRequest) {
   try {
     const headersList = await headers();
-    const { user, error } = await auth.api.getSession({
-      headers: headersList,
-    });
+    const sessionData = await auth.api.getSession({ headers: headersList });
+    if (!sessionData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const user = sessionData.user;
 
-    if (error || !user) {
+    if (!user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
@@ -50,11 +50,11 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const headersList = await headers();
-    const { user, error } = await auth.api.getSession({
-      headers: headersList,
-    });
+    const sessionData = await auth.api.getSession({ headers: headersList });
+    if (!sessionData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const user = sessionData.user;
 
-    if (error || !user) {
+    if (!user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 

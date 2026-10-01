@@ -15,11 +15,11 @@ export async function GET(
     const { id: ticketId } = await params;
     
     const headersList = await headers();
-    const { user, error } = await auth.api.getSession({
-      headers: headersList,
-    });
+    const sessionData = await auth.api.getSession({ headers: headersList });
+    if (!sessionData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const user = sessionData.user;
 
-    if (error || !user) {
+    if (!user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
@@ -75,11 +75,11 @@ export async function PATCH(
     const { id: ticketId } = await params;
     
     const headersList = await headers();
-    const { user, error } = await auth.api.getSession({
-      headers: headersList,
-    });
+    const sessionData = await auth.api.getSession({ headers: headersList });
+    if (!sessionData?.user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    const user = sessionData.user;
 
-    if (error || !user || user.role !== 'ADMINISTRADOR') {
+    if (!user || user.role !== 'ADMINISTRADOR') {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 

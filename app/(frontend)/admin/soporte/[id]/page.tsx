@@ -248,7 +248,7 @@ export default function TicketDetalleAdminPage({ params }: { params: Promise<{ i
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Cambiar estado</label>
-              <Select value={estadoSeleccionado} onValueChange={setEstadoSeleccionado}>
+              <Select value={estadoSeleccionado} onValueChange={(val) => setEstadoSeleccionado(val ?? "")}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
