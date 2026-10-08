@@ -1,6 +1,10 @@
 // Ubicación sugerida: @/lib/validation/instituciones.ts
 
 import { z } from "zod";
+import { es } from "zod/locales"; // O también desde "zod/v4/locales/es.js"
+
+// Configura el idioma español globalmente
+z.config(es());
 
 import { institucionEstadoEnum } from "@/lib/db/schema/instituciones";
 

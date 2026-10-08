@@ -25,7 +25,7 @@ export function refineTipoPublicacionCliente(
   if (data.tipo === TipoPublicacion.OTRO) {
     if (!data.tipoOtro) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["tipoOtro"],
         message:
           'Debe especificar el tipo de publicación cuando selecciona "Otro".',
@@ -35,7 +35,7 @@ export function refineTipoPublicacionCliente(
 
     if (data.tipoOtro.length < 3 || data.tipoOtro.length > 50) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["tipoOtro"],
         message:
           'La especificación de "Otro" debe tener entre 3 y 50 caracteres.',

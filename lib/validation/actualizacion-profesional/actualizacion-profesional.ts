@@ -14,14 +14,17 @@ import {
 /* -------------------------------------------------------------------------- */
 
 /** type: text / textarea con min_length y max_length. */
-const texto = (min: number, max: number) => {
-  let esquema = z.string({ error: "Este campo es obligatorio" }).trim();
-  // Vacío → "obligatorio" (más claro que "Mínimo 2 caracteres").
-  if (min > 1) esquema = esquema.min(1, "Este campo es obligatorio");
-  return esquema
-    .min(min, `Mínimo ${min} ${min === 1 ? "carácter" : "caracteres"}`)
+const texto = (min: number, max: number) =>
+  z
+    .string({ error: "Este campo es obligatorio" })
+    .trim()
+    .min(min, {
+      error:
+        min === 1
+          ? "Este campo es obligatorio"
+          : `Mínimo ${min} ${min === 1 ? "carácter" : "caracteres"}`,
+    })
     .max(max, `Máximo ${max} caracteres`);
-};
 
 const fechaActual = () => {
   const hoy = new Date();
@@ -60,7 +63,11 @@ function exigirSegunVisibilidad(
   campo: string,
   condicion: string,
 ) {
-  const vacio = valor == null;
+  const vacio =
+    valor == null ||
+    valor === "" ||
+    (Array.isArray(valor) && valor.length === 0);
+
   if (visible && vacio) {
     ctx.addIssue({
       code: "custom",
@@ -68,6 +75,7 @@ function exigirSegunVisibilidad(
       message: "Este campo es obligatorio",
     });
   }
+
   if (!visible && !vacio) {
     ctx.addIssue({
       code: "custom",
@@ -82,8 +90,8 @@ function exigirSegunVisibilidad(
 /* -------------------------------------------------------------------------- */
 
 export const actividadActualizacionSchema = z.object({
-  tematica: texto(2, 200), // "Temática"
-  institucion: texto(2, 200), // "Institución"
+  tematica: texto(2, 150), // "Temática"
+  institucion: texto(2, 150), // "Institución"
 });
 
 export type ActividadActualizacion = z.infer<
@@ -103,8 +111,8 @@ const anioCargo = numeroEntero()
 const mesCargo = numeroEntero().min(1, "Mes inválido").max(12, "Mes inválido");
 
 export const cargoEleccionPopularBaseSchema = z.object({
-  puesto: texto(2, 200),
-  lugar: texto(2, 200),
+  puesto: texto(2, 150),
+  lugar: texto(2, 150),
   esCargoActual: siNo(),
   anioInicio: anioCargo,
   mesInicio: mesCargo,
@@ -155,7 +163,7 @@ export const cargoEleccionPopularSchema =
     if (indiceInicio > indiceHoy) {
       ctx.addIssue({
         code: "custom",
-        path: ["anioInicio"],
+        path: [anioInicio > hoy.anio ? "anioInicio" : "mesInicio"],
         message: "La fecha de inicio no puede ser posterior a la fecha actual",
       });
     }
@@ -167,17 +175,16 @@ export const cargoEleccionPopularSchema =
       if (indiceTermino > indiceHoy) {
         ctx.addIssue({
           code: "custom",
-          path: ["anioTermino"],
+          path: [anioTermino > hoy.anio ? "anioTermino" : "mesTermino"],
           message:
             "La fecha de término no puede ser posterior a la fecha actual",
         });
       }
-
       // start_date_before_end_date (primero año, luego mes)
       if (indiceInicio >= indiceTermino) {
         ctx.addIssue({
           code: "custom",
-          path: ["anioTermino"],
+          path: [anioInicio === anioTermino ? "mesTermino" : "anioTermino"],
           message: "La fecha de inicio debe ser anterior a la fecha de término",
         });
       }
@@ -196,7 +203,9 @@ export const actualizacionProfesionalBaseSchema = z.object({
 
   // actividades_actualizacion (JSONB, visible si haTomadoActualizacion = true)
   actividadesActualizacion: z
-    .array(actividadActualizacionSchema)
+    .array(actividadActualizacionSchema, {
+      error: "Este campo es obligatorio",
+    })
     .min(1, "Agrega al menos una actividad")
     .max(MAX_ITEMS_REPETIBLE, `Máximo ${MAX_ITEMS_REPETIBLE} actividades`)
     .nullish(),
@@ -206,18 +215,26 @@ export const actualizacionProfesionalBaseSchema = z.object({
 
   // disponibilidad_actualizacion (checkbox, 1–5 opciones)
   disponibilidadActualizacion: z
-    .array(z.enum(DISPONIBILIDAD_ACTUALIZACION), {
-      error: "Selecciona al menos una opción",
-    })
+    .array(
+      z.enum(DISPONIBILIDAD_ACTUALIZACION, {
+        error: "Selecciona una opción válida",
+      }),
+      {
+        error: "Selecciona al menos una opción",
+      },
+    )
     .min(1, "Selecciona al menos una opción")
-    .max(DISPONIBILIDAD_ACTUALIZACION.length),
+    .max(
+      DISPONIBILIDAD_ACTUALIZACION.length,
+      `Puedes seleccionar máximo ${DISPONIBILIDAD_ACTUALIZACION.length} opciones`,
+    ),
 
   // horario_actualizacion (text, opcional)
   horarioActualizacion: texto(1, 100).nullish(),
 
   // creacion_empresa (boolean) + nombre_empresa (visible si creacionEmpresa = true)
   creacionEmpresa: siNo(),
-  nombreEmpresa: texto(2, 200).nullish(),
+  nombreEmpresa: texto(2, 150).nullish(),
 
   // puesto_5_anios (textarea, opcional)
   puesto5Anios: texto(2, 500).nullish(),
@@ -225,7 +242,9 @@ export const actualizacionProfesionalBaseSchema = z.object({
   // ha_ocupado_cargo_eleccion_popular (boolean) + detalle_cargo_publico (JSONB)
   haOcupadoCargoEleccionPopular: siNo(),
   detalleCargoPublico: z
-    .array(cargoEleccionPopularSchema)
+    .array(cargoEleccionPopularSchema, {
+      error: "Este campo es obligatorio",
+    })
     .min(1, "Agrega al menos un cargo")
     .max(MAX_ITEMS_REPETIBLE, `Máximo ${MAX_ITEMS_REPETIBLE} cargos`)
     .nullish(),

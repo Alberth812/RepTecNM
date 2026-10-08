@@ -119,7 +119,9 @@ export function escapeSqlLikePattern(value: string): string {
 const DOI_REGEX = /^10\.\d{4,9}\/[-._;()/:A-Z0-9]+$/i;
 
 export const doiSchema = z
-  .string()
+  .string({
+    error: "El DOI debe ser una cadena de texto.",
+  })
   .trim()
   .transform((value) =>
     value
@@ -132,14 +134,14 @@ export const doiSchema = z
   })
   .transform((value) => value.toLowerCase());
 
-export const optionalDoiSchema = z
-  .union([z.string(), z.null(), z.undefined()])
-  .transform((val) => {
-    if (!val) return null;
-    const trimmed = val.trim();
-    return trimmed === "" ? null : trimmed;
-  })
-  .pipe(z.union([z.null(), doiSchema]));
+export const optionalDoiSchema = z.preprocess(
+  (value) => {
+    if (value === null || value === undefined) return null;
+    if (typeof value === "string" && value.trim() === "") return null;
+    return value;
+  },
+  doiSchema.nullable(),
+);
 
 // --- ISSN ---
 export const issnSchema = z
@@ -235,7 +237,7 @@ export const palabrasClaveArraySchema = z
       const kw = keywords[i];
       if (seen.has(kw)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: `La palabra clave "${kw}" está duplicada tras su normalización.`,
           path: [i],
         });
@@ -281,7 +283,7 @@ export const autoresArraySchema = z
       const orden = autores[i].orden;
       if (ordenes.has(orden)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: `La posición de orden ${orden} está duplicada entre los autores.`,
           path: [i, "orden"],
         });
@@ -397,7 +399,7 @@ function refineTipoPublicacion<
   if (data.tipo === TipoPublicacion.OTRO) {
     if (!data.tipoOtro) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["tipoOtro"],
         message:
           'Debe especificar el tipo de publicación cuando selecciona "Otro".',
@@ -407,7 +409,7 @@ function refineTipoPublicacion<
 
     if (data.tipoOtro.length < 3 || data.tipoOtro.length > 50) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["tipoOtro"],
         message:
           'La especificación de "Otro" debe tener entre 3 y 50 caracteres.',

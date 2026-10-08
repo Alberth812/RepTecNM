@@ -21,7 +21,9 @@ const SITUACIONES_CON_DETALLE = ["CONCLUIDA", "ACTUAL"] as const;
 export const estanciaPosdoctoralSchema = z
   .object({
     id: z.uuid().optional(),
-    situacion: z.enum(situacionPosdoctoradoEnum.enumValues),
+    situacion: z.enum(situacionPosdoctoradoEnum.enumValues, {
+      error: "Escoga una situación posdoctoral válida",
+    }),
 
     // Los siguientes campos solo aplican cuando situacion in (CONCLUIDA, ACTUAL)
     institucionId: z.uuid().nullish(),

@@ -6,6 +6,10 @@
 // archivos).
 
 import { z } from "zod";
+import { es } from "zod/locales";
+
+// Configura el idioma español globalmente
+z.config(es());
 import {
   causaDesempleoEnum,
   estrategiaConsecucionEmpleoEnum,

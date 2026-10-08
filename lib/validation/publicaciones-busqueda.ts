@@ -91,7 +91,7 @@ export const buscarPublicacionesQuerySchema = z
       (data.anioDesde !== undefined || data.anioHasta !== undefined)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["anio"],
         message:
           "El parámetro anio no puede combinarse con anioDesde ni anioHasta.",
@@ -105,7 +105,7 @@ export const buscarPublicacionesQuerySchema = z
       data.anioDesde > data.anioHasta
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["anioDesde"],
         message: "anioDesde no puede ser mayor que anioHasta.",
       });

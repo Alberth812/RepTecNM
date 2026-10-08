@@ -154,14 +154,14 @@ export const evaluacionProgramaEstudiosSchema =
       if (data.tieneOtroAspectoInfraestructura) {
         if (data.otroAspectoInfraestructura === null) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             path: ["otroAspectoInfraestructura"],
             message: "Debe especificar el otro aspecto de infraestructura.",
           });
         }
         if (data.calificacionOtroAspectoInfraestructura === null) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: "custom",
             path: ["calificacionOtroAspectoInfraestructura"],
             message:
               "Debe indicar la calificación del otro aspecto de infraestructura.",

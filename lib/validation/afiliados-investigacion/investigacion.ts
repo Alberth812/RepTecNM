@@ -138,14 +138,14 @@ function requireWhenVisible(
   const empty = isEmptyValue(value);
   if (isVisible && empty) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path,
       message: requiredMessage,
     });
   }
   if (!isVisible && !empty) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path,
       message: clearedMessage,
     });
@@ -162,7 +162,7 @@ function forbidWhenHidden(
 ) {
   if (!isVisible && !isEmptyValue(value)) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: "custom",
       path,
       message: clearedMessage,
     });
@@ -207,7 +207,7 @@ function validarReglasCruzadas(
 
   for (const [value, path, message] of requiredTopLevel) {
     if (value === null) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path, message });
+      ctx.addIssue({ code: "custom", path, message });
     }
   }
 

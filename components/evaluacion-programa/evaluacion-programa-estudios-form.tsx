@@ -170,14 +170,14 @@ const formSchema = z
         data.otroAspectoInfraestructura.trim().length < 3
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["otroAspectoInfraestructura"],
           message: "Especifica el otro aspecto (mínimo 3 caracteres).",
         });
       }
       if (data.calificacionOtroAspectoInfraestructura == null) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           path: ["calificacionOtroAspectoInfraestructura"],
           message: "Indica una calificación.",
         });

@@ -126,7 +126,7 @@ export const publicacionesFiltrosFormSchema = z
       (data.anioDesde !== undefined || data.anioHasta !== undefined)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["anio"],
         message: "No puedes combinar un año exacto con un rango (desde/hasta).",
       });
@@ -138,7 +138,7 @@ export const publicacionesFiltrosFormSchema = z
       data.anioDesde > data.anioHasta
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         path: ["anioHasta"],
         message: "El año 'hasta' no puede ser menor que el año 'desde'.",
       });

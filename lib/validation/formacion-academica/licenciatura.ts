@@ -11,6 +11,10 @@ import {
   required,
   validateRangoAnios,
 } from "./common";
+import { es } from "zod/locales"; // O también desde "zod/v4/locales/es.js"
+
+// Configura el idioma español globalmente
+z.config(es());
 
 export const licenciaturaSchema = z
   .object({
