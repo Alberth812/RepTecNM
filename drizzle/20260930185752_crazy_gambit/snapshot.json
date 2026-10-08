@@ -1,0 +1,5833 @@
+{
+  "version": "8",
+  "dialect": "postgres",
+  "id": "4cc154e2-2ccb-40ee-b4ba-7cd79ecaf20f",
+  "prevIds": [
+    "cbd513d7-3539-4dc8-b1a3-71250b74309f"
+  ],
+  "ddl": [
+    {
+      "values": [
+        "mananas",
+        "tardes",
+        "fines_de_semana",
+        "unicamente_sabados",
+        "sin_disponibilidad"
+      ],
+      "name": "disponibilidad_actualizacion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "articulos_revistas",
+        "articulos_divulgacion",
+        "articulos_periodicos",
+        "libros",
+        "capitulos_libro",
+        "ponencias",
+        "conferencias",
+        "direccion_tesis",
+        "informes_tecnicos",
+        "prototipos_productos",
+        "propiedad_intelectual",
+        "proyectos_investigacion",
+        "grupos_investigacion",
+        "divulgacion_cientifica",
+        "otra"
+      ],
+      "name": "produccion_academica_opcion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "nunca",
+        "anterior",
+        "actual",
+        "anterior_y_actual"
+      ],
+      "name": "situacion_sni",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "AFILIADO",
+        "ADMINISTRADOR"
+      ],
+      "name": "account_role",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "GENERAL",
+        "CONTENIDO"
+      ],
+      "name": "admin_subtype",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "EMAIL_VERIFICATION_OTP_SENT",
+        "PASSWORD_RESET_REQUESTED",
+        "PASSWORD_RESET_COMPLETED",
+        "SIGNUP_ATTEMPTED",
+        "LOGIN_FAILED"
+      ],
+      "name": "auth_event_type",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "NO_INICIADA",
+        "PENDIENTE_APROBACION",
+        "REQUIERE_CORRECCION",
+        "RECHAZADO",
+        "ACTIVO",
+        "INACTIVO",
+        "SUSPENDIDO",
+        "BAJA"
+      ],
+      "name": "membership_status",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "APROBADO",
+        "REQUIERE_CORRECCION",
+        "RECHAZADO"
+      ],
+      "name": "revision_decision",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "A+",
+        "A-",
+        "B+",
+        "B-",
+        "AB+",
+        "AB-",
+        "O+",
+        "O-"
+      ],
+      "name": "tipo_sanguineo",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "muy_de_acuerdo",
+        "de_acuerdo",
+        "ni_de_acuerdo_ni_en_desacuerdo",
+        "en_desacuerdo",
+        "muy_en_desacuerdo"
+      ],
+      "name": "cumplimiento_expectativas",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "totalmente_satisfecho",
+        "muy_satisfecho",
+        "regularmente_satisfecho",
+        "poco_satisfecho",
+        "nada_satisfecho"
+      ],
+      "name": "satisfaccion_formacion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "excelente",
+        "buena",
+        "regular",
+        "mala",
+        "pesima"
+      ],
+      "name": "valoracion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "CIENCIAS_SOCIALES_HUMANIDADES",
+        "CIENCIAS_NATURALES_EXACTAS",
+        "INGENIERIA_TECNOLOGIA",
+        "CIENCIAS_AGROPECUARIAS",
+        "EDUCACION",
+        "OTRO"
+      ],
+      "name": "campo_investigacion_posdoctorado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "TIEMPO_COMPLETO",
+        "MEDIO_TIEMPO",
+        "TIEMPO_PARCIAL"
+      ],
+      "name": "dedicacion_posgrado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "SOLTERO",
+        "CASADO",
+        "UNION_LIBRE",
+        "OTRO"
+      ],
+      "name": "estado_civil",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "BECA_NACIONAL",
+        "BECA_INTERNACIONAL",
+        "APOYO_INSTITUCIONAL",
+        "PROYECTO_INVESTIGACION",
+        "OTRO"
+      ],
+      "name": "fuente_financiamiento_posdoctorado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "CONAHCYT",
+        "INSTITUCION_LABORA",
+        "PRODEP",
+        "INSTITUCION_POSGRADO",
+        "OTRO"
+      ],
+      "name": "fuente_financiamiento_posgrado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "PRESENCIAL",
+        "EN_LINEA",
+        "HIBRIDA",
+        "OTRA"
+      ],
+      "name": "modalidad_posgrado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "EN_PROCESO",
+        "TESIS_PENDIENTE",
+        "EXAMEN_PENDIENTE",
+        "TRAMITE_NO_REALIZADO",
+        "OTRO"
+      ],
+      "name": "motivo_no_obtencion_grado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "CONCLUIDA",
+        "ACTUAL",
+        "INTERES_FUTURO",
+        "SIN_INTERES"
+      ],
+      "name": "situacion_posdoctorado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "MAESTRIA",
+        "DOCTORADO"
+      ],
+      "name": "tipo_posgrado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "INDEPENDIENTE",
+        "INTEGRADA_MAESTRIA_DOCTORADO"
+      ],
+      "name": "trayectoria_posgrado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "poca_experiencia",
+        "falta_oportunidades",
+        "sin_grado",
+        "idioma",
+        "personales",
+        "otro"
+      ],
+      "name": "causa_desempleo",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "periodico",
+        "redes_sociales",
+        "internet",
+        "convocatorias",
+        "recomendacion_contacto",
+        "autoempleo",
+        "emigracion",
+        "solicitudes",
+        "otro"
+      ],
+      "name": "estrategia_consecucion_empleo",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "prestigio_institucion",
+        "perfil_academico",
+        "experiencia_laboral",
+        "genero",
+        "edad",
+        "recomendaciones",
+        "otro"
+      ],
+      "name": "factor_empleo",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "agricultura",
+        "ganaderia",
+        "forestal",
+        "pesca"
+      ],
+      "name": "sector_primario",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "mineria",
+        "energia",
+        "agua_gas",
+        "construccion",
+        "manufactura"
+      ],
+      "name": "sector_secundario",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "comercio_mayor",
+        "comercio_menor",
+        "transporte",
+        "medios",
+        "financiero",
+        "inmobiliario",
+        "profesionales",
+        "educativos",
+        "salud",
+        "cultura",
+        "turismo",
+        "otros_servicios"
+      ],
+      "name": "sector_terciario",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "menos_seis_meses",
+        "seis_meses_un_anio",
+        "mas_de_un_anio",
+        "sin_empleo"
+      ],
+      "name": "tiempo_primer_empleo",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "academica",
+        "empresarial",
+        "gubernamental",
+        "independiente",
+        "otro"
+      ],
+      "name": "tipo_actividad_empleo",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "base",
+        "confianza",
+        "eventual",
+        "por_contrato",
+        "otro"
+      ],
+      "name": "tipo_contratacion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "privada",
+        "gobierno",
+        "educacion",
+        "investigacion",
+        "social",
+        "otro"
+      ],
+      "name": "tipo_institucion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "muy_bajo",
+        "bajo",
+        "medio",
+        "alto",
+        "muy_alto"
+      ],
+      "name": "valoracion_impacto",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "muy_baja",
+        "baja",
+        "media",
+        "alta",
+        "muy_alta"
+      ],
+      "name": "valoracion_nivel",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "ACTIVO",
+        "INACTIVO"
+      ],
+      "name": "institucion_estado",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "ACTIVO"
+      ],
+      "name": "estado_publicacion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "values": [
+        "ARTICULO",
+        "TESIS",
+        "LIBRO",
+        "MEMORIA_CONGRESO",
+        "PRESENTACION",
+        "ENSAYO",
+        "REPORTE_TECNICO",
+        "OTRO"
+      ],
+      "name": "tipo_publicacion",
+      "entityType": "enums",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "afiliado_actualizacion_profesional",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "administradores",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "afiliados_investigacion",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "afiliados",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "datos_emergencia",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "proyectos_relevantes",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "archivo",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "accounts",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "sessions",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "users",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "verifications",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "evaluacion_programa_estudios",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "folios_anuales",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "estancias_posdoctorales",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "licenciaturas",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "posgrados",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "afiliados_empleos",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "afiliados_informacion_laboral",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "instituciones",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "publicacion_autores",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "publicacion_palabras_clave",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "publicaciones",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "auth_events",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "login_lockouts",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "solicitudes",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ha_tomado_actualizacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actividades_actualizacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "varchar(1000)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actualizacion_deseada",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "disponibilidad_actualizacion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "disponibilidad_actualizacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "varchar(100)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "horario_actualizacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "creacion_empresa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "varchar(200)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre_empresa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "varchar(500)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "puesto_5_anios",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ha_ocupado_cargo_eleccion_popular",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "detalle_cargo_publico",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre_completo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "admin_subtype",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "subtype",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "true",
+      "generated": null,
+      "identity": null,
+      "name": "is_active",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "is_root",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "participacion_produccion_conocimiento",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "produccion_academica_opcion",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "produccion_academica",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "otros_productos_academicos",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "situacion_sni",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "situacion_sni",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sni_periodo_anterior",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sni_periodo_actual",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "red_tematica_conacyt",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre_red",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ha_recibido_premios_reconocimientos",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "detalle_reconocimiento",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "pertenece_academia_sociedad",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre_organizacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "apellido_paterno",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "apellido_materno",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombres",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fotografia_archivo_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "comprobante_membresia_archivo_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "genero",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "membership_status",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'NO_INICIADA'",
+      "generated": null,
+      "identity": null,
+      "name": "membership_status",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "last_email_change_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "varchar(15)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "folio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "varchar(10)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "telefono_celular",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "varchar(10)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "telefono_casa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correo_electronico",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "linkedin",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "orcid",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sitio_web",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estado_residencia",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ciudad_residencia",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "disponibilidad_geografica",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "area_conocimiento",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "area_conocimiento_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "perfil_profesional",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "palabras_clave",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "habilidades_tecnologicas",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_servicios",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_servicios_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "descripcion_servicios",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sectores",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sectores_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "modalidad_servicios",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "interesado_en",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "interesado_en_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "autoriza_publicacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "datos_publicos",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre_contacto",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "parentesco",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "parentesco_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "varchar(10)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "telefono",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "tipo_sanguineo",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_sanguineo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "alergias_condiciones_medicas",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "mostrar_en_qr",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "descripcion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "rol",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "bucket",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "object_key",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "original_name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "content_type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "bigint",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "size",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "archivo"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issuer",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "account_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "provider_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "access_token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "refresh_token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id_token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "access_token_expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "refresh_token_expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "scope",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "password",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "token",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ip_address",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_agent",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "name",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "email",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "email_verified",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "image",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "account_role",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'AFILIADO'",
+      "generated": null,
+      "identity": null,
+      "name": "role",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "email_verified_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "users"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "identifier",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "value",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "expires_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre_tesis",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "valoracion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "correspondencia_plan_estudios",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "valoracion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estrategias_didacticas",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "valoracion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "formas_evaluacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "valoracion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "bibliografia",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "asesoria_tesis",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "satisfaccion_formacion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "satisfaccion_formacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "evaluacion_infraestructura",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tiene_otro_aspecto_infraestructura",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "otro_aspecto_infraestructura",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "calificacion_otro_aspecto_infraestructura",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "cumplimiento_expectativas",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "cumplimiento_expectativas",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "valoracion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "calidad_programa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "areas_mejora",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "mejoras_plan_estudios",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "folios_anuales"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "ultimo_numero",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "folios_anuales"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "situacion_posdoctorado",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "situacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "institucion_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "programa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "campo_investigacion_posdoctorado",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "campo_investigacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "campo_investigacion_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "linea_investigacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_inicio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_fin",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "recibio_apoyo_economico",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "fuente_financiamiento_posdoctorado",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fuentes_financiamiento",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fuentes_financiamiento_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "institucion_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "programa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "disciplina",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_ingreso",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_egreso",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_titulacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "tipo_posgrado",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_posgrado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "trayectoria_posgrado",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "trayectoria_posgrado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "institucion_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "programa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "disciplina",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "linea_investigacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "motivos_eleccion_institucion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_ingreso",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_egreso",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actualmente_cursa",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "modalidad_posgrado",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "modalidad",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "modalidad_otra",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "dedicacion_posgrado",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "dedicacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "becado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "fuente_financiamiento_posgrado",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fuentes_financiamiento",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fuentes_financiamiento_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tiene_grado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_obtencion_grado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "meses_obtencion_grado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "motivo_no_obtencion_grado",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "motivo_no_obtencion_grado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "motivo_no_obtencion_grado_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "estado_civil",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estado_civil_inicio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estado_civil_inicio_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "estado_civil",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estado_civil_conclusion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estado_civil_conclusion_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "varchar(200)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "puesto",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "varchar(250)",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "institucion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fecha_inicio_anio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fecha_inicio_mes",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "es_actual",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fecha_fin_anio",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fecha_fin_mes",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "tipo_contratacion",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_contratacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_contratacion_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "numeric(12,2)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "salario_mensual_bruto",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "horas_semanales",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "tipo_institucion",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_institucion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_institucion_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "varchar(20)",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "telefono_organismo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "sector_primario",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sector_primario",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "sector_secundario",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sector_secundario",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "sector_terciario",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "sector_terciario",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "tipo_actividad_empleo",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_actividad_empleo_actual",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_actividad_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "actividades_principales",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "estrategia_consecucion_empleo",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estrategia_empleo_actual",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estrategia_empleo_actual_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "valoracion_nivel",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "valoracion_coincidencia_conocimientos_con_campo_laboral",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "valoracion_nivel",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "valoracion_capacidad_resolver_problemas_laborales",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "valoracion_impacto",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "valoracion_impacto_social_actividad_profesional",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "valoracion_nivel",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "valoracion_pertinencia_programa_campo_laboral",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "tiempo_primer_empleo",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tiempo_primer_empleo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "factor_empleo",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "factores_empleo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "factores_empleo_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "boolean",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "false",
+      "generated": null,
+      "identity": null,
+      "name": "labora_actualmente",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "causa_desempleo",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "causas_desempleo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "causas_desempleo_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "estrategia_consecucion_empleo",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 1,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estrategia_postgrado_para_conseguir_empleo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "estrategia_postgrado_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "instituciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombre",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "instituciones"
+    },
+    {
+      "type": "institucion_estado",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'ACTIVO'",
+      "generated": null,
+      "identity": null,
+      "name": "estado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "instituciones"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "last_changed_to_inactivo_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "instituciones"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "publicacion_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "nombres",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "apellidos",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "orden",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "publicacion_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "valor",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "titulo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "descripcion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "tipo_publicacion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "tipo_otro",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "anio_publicacion",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "doi",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "revista_congreso",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "editorial",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "isbn",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issn",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "url",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "documento_archivo_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "descargo_version",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "descargo_aceptado_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "estado_publicacion",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": "'ACTIVO'",
+      "generated": null,
+      "identity": null,
+      "name": "estado",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "type": "auth_event_type",
+      "typeSchema": "public",
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "type",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "email",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "ip_address",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "email_key",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "login_lockouts"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "0",
+      "generated": null,
+      "identity": null,
+      "name": "failed_count",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "login_lockouts"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "locked_until",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "login_lockouts"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "updated_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "login_lockouts"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "gen_random_uuid()",
+      "generated": null,
+      "identity": null,
+      "name": "id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "afiliado_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "integer",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "version",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "jsonb",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "datos",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "fotografia_archivo_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "comprobante_membresia_archivo_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "revision_decision",
+      "typeSchema": "public",
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "revision_decision",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "revision_observaciones",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "revisado_por_admin_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": false,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "revisado_en",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "created_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "issuer",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "account_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "accounts_issuer_accountId_uidx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "accounts_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "sessions_userId_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "identifier",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "verifications_identifier_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "verifications"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "publicacion_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "orden",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicacion_autores_publicacion_orden_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "publicacion_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicacion_autores_publicacion_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "publicacion_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "valor",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicacion_palabras_clave_publicacion_valor_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "valor",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicacion_palabras_clave_valor_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "documento_archivo_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicaciones_documento_archivo_id_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "afiliado_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicaciones_afiliado_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "estado",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicaciones_estado_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicaciones_created_at_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "tipo",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicaciones_tipo_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "anio_publicacion",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "publicaciones_anio_publicacion_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "type",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_events_type_user_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "type",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "email",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_events_type_email_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "type",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "ip_address",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "created_at",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "auth_events_type_ip_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "auth_events"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "afiliado_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "version",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "solicitudes_afiliado_version_unique",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "afiliado_actualizacion_profesional_V8OyLakhzVa1_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "administradores_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "administradores"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "afiliados_investigacion_user_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliados_investigacion"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "afiliados_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "fotografia_archivo_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "archivo",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "afiliados_fotografia_archivo_id_archivo_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "comprobante_membresia_archivo_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "archivo",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "afiliados_comprobante_membresia_archivo_id_archivo_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliados"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "datos_emergencia_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "datos_emergencia"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "proyectos_relevantes_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "proyectos_relevantes"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "accounts_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "sessions_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "sessions"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "evaluacion_programa_estudios_user_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "estancias_posdoctorales_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "institucion_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "instituciones",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "estancias_posdoctorales_institucion_id_instituciones_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "estancias_posdoctorales"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "licenciaturas_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "institucion_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "instituciones",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "licenciaturas_institucion_id_instituciones_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "licenciaturas"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "posgrados_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "institucion_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "instituciones",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "posgrados_institucion_id_instituciones_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "posgrados"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "afiliados_empleos_afiliado_user_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliados_empleos"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "user_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "afiliados_informacion_laboral_user_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "publicacion_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "publicaciones",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "publicacion_autores_publicacion_id_publicaciones_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "publicacion_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "publicaciones",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "publicacion_palabras_clave_publicacion_id_publicaciones_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "publicaciones_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "documento_archivo_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "archivo",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "name": "publicaciones_documento_archivo_id_archivo_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "afiliados",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "solicitudes_afiliado_id_afiliados_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "fotografia_archivo_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "archivo",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "solicitudes_fotografia_archivo_id_archivo_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "comprobante_membresia_archivo_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "archivo",
+      "columnsTo": [
+        "id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "solicitudes_comprobante_membresia_archivo_id_archivo_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "revisado_por_admin_id"
+      ],
+      "schemaTo": "public",
+      "tableTo": "administradores",
+      "columnsTo": [
+        "user_id"
+      ],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "name": "solicitudes_revisado_por_admin_id_administradores_user_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "solicitudes"
+    },
+    {
+      "columns": [
+        "anio"
+      ],
+      "nameExplicit": false,
+      "name": "folios_anuales_pkey",
+      "entityType": "pks",
+      "schema": "public",
+      "table": "folios_anuales"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "afiliado_actualizacion_profesional_pkey",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "administradores_pkey",
+      "schema": "public",
+      "table": "administradores",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "afiliados_investigacion_pkey",
+      "schema": "public",
+      "table": "afiliados_investigacion",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "afiliados_pkey",
+      "schema": "public",
+      "table": "afiliados",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "datos_emergencia_pkey",
+      "schema": "public",
+      "table": "datos_emergencia",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "proyectos_relevantes_pkey",
+      "schema": "public",
+      "table": "proyectos_relevantes",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "archivo_pkey",
+      "schema": "public",
+      "table": "archivo",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "accounts_pkey",
+      "schema": "public",
+      "table": "accounts",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "sessions_pkey",
+      "schema": "public",
+      "table": "sessions",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "users_pkey",
+      "schema": "public",
+      "table": "users",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "verifications_pkey",
+      "schema": "public",
+      "table": "verifications",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "evaluacion_programa_estudios_pkey",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "estancias_posdoctorales_pkey",
+      "schema": "public",
+      "table": "estancias_posdoctorales",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "licenciaturas_pkey",
+      "schema": "public",
+      "table": "licenciaturas",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "posgrados_pkey",
+      "schema": "public",
+      "table": "posgrados",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "afiliados_empleos_pkey",
+      "schema": "public",
+      "table": "afiliados_empleos",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "user_id"
+      ],
+      "nameExplicit": false,
+      "name": "afiliados_informacion_laboral_pkey",
+      "schema": "public",
+      "table": "afiliados_informacion_laboral",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "instituciones_pkey",
+      "schema": "public",
+      "table": "instituciones",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "publicacion_autores_pkey",
+      "schema": "public",
+      "table": "publicacion_autores",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "publicacion_palabras_clave_pkey",
+      "schema": "public",
+      "table": "publicacion_palabras_clave",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "publicaciones_pkey",
+      "schema": "public",
+      "table": "publicaciones",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "auth_events_pkey",
+      "schema": "public",
+      "table": "auth_events",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "email_key"
+      ],
+      "nameExplicit": false,
+      "name": "login_lockouts_pkey",
+      "schema": "public",
+      "table": "login_lockouts",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        "id"
+      ],
+      "nameExplicit": false,
+      "name": "solicitudes_pkey",
+      "schema": "public",
+      "table": "solicitudes",
+      "entityType": "pks"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "folio"
+      ],
+      "nullsNotDistinct": false,
+      "name": "afiliados_folio_key",
+      "schema": "public",
+      "table": "afiliados",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "correo_electronico"
+      ],
+      "nullsNotDistinct": false,
+      "name": "afiliados_correo_electronico_key",
+      "schema": "public",
+      "table": "afiliados",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "afiliado_id"
+      ],
+      "nullsNotDistinct": false,
+      "name": "datos_emergencia_afiliado_id_key",
+      "schema": "public",
+      "table": "datos_emergencia",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "object_key"
+      ],
+      "nullsNotDistinct": false,
+      "name": "archivo_object_key_key",
+      "schema": "public",
+      "table": "archivo",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "token"
+      ],
+      "nullsNotDistinct": false,
+      "name": "sessions_token_key",
+      "schema": "public",
+      "table": "sessions",
+      "entityType": "uniques"
+    },
+    {
+      "nameExplicit": false,
+      "columns": [
+        "email"
+      ],
+      "nullsNotDistinct": false,
+      "name": "users_email_key",
+      "schema": "public",
+      "table": "users",
+      "entityType": "uniques"
+    },
+    {
+      "value": "(\n  (\"ha_tomado_actualizacion\" AND \"actividades_actualizacion\" IS NOT NULL AND jsonb_typeof(\"actividades_actualizacion\") = 'array'\n    AND jsonb_array_length(\"actividades_actualizacion\") BETWEEN 1 AND 15)\n  OR (NOT \"ha_tomado_actualizacion\" AND \"actividades_actualizacion\" IS NULL)\n)",
+      "name": "ap_actividades_coherentes",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "value": "(\n  (\"creacion_empresa\" AND \"nombre_empresa\" IS NOT NULL) OR (NOT \"creacion_empresa\" AND \"nombre_empresa\" IS NULL)\n)",
+      "name": "ap_empresa_coherente",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "value": "(\n  (\"ha_ocupado_cargo_eleccion_popular\" AND \"detalle_cargo_publico\" IS NOT NULL AND jsonb_typeof(\"detalle_cargo_publico\") = 'array'\n    AND jsonb_array_length(\"detalle_cargo_publico\") BETWEEN 1 AND 15)\n  OR (NOT \"ha_ocupado_cargo_eleccion_popular\" AND \"detalle_cargo_publico\" IS NULL)\n)",
+      "name": "ap_cargos_coherentes",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "value": "(\n        cardinality(\"disponibilidad_actualizacion\") BETWEEN 1 AND 5\n        AND (\n          NOT ('sin_disponibilidad' = ANY(\"disponibilidad_actualizacion\"))\n          OR cardinality(\"disponibilidad_actualizacion\") = 1\n        )\n      )",
+      "name": "ap_disponibilidad_valida",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "afiliado_actualizacion_profesional"
+    },
+    {
+      "value": "\"asesoria_tesis\" BETWEEN 1 AND 10",
+      "name": "asesoria_tesis_range",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "value": "\"calificacion_otro_aspecto_infraestructura\" IS NULL\n          OR \"calificacion_otro_aspecto_infraestructura\" BETWEEN 1 AND 10",
+      "name": "calificacion_otro_aspecto_infraestructura_range",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "value": "(\n            \"tiene_otro_aspecto_infraestructura\" = false\n            AND \"otro_aspecto_infraestructura\" IS NULL\n            AND \"calificacion_otro_aspecto_infraestructura\" IS NULL\n          ) OR (\n            \"tiene_otro_aspecto_infraestructura\" = true\n            AND \"otro_aspecto_infraestructura\" IS NOT NULL\n            AND \"calificacion_otro_aspecto_infraestructura\" IS NOT NULL\n          )",
+      "name": "otro_aspecto_infraestructura_coherence",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "evaluacion_programa_estudios"
+    },
+    {
+      "value": "char_length(\"nombres\") BETWEEN 3 AND 150",
+      "name": "publicacion_autores_nombres_length_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "value": "char_length(\"apellidos\") BETWEEN 3 AND 150",
+      "name": "publicacion_autores_apellidos_length_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "value": "\"orden\" >= 1",
+      "name": "publicacion_autores_orden_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicacion_autores"
+    },
+    {
+      "value": "char_length(\"valor\") BETWEEN 3 AND 50",
+      "name": "publicacion_palabras_clave_valor_length_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicacion_palabras_clave"
+    },
+    {
+      "value": "(\"tipo\" = 'OTRO' AND \"tipo_otro\" IS NOT NULL)\n        OR (\"tipo\" <> 'OTRO' AND \"tipo_otro\" IS NULL)",
+      "name": "publicaciones_tipo_otro_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "value": "\"tipo_otro\" IS NULL\n        OR char_length(\"tipo_otro\") BETWEEN 3 AND 50",
+      "name": "publicaciones_tipo_otro_length_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "value": "char_length(\"titulo\") BETWEEN 3 AND 300",
+      "name": "publicaciones_titulo_length_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "value": "char_length(\"descripcion\") BETWEEN 10 AND 1800",
+      "name": "publicaciones_descripcion_length_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicaciones"
+    },
+    {
+      "value": "\"anio_publicacion\" BETWEEN 1950\n        AND EXTRACT(YEAR FROM CURRENT_DATE)::int",
+      "name": "publicaciones_anio_check",
+      "entityType": "checks",
+      "schema": "public",
+      "table": "publicaciones"
+    }
+  ],
+  "renames": []
+}

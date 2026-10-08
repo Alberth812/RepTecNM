@@ -10,5 +10,5 @@ export default async function Page() {
     redirect("/login");
   }
 
-  return <ChangePasswordForm />;
+  return <ChangePasswordForm isAdmin={true} />;
 }

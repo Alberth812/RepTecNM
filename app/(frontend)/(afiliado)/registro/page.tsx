@@ -5,6 +5,7 @@ import { getFileUrl } from "@/lib/storage";
 import RegistroForm from "@/components/afilliate/registro/RegistroFormv2";
 import { mapSnapshotToFormInput } from "@/lib/db/solicitudes/mapSnapshotToFormInput";
 import RegistroEnviado from "@/components/afilliate/registro/ui/RegistroEnviado";
+import { NoAutorizado } from "@/components/auth/no-autorizado";
 
 export default async function Page() {
   const { afiliado } = await requireAfiliado([
@@ -56,5 +57,5 @@ export default async function Page() {
   // ACTIVO, RECHAZADO, INACTIVO, SUSPENDIDO, BAJA:
   // ya los manejas en otro lado según comentaste — deja aquí tu
   // componente/mensaje correspondiente para esos casos.
-  return <p>No puedes hacer un registro debido a tu estado de membresía</p>;
+  return <NoAutorizado redirectHref="/" />;
 }

@@ -1,7 +1,9 @@
 "use client";
 
+import { LogoutButton } from "@/components/auth/logout-button";
 import { CheckCircle2 } from "lucide-react";
 
+//
 export default function RegistroEnviado({ esCorreccion = false }) {
   return (
     <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
@@ -14,8 +16,10 @@ export default function RegistroEnviado({ esCorreccion = false }) {
       <p className="mt-2 text-sm text-slate-500">
         {esCorreccion
           ? "Gracias por enviar tus correcciones. Un administrador revisará tu solicitud nuevamente."
-          : "Gracias por afiliarte a la Red de Egresados de Posgrado del TecNM. Revisaremos tu información y te contactaremos por correo electrónico."}
+          : "Gracias por afiliarte a la Red de Egresados de Posgrado del TecNM. Revisaremos tu información."}
       </p>
+
+      <LogoutButton className="w-full" />
     </div>
   );
 }

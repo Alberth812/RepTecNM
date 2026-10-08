@@ -6,6 +6,7 @@ import z from "zod";
 import { optionalPhoneSchema, phoneSchema } from "./util";
 import { ORCID_REGEX } from "../validators";
 
+//
 export const contactoSchema = z.object({
   telefono_celular: phoneSchema("El teléfono móvil"),
   telefono_casa: optionalPhoneSchema,

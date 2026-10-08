@@ -27,6 +27,7 @@ export type NavGroup = {
  * Para agregar/quitar/mover un link, solo edita este arreglo: BarraAdmin.tsx
  * no necesita tocarse.
  */
+
 export const NAV_GROUPS: NavGroup[] = [
   {
     items: [
@@ -39,6 +40,16 @@ export const NAV_GROUPS: NavGroup[] = [
       {
         label: "Repositorio",
         href: "/publicaciones",
+        icon: FileText,
+      },
+      {
+        label: "Instituciones",
+        href: "/admin/instituciones",
+        icon: FileText,
+      },
+      {
+        label: "Administradores",
+        href: "/admin/admins",
         icon: FileText,
       },
     ],

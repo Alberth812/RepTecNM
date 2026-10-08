@@ -24,7 +24,7 @@ export default function MiCuenta() {
       <CardContent className="pt-0">
         <nav className="rounded-lg border">
           <Link
-            href="/cambiar-password"
+            href="/admin/cambiar-password"
             className="group flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-muted/50"
           >
             <div>

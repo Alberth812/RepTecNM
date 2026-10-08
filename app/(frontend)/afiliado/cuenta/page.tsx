@@ -39,7 +39,7 @@ export default function MiCuenta() {
           </Link>
 
           <Link
-            href="/cambiar-password"
+            href="/afiliado/cambiar-password"
             className="group flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-muted/50"
           >
             <div>

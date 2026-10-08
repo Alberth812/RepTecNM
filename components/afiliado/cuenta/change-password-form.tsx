@@ -104,7 +104,7 @@ function PasswordInput({
   );
 }
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({ isAdmin }: { isAdmin: boolean }) {
   const router = useRouter();
 
   const [serverError, setServerError] = useState<string | null>(
@@ -184,7 +184,8 @@ export function ChangePasswordForm() {
 
       form.reset();
 
-      router.push("/afiliado/cuenta");
+      if(isAdmin) router.push("/admin/cuenta");
+      else router.push("/afiliado/cuenta");
       router.refresh();
     } catch {
       const message =
