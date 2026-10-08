@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(afiliados).innerJoin(users, eq(afiliados.userId, users.id)).where(where);
     const total = Number(count);
 
-    // ✅ CORRECCIÓN: No reasignar 'let query', usar variables encadenadas
+    // CORRECCIÓN: No reasignar 'let query', usar variables encadenadas
     const baseQuery = db
       .select({
         userId: afiliados.userId,

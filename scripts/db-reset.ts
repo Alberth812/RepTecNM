@@ -6,7 +6,7 @@ const client = new Client({
 });
 
 async function reset() {
-  console.log("🗑️  Reseteando base de datos...");
+  console.log("Reseteando base de datos...");
 
   await client.connect();
 
@@ -17,17 +17,17 @@ async function reset() {
 
   //
 
-  console.log("✅ Base de datos limpia");
+  console.log("Base de datos limpia");
   console.log("Ejecutando migraciones...");
 
   /*execSync("npx drizzle-kit migrate", {
     stdio: "inherit",
   });*/
 
-  console.log("✅ Base de datos lista");
+  console.log("Base de datos lista");
 }
 
 reset().catch((error) => {
-  console.error("❌ Error reseteando la base de datos:", error);
+  console.error("Error reseteando la base de datos:", error);
   process.exit(1);
 });

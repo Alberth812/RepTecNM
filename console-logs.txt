@@ -1,0 +1,21 @@
+./components/formacion-academica/estancia-posdoctoral-fields.tsx:194:                console.log(recibio);
+./components/formacion-academica/formacion-academica-form.tsx:123:  /** Si no se provee, el formulario solo hace console.log del payload validado. */
+./components/formacion-academica/formacion-academica-form.tsx:168:    //console.log(" Errores de validación:", formErrors);
+./components/formacion-academica/formacion-academica-form.tsx:191:      console.log(res);
+./components/informacion-laboral/informacion-laboral-form.tsx:259:      console.log("Información laboral", data);
+./components/informacion-laboral/informacion-laboral-form.tsx:262:      console.log(" Error de validación del formulario");
+./components/informacion-laboral/informacion-laboral-form.tsx:263:      console.log("Errores RHF/Zod:", errors);
+./components/informacion-laboral/informacion-laboral-form.tsx:266:      console.log("Errores serializados:", JSON.stringify(errors, null, 2));
+./scripts/db-reset.ts:9:  console.log("🗑️  Reseteando base de datos...");
+./scripts/db-reset.ts:20:  console.log("✅ Base de datos limpia");
+./scripts/db-reset.ts:21:  console.log("Ejecutando migraciones...");
+./scripts/db-reset.ts:27:  console.log("✅ Base de datos lista");
+./scripts/recover-root-admin.ts:78:  console.log(
+./scripts/recover-root-admin.ts:81:  console.log("Se cerraron todas sus sesiones activas.");
+./scripts/seed-instituciones.ts:34:      console.log(`Ya existe: ${nombre}`);
+./scripts/seed-instituciones.ts:40:    console.log(`Institución creada: ${nombre}`);
+./scripts/seed-instituciones.ts:43:  console.log("Seed de instituciones completado.");
+./scripts/seed-root-admin.ts:85:  console.log(
+./scripts/seed-test-affiliate.ts:13:  console.log("Creando usuario base...");
+./scripts/seed-test-affiliate.ts:19:  console.log("Verificando correo y creando perfil de afiliado...");
+./scripts/seed-test-affiliate.ts:32:  console.log(`✅ Afiliado de prueba creado exitosamente: ${email}`);

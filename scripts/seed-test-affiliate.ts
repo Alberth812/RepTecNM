@@ -29,7 +29,7 @@ async function main() {
     }).onConflictDoNothing();
   });
 
-  console.log(`✅ Afiliado de prueba creado exitosamente: ${email}`);
+  console.log(`Afiliado de prueba creado exitosamente: ${email}`);
   process.exit(0);
 }
 
