@@ -164,3 +164,4 @@ export async function getInternalFileUrl(
     expiresIn: expiresInSeconds,
   });
 }
+export type { StorageTarget } from './config';

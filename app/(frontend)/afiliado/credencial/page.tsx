@@ -150,7 +150,7 @@ export default function CredencialDigitalPage() {
           qrCodeDataUrl={qrCodeDataUrl}
           datosEmergencia={credencial.datosEmergencia ? {
             ...credencial.datosEmergencia,
-            telefono: credencial.datosEmergencia.telefonoContacto
+            telefonoContacto: credencial.datosEmergencia.telefonoContacto
           } : null}
         />
       ).toBlob();
