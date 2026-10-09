@@ -4,15 +4,13 @@ export type Mensaje = {
   contenido: string;
   leido: boolean;
   createdAt: string;
-  // Para mensajes recibidos:
-  remitenteNombre?: string;
-  remitenteEmail?: string;
-  nombreParaRespuesta?: string;
-  correoParaRespuesta?: string;
-  telefonoParaRespuesta?: string;
-  // Para mensajes enviados:
-  destinatarioNombre?: string;
-  destinatarioEmail?: string;
+  nombreRemitente: string;
+  nombreDestinatario: string;
+  datosContacto: {
+    nombre?: string;
+    email?: string;
+    telefono?: string;
+  } | null;
 };
 
 export async function cargarMensajes(tipo: "recibidos" | "enviados" = "recibidos"): Promise<Mensaje[]> {

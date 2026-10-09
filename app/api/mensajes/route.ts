@@ -2,150 +2,146 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { mensajes } from "@/lib/db/schema/mensajes";
 import { users } from "@/lib/db/schema/auth-schema";
-import { eq, desc } from "drizzle-orm";
-import { z } from "zod";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { getCurrentSession } from "@/lib/auth/session";
+import { z } from "zod";
 
-function sanitizeInput(text: string): string {
-  if (!text) return "";
-  return text
-    .replace(/[<>\"'`;\\]/g, "")
-    .replace(/javascript:/gi, "")
-    .replace(/on\w+=/gi, "")
-    .trim();
-}
-
-// VALIDACIÓN CORREGIDA: destinatarioId ya NO exige UUID, acepta cualquier string válido
+// Esquema para enviar mensajes (se mantiene igual)
 const enviarMensajeSchema = z.object({
-  destinatarioId: z.string().min(1, "ID de destinatario requerido").max(255, "ID demasiado largo"),
-  nombreParaRespuesta: z.string().min(2, "Nombre es obligatorio").max(100, "Nombre demasiado largo"),
-  correoParaRespuesta: z.string().email("Correo no válido").max(255).optional().or(z.literal("")),
-  telefonoParaRespuesta: z.string().regex(/^\d{10,12}$/, "Teléfono debe tener 10-12 dígitos").optional().or(z.literal("")),
+  destinatarioId: z.string().min(1, "Debes seleccionar un destinatario"),
+  nombreParaRespuesta: z.string().min(2, "Nombre para respuesta es obligatorio").max(100),
+  correoParaRespuesta: z.string().email("Correo electrónico no válido"),
+  telefonoParaRespuesta: z.string().regex(/^\+?\d{10,12}$/, "Teléfono debe tener 10-12 dígitos").optional().or(z.literal("")),
   motivo: z.string().min(5, "El motivo es muy corto").max(150, "El motivo es muy largo"),
-  contenido: z.string().min(10, "El mensaje debe tener al menos 10 caracteres").max(2000, "El mensaje es demasiado largo"),
+  contenido: z.string().min(10, "El mensaje debe tener al menos 10 caracteres").refine((val) => {
+    const palabras = val.trim().split(/\s+/).filter((p) => p.length > 0);
+    return palabras.length <= 600;
+  }, { message: "El mensaje no puede exceder 600 palabras" }),
 });
 
 export async function POST(request: NextRequest) {
   try {
-    const sessionData = await getCurrentSession();
-    
-    if (!sessionData || !sessionData.user) {
-      return NextResponse.json({ error: "No autorizado. Debes iniciar sesión." }, { status: 401 });
+    const session = await getCurrentSession();
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const currentUserId = sessionData.user.id;
     const body = await request.json();
-    
     const parsed = enviarMensajeSchema.safeParse(body);
 
     if (!parsed.success) {
-      const errores = parsed.error.issues.map((i) => ({
-        campo: i.path.join("."),
-        mensaje: i.message,
-      }));
-      console.error(" Errores de validación en /api/mensajes:", errores);
-      return NextResponse.json(
-        { error: "Errores de validación", detalles: errores },
-        { status: 400 }
-      );
+      return NextResponse.json({ 
+        error: "Errores de validación", 
+        detalles: parsed.error.issues.map((i) => ({ campo: i.path.join("."), mensaje: i.message })) 
+      }, { status: 400 });
     }
 
-    const {
-      destinatarioId,
-      nombreParaRespuesta,
-      correoParaRespuesta,
-      telefonoParaRespuesta,
-      motivo,
-      contenido,
-    } = parsed.data;
+    const { destinatarioId, nombreParaRespuesta, correoParaRespuesta, telefonoParaRespuesta, motivo, contenido } = parsed.data;
 
-    if (destinatarioId === currentUserId) {
+    if (destinatarioId === session.user.id) {
       return NextResponse.json({ error: "No puedes enviarte mensajes a ti mismo" }, { status: 400 });
     }
 
-    // CORRECCIÓN DRIZZLE: Usar db.select en lugar de db.query para evitar el bug "decoder"
-    const destinatario = await db.select().from(users).where(eq(users.id, destinatarioId)).limit(1);
-
-    if (!destinatario || destinatario.length === 0) {
-      return NextResponse.json({ error: "Destinatario no encontrado" }, { status: 404 });
+    const destinatario = await db.select({ id: users.id }).from(users).where(eq(users.id, destinatarioId)).limit(1);
+    if (destinatario.length === 0) {
+      return NextResponse.json({ error: "El destinatario no existe" }, { status: 404 });
     }
 
     const [mensaje] = await db.insert(mensajes).values({
-      remitenteId: currentUserId,
+      remitenteId: session.user.id,
       destinatarioId,
-      nombreParaRespuesta: sanitizeInput(nombreParaRespuesta),
-      correoParaRespuesta: correoParaRespuesta ? sanitizeInput(correoParaRespuesta) : null,
-      telefonoParaRespuesta: telefonoParaRespuesta ? sanitizeInput(telefonoParaRespuesta) : null,
-      motivo: sanitizeInput(motivo),
-      contenido: sanitizeInput(contenido),
+      nombreParaRespuesta,
+      correoParaRespuesta,
+      telefonoParaRespuesta: telefonoParaRespuesta || null,
+      motivo,
+      contenido,
       leido: false,
     }).returning();
 
-    console.log(` Mensaje enviado de ${currentUserId} a ${destinatarioId}`);
-
-    return NextResponse.json({
-      success: true,
-      data: mensaje,
-      message: "Mensaje enviado correctamente",
-    });
+    return NextResponse.json({ success: true, data: mensaje }, { status: 201 });
   } catch (error) {
-    console.error(" Error en POST /api/mensajes:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    console.error("Error enviando mensaje:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const sessionData = await getCurrentSession();
-    if (!sessionData || !sessionData.user) {
+    const session = await getCurrentSession();
+    if (!session || !session.user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const currentUserId = sessionData.user.id;
     const { searchParams } = new URL(request.url);
-    const tipo = searchParams.get("tipo") || "recibidos"; // 'recibidos' o 'enviados'
+    const tipo = searchParams.get("tipo") || "recibidos";
+    const soloNoLeidos = searchParams.get("noLeidos") === "true";
 
-    let query;
-    if (tipo === "enviados") {
-      query = db.select({
+    const condiciones = [
+      tipo === "recibidos" 
+        ? eq(mensajes.destinatarioId, session.user.id)
+        : eq(mensajes.remitenteId, session.user.id),
+    ];
+
+    if (tipo === "recibidos") {
+      condiciones.push(eq(mensajes.eliminadoParaDestinatario, false));
+      if (soloNoLeidos) {
+        condiciones.push(eq(mensajes.leido, false));
+      }
+    }
+
+    // 1. Obtener mensajes con datos del remitente (JOIN con users)
+    const resultados = await db
+      .select({
         id: mensajes.id,
         motivo: mensajes.motivo,
         contenido: mensajes.contenido,
         leido: mensajes.leido,
         createdAt: mensajes.createdAt,
-        destinatarioNombre: users.name,
-        destinatarioEmail: users.email,
-      })
-      .from(mensajes)
-      .leftJoin(users, eq(mensajes.destinatarioId, users.id))
-      .where(eq(mensajes.remitenteId, currentUserId))
-      .orderBy(desc(mensajes.createdAt));
-    } else {
-      query = db.select({
-        id: mensajes.id,
-        motivo: mensajes.motivo,
-        contenido: mensajes.contenido,
-        leido: mensajes.leido,
-        createdAt: mensajes.createdAt,
-        remitenteNombre: users.name,
-        remitenteEmail: users.email,
+        remitenteId: mensajes.remitenteId,
+        destinatarioId: mensajes.destinatarioId,
         nombreParaRespuesta: mensajes.nombreParaRespuesta,
         correoParaRespuesta: mensajes.correoParaRespuesta,
         telefonoParaRespuesta: mensajes.telefonoParaRespuesta,
+        remitenteNombre: users.name,
       })
       .from(mensajes)
-      .leftJoin(users, eq(mensajes.remitenteId, users.id))
-      .where(eq(mensajes.destinatarioId, currentUserId))
-      .orderBy(desc(mensajes.createdAt));
+      .innerJoin(users, eq(mensajes.remitenteId, users.id))
+      .where(and(...condiciones))
+      .orderBy(desc(mensajes.createdAt))
+      .limit(100);
+
+    // 2. Obtener nombres de destinatarios para la vista de "enviados" (evita N+1 queries)
+    const userIds = [...new Set(resultados.map(r => r.destinatarioId).filter(Boolean) as string[])];
+    let destinatariosMap: Record<string, string> = {};
+    
+    if (userIds.length > 0) {
+      const destUsers = await db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(inArray(users.id, userIds));
+      
+      destinatariosMap = Object.fromEntries(destUsers.map(u => [u.id, u.name || "Desconocido"]));
     }
 
-    const mensajesList = await query;
-    return NextResponse.json({ success: true, data: mensajesList });
+    // 3. Formatear la respuesta para que coincida con el tipo Mensaje del frontend
+    const mensajesFormateados = resultados.map(r => ({
+      id: r.id,
+      motivo: r.motivo,
+      contenido: r.contenido,
+      leido: r.leido,
+      createdAt: r.createdAt.toISOString(),
+      nombreRemitente: r.remitenteNombre || "Desconocido",
+      nombreDestinatario: destinatariosMap[r.destinatarioId] || "Desconocido",
+      datosContacto: r.nombreParaRespuesta ? {
+        nombre: r.nombreParaRespuesta,
+        email: r.correoParaRespuesta || undefined,
+        telefono: r.telefonoParaRespuesta || undefined,
+      } : null,
+    }));
+
+    return NextResponse.json({ data: mensajesFormateados });
   } catch (error) {
-    console.error(" Error en GET /api/mensajes:", error);
+    console.error("Error cargando mensajes:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
