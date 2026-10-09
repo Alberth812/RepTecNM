@@ -24,7 +24,7 @@ interface Afiliado {
     alergiasCondiciones: string;
     nombreContacto: string;
     parentesco: string;
-    telefono: string;
+    telefonoContacto: string;
   } | null;
 }
 

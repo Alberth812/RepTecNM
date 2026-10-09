@@ -2,79 +2,86 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { afiliados, datosEmergencia } from "@/lib/db/schema/afiliados";
 import { users } from "@/lib/db/schema/auth-schema";
-import { auth } from "@/lib/auth/auth";
-import { headers } from "next/headers";
-import { eq, ilike, or, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+import { getCurrentSession } from "@/lib/auth/session";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const headersList = await headers();
-    const sessionData = await auth.api.getSession({ headers: headersList });
-    if (!sessionData?.user) return new Response(JSON.stringify({ error: "No autorizado" }), { status: 401, headers: { "Content-Type": "application/json" } });
-    const user = sessionData.user;
-
-    if (!user || user.role !== "ADMINISTRADOR") {
+    const session = await getCurrentSession();
+    if (!session || !session.user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const query = searchParams.get("q") || "";
-    const estado = searchParams.get("estado") || "";
+    const { searchParams } = new URL(request.url);
+    const q = searchParams.get("q");
+    const estado = searchParams.get("estado");
 
-    // Construir condiciones de búsqueda
-    const conditions = [];
-
-    if (query) {
-      // Buscar por nombre completo o folio
-      const searchCondition = or(
-        ilike(afiliados.nombres, `%${query}%`),
-        ilike(afiliados.apellidoPaterno, `%${query}%`),
-        ilike(afiliados.apellidoMaterno, `%${query}%`),
-        ilike(afiliados.folio, `%${query}%`)
-      );
-      if (searchCondition) conditions.push(searchCondition);
-    }
-
-    if (estado) {
-      conditions.push(eq(afiliados.membershipStatus, estado as any));
-    }
-
-    // Ejecutar consulta
-    const afiliadosResult = await db
+    // 1. Consulta con LEFT JOIN a users para obtener el email correctamente
+    const resultados = await db
       .select({
         userId: afiliados.userId,
+        folio: afiliados.folio,
         nombres: afiliados.nombres,
         apellidoPaterno: afiliados.apellidoPaterno,
         apellidoMaterno: afiliados.apellidoMaterno,
-        folio: afiliados.folio,
         membershipStatus: afiliados.membershipStatus,
         fotografiaArchivoId: afiliados.fotografiaArchivoId,
-        email: users.email,
+        email: users.email, // Ahora sí funciona porque viene de la tabla users
       })
       .from(afiliados)
-      .leftJoin(users, eq(afiliados.userId, users.id))
-      .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .limit(50);
+      .leftJoin(users, eq(afiliados.userId, users.id));
 
-    // Obtener datos de emergencia para cada afiliado
+    // 2. Filtrado en memoria (más seguro y evita errores complejos de Drizzle con filtros opcionales)
+    let filtrados = resultados;
+
+    if (estado) {
+      filtrados = filtrados.filter(a => a.membershipStatus === estado);
+    }
+
+    if (q) {
+      const queryLower = q.toLowerCase();
+      filtrados = filtrados.filter(a => 
+        a.nombres?.toLowerCase().includes(queryLower) ||
+        a.apellidoPaterno?.toLowerCase().includes(queryLower) ||
+        a.apellidoMaterno?.toLowerCase().includes(queryLower) ||
+        a.folio?.toLowerCase().includes(queryLower) ||
+        a.email?.toLowerCase().includes(queryLower)
+      );
+    }
+
+    // 3. Para cada afiliado, obtener sus datos de emergencia
     const afiliadosConEmergencia = await Promise.all(
-      afiliadosResult.map(async (afiliado) => {
+      filtrados.map(async (a) => {
         const [emergencia] = await db
           .select()
           .from(datosEmergencia)
-          .where(eq(datosEmergencia.afiliadoId, afiliado.userId));
+          .where(eq(datosEmergencia.afiliadoId, a.userId));
+
+        const nombreCompleto = `${a.nombres || ""} ${a.apellidoPaterno || ""} ${a.apellidoMaterno || ""}`.trim();
 
         return {
-          ...afiliado,
-          nombreCompleto: `${afiliado.nombres || ""} ${afiliado.apellidoPaterno || ""} ${afiliado.apellidoMaterno || ""}`.trim(),
-          datosEmergencia: emergencia || null,
+          userId: a.userId,
+          nombreCompleto,
+          folio: a.folio,
+          membershipStatus: a.membershipStatus,
+          fotografiaArchivoId: a.fotografiaArchivoId,
+          email: a.email,
+          datosEmergencia: emergencia
+            ? {
+                tipoSanguineo: emergencia.tipoSanguineo || "N/A",
+                alergiasCondiciones: emergencia.alergiasCondicionesMedicas || "Ninguna",
+                nombreContacto: emergencia.nombreContacto || "N/A",
+                parentesco: emergencia.parentesco || "N/A",
+                telefonoContacto: emergencia.telefono || "N/A",
+              }
+            : null,
         };
       })
     );
 
     return NextResponse.json(afiliadosConEmergencia);
   } catch (error) {
-    console.error("Error buscando afiliados:", error);
+    console.error(" Error cargando credenciales:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

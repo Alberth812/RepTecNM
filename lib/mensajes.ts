@@ -44,3 +44,23 @@ export async function marcarLeido(id: string) {
     return false;
   }
 }
+
+export async function eliminarMensaje(id: string) {
+  try {
+    const res = await fetch(`/api/mensajes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accion: "eliminar" }),
+    });
+    
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Error al eliminar el mensaje");
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Error eliminando mensaje:", error);
+    throw error;
+  }
+}
