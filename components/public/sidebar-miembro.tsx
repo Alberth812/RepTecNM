@@ -13,11 +13,18 @@ import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
 import { BadgeEstado } from "@/components/public/badge-estado";
 import { useRol, type Rol } from "@/lib/use-rol";
 
-export function contarMensajesNoLeidos(): number {
+export async function contarMensajesNoLeidos(): Promise<number> {
   if (typeof window === "undefined") return 0;
   const rol = localStorage.getItem("rep-rol");
   if (rol !== "admin" && rol !== "afiliado") return 0;
-  return cargarMensajes().filter((m) => !m.leido && m.para.rol === rol).length;
+  
+  try {
+    const mensajes = await cargarMensajes("recibidos");
+    return mensajes.filter((m) => !m.leido).length;
+  } catch (error) {
+    console.error("Error al contar mensajes:", error);
+    return 0;
+  }
 }
 
 export const MENU_AFILIADO = [
@@ -57,11 +64,17 @@ export function SidebarMiembro({ rol }: { rol: Rol }) {
 
   useEffect(() => {
     if (rol === "visitante") return;
-    if (rol === "afiliado") {
-      const leidas = leerLeidas();
-      setNoLeidas(cargarNotificaciones().filter((n) => !leidas.includes(n.id)).length);
-    }
-    setMsgNoLeidas(contarMensajesNoLeidos());
+    
+    const cargarDatos = async () => {
+      if (rol === "afiliado") {
+        const leidas = leerLeidas();
+        setNoLeidas(cargarNotificaciones().filter((n) => !leidas.includes(n.id)).length);
+      }
+      const totalMsg = await contarMensajesNoLeidos();
+      setMsgNoLeidas(totalMsg);
+    };
+    
+    cargarDatos();
   }, [rol, pathname]);
 
   const nombreReal = nombre || (rol === "admin" ? "Administración RepTecNM" : "María Fernanda López Herrera");
