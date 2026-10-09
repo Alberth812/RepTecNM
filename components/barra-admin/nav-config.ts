@@ -7,7 +7,6 @@ import {
   CreditCard,
   Megaphone,
   BookOpen,
-  Mail,
   User,
 } from "lucide-react";
 
@@ -46,7 +45,6 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Comunicación",
     items: [
-      { label: "Mensajería", href: "/admin/mensajeria", icon: Mail, badge: true },
       { label: "Avisos", href: "/admin/avisos", icon: Megaphone },
     ],
   },

@@ -1,5 +1,6 @@
-import { MensajeriaPage } from "@/components/mensajeria/MensajeriaPage";
+import { redirect } from "next/navigation";
 
-export default function AdminMensajeria() {
-  return <MensajeriaPage rol="admin" />;
+export default function AdminMensajeriaRedirect() {
+  // Redirigir al inicio del panel de admin, ya que esta sección no existe para este rol
+  redirect("/admin/inicio");
 }

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { pdf } from "@react-pdf/renderer";
 import { CredencialPDF } from "@/components/credencial/CredencialPDF";
+import QRCode from "qrcode";
 
 interface Afiliado {
   userId: string;
@@ -69,6 +70,19 @@ export default function AdminCredencialesPage() {
         ? `${baseUrl}/api/archivo/${afiliado.fotografiaArchivoId}`
         : undefined;
 
+      // Generar QR como base64 para el PDF
+      const qrCodeDataUrl = await QRCode.toDataURL(
+        `${baseUrl}/verificar/${afiliado.folio}`,
+        {
+          width: 200,
+          margin: 1,
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF"
+          }
+        }
+      );
+
       const blob = await pdf(
         <CredencialPDF
           numeroAfiliado={afiliado.folio}
@@ -78,6 +92,7 @@ export default function AdminCredencialesPage() {
           folio={afiliado.folio}
           logoUrl={logoUrl}
           fotografiaUrl={fotografiaUrl}
+          qrCodeDataUrl={qrCodeDataUrl}
           datosEmergencia={afiliado.datosEmergencia}
         />
       ).toBlob();

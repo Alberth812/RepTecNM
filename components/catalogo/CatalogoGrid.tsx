@@ -170,18 +170,6 @@ export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
                     </Button>
                   )}
 
-                  {rolUsuario === "admin" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full h-10 mt-2 border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
-                      onClick={() => window.location.href = `/admin/afiliados/${a.userId}`}
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      Gestionar perfil
-                    </Button>
-                  )}
-
                   {rolUsuario === "visitante" && (
                     <div className="text-center space-y-2">
                       <p className="text-xs text-slate-500">
