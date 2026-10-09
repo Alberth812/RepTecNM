@@ -1,6 +1,6 @@
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // 5. Servicios profesionales
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 import z from "zod";
 import { INTERESADO_EN_OPTIONS, MODALIDAD_SERVICIOS_OPTIONS, SECTORES_OPTIONS, TIPO_SERVICIOS_OPTIONS } from "../types";

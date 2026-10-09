@@ -13,17 +13,23 @@ export async function GET() {
 
     const [afiliado] = await db
       .select({
+        userId: afiliados.userId,
         folio: afiliados.folio,
         nombres: afiliados.nombres,
         apellidoPaterno: afiliados.apellidoPaterno,
         apellidoMaterno: afiliados.apellidoMaterno,
         membershipStatus: afiliados.membershipStatus,
+        fotografiaArchivoId: afiliados.fotografiaArchivoId,
+        createdAt: afiliados.createdAt,
       })
       .from(afiliados)
       .where(eq(afiliados.userId, session.user.id));
 
-    if (!afiliado || !afiliado.folio) {
-      return NextResponse.json({ error: "Credencial no encontrada" }, { status: 404 });
+    if (!afiliado || afiliado.membershipStatus !== "ACTIVO") {
+      return NextResponse.json(
+        { error: "Credencial no disponible" },
+        { status: 404 }
+      );
     }
 
     // Obtener datos de emergencia
@@ -32,27 +38,50 @@ export async function GET() {
       .from(datosEmergencia)
       .where(eq(datosEmergencia.afiliadoId, session.user.id));
 
-    const nombreCompleto = `${afiliado.nombres} ${afiliado.apellidoPaterno} ${afiliado.apellidoMaterno}`.trim();
+    const nombreCompleto = `${afiliado.nombres || ""} ${
+      afiliado.apellidoPaterno || ""
+    } ${afiliado.apellidoMaterno || ""}`.trim();
+
+    // Generar folio si no existe
+    let folioFinal = afiliado.folio;
+    if (!folioFinal) {
+      // Generar folio temporal (en producción, usarías la función del script)
+      const anio = new Date().getFullYear().toString().slice(-2);
+      const mes = String(new Date().getMonth() + 1).padStart(2, "0");
+      const dia = String(new Date().getDate()).padStart(2, "0");
+      const iniciales = `${afiliado.nombres.charAt(0)}${afiliado.apellidoPaterno.charAt(0)}H`.toUpperCase();
+      const aleatorio = Math.floor(1000 + Math.random() * 9000);
+      folioFinal = `REP-AF${anio}${mes}${dia}-${iniciales}-${aleatorio}`;
+      
+      // Actualizar en BD
+      await db
+        .update(afiliados)
+        .set({ folio: folioFinal })
+        .where(eq(afiliados.userId, session.user.id));
+    }
 
     return NextResponse.json({
-      numeroAfiliado: afiliado.folio,
-      folio: afiliado.folio, // En producción, esto sería un hash diferente
-      nombreCompleto,
-      instituto: "Instituto Tecnológico", // Esto vendría del posgrado más reciente
-      anioAprobacion: new Date().getFullYear(),
+      numeroAfiliado: folioFinal,
+      folio: folioFinal,
+      nombreCompleto: nombreCompleto || "Nombre no disponible",
+      instituto: "Instituto Tecnológico", // Esto vendría de posgrados
+      anioAprobacion: new Date(afiliado.createdAt).getFullYear(),
+      fotografiaArchivoId: afiliado.fotografiaArchivoId,
       datosEmergencia: emergencia
         ? {
-            tipoSanguineo: emergencia.tipoSanguineo,
-            alergiasCondiciones: emergencia.alergiasCondicionesMedicas || "",
-            nombreContacto: emergencia.nombreContacto,
-            parentesco: emergencia.parentesco,
-            telefonoContacto: emergencia.telefono,
+            tipoSanguineo: emergencia.tipoSanguineo || "N/A",
+            alergiasCondiciones: emergencia.alergiasCondicionesMedicas || "Ninguna",
+            nombreContacto: emergencia.nombreContacto || "N/A",
+            parentesco: emergencia.parentesco || "N/A",
+            telefonoContacto: emergencia.telefono || "N/A",
           }
-        : undefined,
-      mostrarEmergencia: emergencia?.mostrarEnQr || false,
+        : null,
     });
   } catch (error) {
-    console.error("Error cargando credencial:", error);
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+    console.error(" Error cargando credencial:", error);
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }

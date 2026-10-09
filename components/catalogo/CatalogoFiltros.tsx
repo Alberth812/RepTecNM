@@ -29,7 +29,7 @@ export function CatalogoFiltros({ facets }: CatalogoFiltrosProps) {
 
   const [filtrosAbiertos, setFiltrosAbiertos] = useState(true);
 
-  // ── Estados locales para respuesta instantánea al clic ──
+  //  Estados locales para respuesta instantánea al clic 
   const [search, setSearch] = useState("");
   const [estado, setEstado] = useState("");
   const [posgrado, setPosgrado] = useState("");

@@ -1,50 +1,40 @@
-/**
- * API para operaciones sobre un mensaje específico
- * 
- * PATCH /api/mensajes/[id] - Marcar un mensaje como leído
- * 
- * Solo el destinatario puede marcar un mensaje como leído
- */
-import { NextRequest } from "next/server";
-import { requireSession } from "@/lib/auth/session";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
 import { mensajes } from "@/lib/db/schema/mensajes";
 import { eq, and } from "drizzle-orm";
-import { ok, toErrorResponse } from "@/lib/http/responses";
-import { ApiError } from "@/lib/errors";
+import { getCurrentSession } from "@/lib/auth/session";
 
-/**
- * PATCH: Marcar un mensaje como leído
- * 
- * Solo funciona si el usuario autenticado es el destinatario del mensaje
- */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    // Verificar autenticación y obtener sesión del usuario
-    const session = await requireSession();
+    const sessionData = await getCurrentSession();
+    if (!sessionData || !sessionData.user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+    
     const { id } = await params;
+    const body = await request.json();
+    const { accion } = body;
 
-    // Actualizar el mensaje: marcar como leído
-    // Solo si el usuario actual es el destinatario (seguridad)
-    const result = await db
-      .update(mensajes)
-      .set({ leido: true })
-      .where(
-        and(
-          eq(mensajes.id, id),
-          eq(mensajes.destinatarioId, session.user.id)
-        )
-      );
+    // Verificar que el mensaje exista y pertenezca al usuario actual
+    const [mensaje] = await db.select().from(mensajes).where(
+      and(eq(mensajes.id, id), eq(mensajes.destinatarioId, sessionData.user.id))
+    );
 
-    if (!result) {
-      throw ApiError.notFound("Mensaje no encontrado o no tienes permiso");
+    if (!mensaje) {
+      return NextResponse.json({ error: "Mensaje no encontrado o no tienes permiso" }, { status: 404 });
     }
 
-    return ok({ message: "Mensaje marcado como leído" });
+    if (accion === "leido") {
+      await db.update(mensajes).set({ leido: true }).where(eq(mensajes.id, id));
+    } else if (accion === "eliminar") {
+      await db.update(mensajes).set({ eliminadoParaDestinatario: true }).where(eq(mensajes.id, id));
+    } else {
+      return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
-    return toErrorResponse(error);
+    console.error("Error al actualizar mensaje:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

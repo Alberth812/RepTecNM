@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, User, BookOpen, Mail, LifeBuoy } from "lucide-react";
+import { FileText, Home, User, BookOpen, Mail, LifeBuoy, CreditCard } from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -12,11 +12,6 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/**
- * Fuente única de verdad para los links del sidebar.
- * Cada grupo tiene un título opcional.
- * Para agregar/quitar/mover un link, solo edita este arreglo.
- */
 export const NAV_GROUPS: NavGroup[] = [
   {
     items: [
@@ -46,6 +41,11 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: FileText,
       },
       {
+        label: "Credencial Digital",
+        href: "/afiliado/credencial",
+        icon: CreditCard,
+      },
+      {
         label: "Centro de Soporte",
         href: "/afiliado/soporte",
         icon: LifeBuoy,
@@ -54,7 +54,6 @@ export const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
-// Item fijo al fondo del sidebar (arriba del botón de cerrar sesión).
 export const ACCOUNT_ITEM: NavItem = {
   label: "Cuenta",
   href: "/afiliado/cuenta",

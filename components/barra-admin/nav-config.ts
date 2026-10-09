@@ -1,10 +1,21 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, MessageSquare, LifeBuoy, CreditCard, User } from "lucide-react";
+import {
+  Home,
+  FileText,
+  Users,
+  Ticket,
+  CreditCard,
+  Megaphone,
+  BookOpen,
+  Mail,
+  User,
+} from "lucide-react";
 
 export type NavItem = {
   label: string;
   href: string;
   icon: LucideIcon;
+  badge?: boolean;
 };
 
 export type NavGroup = {
@@ -16,33 +27,35 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     items: [
       { label: "Inicio", href: "/admin/inicio", icon: Home },
-      {
-        label: "Solicitudes",
-        href: "/admin/solicitudes",
-        icon: FileText,
-      },
-      {
-        label: "Repositorio",
-        href: "/publicaciones",
-        icon: FileText,
-      },
+      { label: "Repositorio", href: "/publicaciones", icon: FileText },
     ],
   },
   {
     title: "Gestión",
     items: [
-      { label: "Solicitudes", href: "/admin/solicitudes", icon: FileText },
-      { label: "Tickets de Soporte", href: "/admin/soporte", icon: LifeBuoy },
+      { 
+        label: "Solicitudes de Afiliación", 
+        href: "/admin/solicitudes", 
+        icon: Users,
+        badge: true 
+      },
+      { label: "Tickets de Soporte", href: "/admin/soporte", icon: Ticket },
       { label: "Credenciales", href: "/admin/credenciales", icon: CreditCard },
     ],
   },
   {
     title: "Comunicación",
     items: [
-      { label: "Avisos", href: "/admin/avisos", icon: MessageSquare },
+      { label: "Mensajería", href: "/admin/mensajeria", icon: Mail, badge: true },
+      { label: "Avisos", href: "/admin/avisos", icon: Megaphone },
     ],
   },
-  //  Se eliminó el grupo "Sistema" y la opción "Configuración"
+  {
+    title: "Catálogo",
+    items: [
+      { label: "Catálogo Profesional", href: "/admin/catalogo", icon: BookOpen },
+    ],
+  },
 ];
 
 export const ACCOUNT_ITEM: NavItem = {

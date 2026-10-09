@@ -32,7 +32,7 @@ services:
       DATABASE_URI: mongodb://mongodb:27017/app
 
       S3_INTERNAL_ENDPOINT: http://garage:3900
-      S3_PUBLIC_ENDPOINT: http://s3.localhost:3000
+      S3_PUBLIC_ENDPOINT: http://s3.localhost:3900
       S3_REGION: garage
       S3_FORCE_PATH_STYLE: "true"
 
@@ -94,6 +94,9 @@ services:
   garage:
     image: dxflrs/garage:v2.3.0
     container_name: dev-garage
+    ports:
+      - "3900:3900"
+      - "3901:3901"
     restart: unless-stopped
     command:
       - /garage

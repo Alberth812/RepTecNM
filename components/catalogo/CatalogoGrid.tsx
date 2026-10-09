@@ -60,21 +60,31 @@ export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
           const tieneInfo = tieneAreas || tieneServicios;
 
           return (
-            <Card key={a.userId} className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200/60 group bg-white">
+            <Card key={a.userId} className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-slate-200/60 group bg-white flex flex-col">
               {/* Header con avatar y nombre */}
               <div className="bg-gradient-to-br from-slate-50 via-white to-slate-50 p-6 pb-5">
                 <div className="flex items-start gap-4">
                   {tieneFoto ? (
-                    <div className="relative">
+                    <div className="relative shrink-0">
                       <img
                         src={a.fotografiaUrl}
                         alt={nombre(a)}
                         className="h-16 w-16 rounded-2xl object-cover ring-4 ring-white shadow-lg"
+                        onError={(e) => {
+                          // Si la imagen falla, ocultarla y mostrar el avatar con iniciales
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }}
                       />
+                      <div className="hidden h-16 w-16 rounded-2xl bg-gradient-to-br from-[#004B87] to-[#0066b3] flex items-center justify-center ring-4 ring-white shadow-lg">
+                        <span className="text-xl font-bold text-white">
+                          {a.nombres?.[0]}{a.apellidoPaterno?.[0]}
+                        </span>
+                      </div>
                       <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-green-500 rounded-full ring-2 ring-white"></div>
                     </div>
                   ) : (
-                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#004B87] to-[#0066b3] flex items-center justify-center ring-4 ring-white shadow-lg">
+                    <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#004B87] to-[#0066b3] flex items-center justify-center ring-4 ring-white shadow-lg shrink-0">
                       <span className="text-xl font-bold text-white">
                         {a.nombres?.[0]}{a.apellidoPaterno?.[0]}
                       </span>
@@ -95,7 +105,7 @@ export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
               </div>
 
               {/* Contenido */}
-              <CardContent className="p-6 pt-5 space-y-4">
+              <CardContent className="p-6 pt-5 space-y-4 flex-1 flex flex-col">
                 {tieneInfo ? (
                   <>
                     {/* Áreas de conocimiento */}
@@ -105,9 +115,9 @@ export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
                           <Award className="h-3.5 w-3.5 text-[#004B87]" />
                           Áreas de conocimiento
                         </p>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap gap-1.5 max-h-20 overflow-hidden">
                           {a.areaConocimiento.slice(0, 3).map((area, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs bg-blue-50 text-[#004B87] hover:bg-blue-100 border-0 font-medium px-2.5 py-1">
+                            <Badge key={i} variant="secondary" className="text-xs bg-blue-50 text-[#004B87] hover:bg-blue-100 border-0 font-medium px-2.5 py-1 whitespace-nowrap">
                               {area}
                             </Badge>
                           ))}
@@ -125,9 +135,9 @@ export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
                           <Briefcase className="h-3.5 w-3.5 text-[#004B87]" />
                           Servicios profesionales
                         </p>
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap gap-1.5 max-h-20 overflow-hidden">
                           {a.tipoServicios.slice(0, 3).map((s, i) => (
-                            <Badge key={i} variant="outline" className="text-xs border-slate-300 text-slate-700 font-medium px-2.5 py-1">
+                            <Badge key={i} variant="outline" className="text-xs border-slate-300 text-slate-700 font-medium px-2.5 py-1 whitespace-nowrap">
                               <Briefcase className="h-3 w-3 mr-1" />{s}
                             </Badge>
                           ))}
@@ -147,8 +157,8 @@ export function CatalogoGrid({ afiliados, rolUsuario }: CatalogoGridProps) {
                   </div>
                 )}
 
-                {/* Botones de acción */}
-                <div className="pt-4 border-t border-slate-100">
+                {/* Botones de acción - siempre al final */}
+                <div className="pt-4 border-t border-slate-100 mt-auto">
                   {(rolUsuario === "afiliado" || rolUsuario === "admin") && (
                     <Button
                       size="sm"

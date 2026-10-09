@@ -1,10 +1,17 @@
+/**
+ * API del Catálogo Profesional de Afiliados
+ * GET /api/catalogo - Obtener lista de afiliados ACTIVOS con filtros avanzados
+ */
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db/client";
 import { afiliados, proyectosRelevantes } from "@/lib/db/schema/afiliados";
 import { users } from "@/lib/db/schema/auth-schema";
+import { archivos } from "@/lib/db/schema/archivo";
 import { posgrados } from "@/lib/db/schema/formacion-academica";
-import { eq, ilike, or, and, sql, inArray, desc } from "drizzle-orm";
+import { eq, ilike, or, and, sql, inArray, desc, ne } from "drizzle-orm";
 import { ok, toErrorResponse } from "@/lib/http/responses";
+import { getCurrentSession } from "@/lib/auth/session";
+import { getFileUrl } from "@/lib/storage";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,10 +27,19 @@ export async function GET(request: NextRequest) {
     const random = sp.get("random") !== "false";
     const offset = (page - 1) * limit;
 
+    // 1. Obtener usuario actual para excluirlo del catálogo
+    const session = await getCurrentSession();
+    const currentUserId = session?.user?.id;
+
     const conditions: any[] = [
       eq(afiliados.membershipStatus, "ACTIVO"),
       eq(afiliados.autorizaPublicacion, true),
     ];
+
+    // 2. Excluir al usuario actual si está autenticado
+    if (currentUserId) {
+      conditions.push(ne(afiliados.userId, currentUserId));
+    }
 
     if (estado) conditions.push(eq(afiliados.estadoResidencia, estado));
 
@@ -62,7 +78,7 @@ export async function GET(request: NextRequest) {
     const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(afiliados).innerJoin(users, eq(afiliados.userId, users.id)).where(where);
     const total = Number(count);
 
-    // CORRECCIÓN: No reasignar 'let query', usar variables encadenadas
+    // 3. Consulta principal con LEFT JOIN a archivos para obtener el objectKey de la foto
     const baseQuery = db
       .select({
         userId: afiliados.userId,
@@ -76,9 +92,11 @@ export async function GET(request: NextRequest) {
         palabrasClave: afiliados.palabrasClave,
         tipoServicios: afiliados.tipoServicios,
         descripcionServicios: afiliados.descripcionServicios,
+        fotoObjectKey: archivos.objectKey,
       })
       .from(afiliados)
       .innerJoin(users, eq(afiliados.userId, users.id))
+      .leftJoin(archivos, eq(afiliados.fotografiaArchivoId, archivos.id))
       .where(where);
 
     const orderedQuery = random && !hasFilters 
@@ -97,10 +115,34 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const data = resultados.map((a) => ({
-      ...a,
-      nombreCompleto: `${a.nombres} ${a.apellidoPaterno} ${a.apellidoMaterno}`.trim(),
-      proyectosRelevantes: proyectosMap.get(a.userId) || [],
+    // 4. Mapear resultados y generar la URL de la foto de forma asíncrona
+    const data = await Promise.all(resultados.map(async (a) => {
+      let fotografiaUrl: string | undefined = undefined;
+      if (a.fotoObjectKey) {
+        try {
+          // Usamos "afiliados" como target del bucket, igual que en el registro
+          fotografiaUrl = await getFileUrl("afiliados", a.fotoObjectKey);
+        } catch (e) {
+          console.error("Error generando URL de foto para", a.userId, e);
+        }
+      }
+
+      return {
+        userId: a.userId,
+        nombres: a.nombres,
+        apellidoPaterno: a.apellidoPaterno,
+        apellidoMaterno: a.apellidoMaterno,
+        estadoResidencia: a.estadoResidencia,
+        ciudadResidencia: a.ciudadResidencia,
+        areaConocimiento: a.areaConocimiento,
+        perfilProfesional: a.perfilProfesional,
+        palabrasClave: a.palabrasClave,
+        tipoServicios: a.tipoServicios,
+        descripcionServicios: a.descripcionServicios,
+        nombreCompleto: `${a.nombres} ${a.apellidoPaterno} ${a.apellidoMaterno}`.trim(),
+        proyectosRelevantes: proyectosMap.get(a.userId) || [],
+        fotografiaUrl,
+      };
     }));
 
     const raw = await db.execute(sql`
@@ -118,5 +160,5 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error en GET /api/catalogo:", error);
     return toErrorResponse(error);
-    }
+  }
 }
