@@ -45,6 +45,11 @@ const SUBTYPE_LABELS: Record<CreateAdminFormValues["subtype"], string> = {
   [ADMIN_SUBTYPES.CONTENIDO]: "Contenido",
 };
 
+const items = Object.values(ADMIN_SUBTYPES).map((value) => ({
+  label: SUBTYPE_LABELS[value],
+  value,
+}));
+
 export function CreateAdminDialog() {
   const [open, setOpen] = useState(false);
   const createAdminMutation = useCreateAdminMutation();
@@ -76,8 +81,8 @@ export function CreateAdminDialog() {
         if (!nextOpen) form.reset();
       }}
     >
-      <DialogTrigger /*asChild*/>
-        <Button>Agregar nuevo administrador</Button>
+      <DialogTrigger render={<Button />}>
+        Agregar nuevo administrador
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -115,14 +120,19 @@ export function CreateAdminDialog() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid || undefined}>
                   <FieldLabel htmlFor={field.name}>Subtipo</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    items={items}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
                     <SelectTrigger id={field.name}>
                       <SelectValue placeholder="Selecciona un subtipo" />
                     </SelectTrigger>
+
                     <SelectContent>
-                      {Object.values(ADMIN_SUBTYPES).map((value) => (
-                        <SelectItem key={value} value={value}>
-                          {SUBTYPE_LABELS[value]}
+                      {items.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

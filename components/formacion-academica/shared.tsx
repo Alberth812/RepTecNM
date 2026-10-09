@@ -29,9 +29,14 @@ import type {
   FormacionAcademicaInput,
 } from "@/lib/validation/formacion-academica";
 
-export type Institucion = {
+/*export type Institucion = {
   id: string;
   nombre: string;
+};*/
+
+export type Institucion = {
+  value: string; // id
+  label: string; // nombre
 };
 
 type FieldName = FieldPath<FormacionAcademica>;
@@ -188,40 +193,35 @@ export function InstitucionFormField({
     <Controller
       control={control}
       name={name}
-      render={({ field, fieldState }) => {
-        const institucionSeleccionada = instituciones.find(
-          (inst) => String(inst.id) === String(field.value),
-        );
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
 
-        return (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+          <Select
+            items={instituciones}
+            value={field.value != null ? String(field.value) : null}
+            onValueChange={(value) => {
+              field.onChange(value);
+            }}
+          >
+            <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
+              <SelectValue placeholder="Selecciona una institución" />
+            </SelectTrigger>
 
-            <Select
-              value={field.value != null ? String(field.value) : ""}
-              onValueChange={field.onChange}
-            >
-              <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
-                <SelectValue placeholder="Selecciona una institución">
-                  {institucionSeleccionada?.nombre}
-                </SelectValue>
-              </SelectTrigger>
+            <SelectContent>
+              {instituciones.map((institucion) => (
+                <SelectItem key={institucion.value} value={institucion.value}>
+                  {institucion.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              <SelectContent>
-                {instituciones.map((inst) => (
-                  <SelectItem key={inst.id} value={inst.id}>
-                    {inst.nombre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {fieldState.invalid ? (
-              <FieldError errors={[fieldState.error]} />
-            ) : null}
-          </Field>
-        );
-      }}
+          {fieldState.invalid ? (
+            <FieldError errors={[fieldState.error]} />
+          ) : null}
+        </Field>
+      )}
     />
   );
 }
@@ -463,7 +463,7 @@ export function RatingSelectField({
           {label ? (
             <FieldLabel className="font-normal">{label}</FieldLabel>
           ) : null}
-
+          {/* <Select /> */}
           <Select
             value={field.value != null ? String(field.value) : ""}
             onValueChange={(v) => field.onChange(Number(v))}

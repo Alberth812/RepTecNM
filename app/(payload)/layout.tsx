@@ -2,10 +2,7 @@
 import type { ServerFunctionClient } from "payload";
 import "@payloadcms/next/css";
 import config from "@payload-config";
-import {
-  handleServerFunctions,
-  RootLayout,
-} from "@payloadcms/next/layouts";
+import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import React from "react";
 
 import { importMap } from "./contenido/importMap.js";
@@ -13,12 +10,9 @@ import "./custom.scss";
 
 import { BarraAdmin } from "@/components/barra-admin/BarraAdmin";
 import { BarraAdminContenido } from "@/components/barra-admin/BarraAdminContenido";
-import {
-  requireAdministrador,
-  requireSession,
-} from "@/lib/auth/session.js";
-import { NoAutorizado } from "@/components/auth/no-autorizado.js";
-import { ApiError } from "@/lib/errors.js";
+import { requireAdministrador, requireSession } from "@/lib/auth/session";
+import { NoAutorizado } from "@/components/auth/no-autorizado";
+import { ApiError } from "@/lib/errors";
 
 type Args = {
   children: React.ReactNode;
@@ -53,9 +47,7 @@ const Layout = async ({ children }: Args) => {
       if (profile.subtype === "GENERAL") {
         componente = <BarraAdmin>{children}</BarraAdmin>;
       } else {
-        componente = (
-          <BarraAdminContenido>{children}</BarraAdminContenido>
-        );
+        componente = <BarraAdminContenido>{children}</BarraAdminContenido>;
       }
     }
   } catch (err) {

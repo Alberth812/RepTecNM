@@ -153,23 +153,20 @@ export function PublicacionesSearchForm({
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor="publicaciones-tipo">Tipo</FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  items={TIPO_PUBLICACION_OPTIONS.map((opcion) => ({
+                    value: opcion.value,
+                    label: opcion.label,
+                  }))}
+                >
                   <SelectTrigger
                     id="publicaciones-tipo"
                     aria-invalid={fieldState.invalid}
                   >
                     <SelectValue placeholder="Todos los tipos" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={FILTRO_TIPO_TODOS}>
-                      Todos los tipos
-                    </SelectItem>
-                    {TIPO_PUBLICACION_OPTIONS.map((opcion) => (
-                      <SelectItem key={opcion.value} value={opcion.value}>
-                        {opcion.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
                 </Select>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

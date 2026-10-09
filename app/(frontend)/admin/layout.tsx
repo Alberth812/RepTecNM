@@ -28,7 +28,7 @@ const Layout = async ({ children }: Args) => {
     }
   } catch (err) {
     if (err instanceof ApiError) {
-      if (err.status === 403) {
+      if (err.status === 403 || err.status === 401) {
         return <NoAutorizado redirectHref="/" />;
       } else throw err;
     } else throw err;

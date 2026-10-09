@@ -22,6 +22,14 @@ const SUBTYPE_LABELS: Record<AdminSubtype, string> = {
 // aceptan value="" como opción seleccionable.
 const ALL_VALUE = "__all__";
 
+const items = [
+  { label: "Todos los subtipos", value: ALL_VALUE },
+  ...Object.values(ADMIN_SUBTYPES).map((value) => ({
+    label: SUBTYPE_LABELS[value as AdminSubtype],
+    value,
+  })),
+];
+
 interface AdministradoresFiltersProps {
   search: string;
   onSearchChange: (value: string) => void;
@@ -50,6 +58,7 @@ export function AdministradoresFilters({
       />
 
       <Select
+        items={items}
         value={subtype ?? ALL_VALUE}
         onValueChange={(value) =>
           onSubtypeChange(
@@ -60,11 +69,11 @@ export function AdministradoresFilters({
         <SelectTrigger className="sm:w-44" aria-label="Filtrar por subtipo">
           <SelectValue placeholder="Subtipo" />
         </SelectTrigger>
+
         <SelectContent>
-          <SelectItem value={ALL_VALUE}>Todos los subtipos</SelectItem>
-          {Object.values(ADMIN_SUBTYPES).map((value) => (
-            <SelectItem key={value} value={value}>
-              {SUBTYPE_LABELS[value as AdminSubtype]}
+          {items.map((item) => (
+            <SelectItem key={item.value} value={item.value}>
+              {item.label}
             </SelectItem>
           ))}
         </SelectContent>

@@ -119,7 +119,7 @@ export async function PATCH(request: Request) {
       body: {
         currentPassword,
         newPassword: passwordResult.data,
-        revokeOtherSessions: true,
+        revokeOtherSessions: false,
       },
     });
 

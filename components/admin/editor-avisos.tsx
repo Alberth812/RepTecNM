@@ -8,12 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cargarAvisos, guardarAvisos, type Aviso } from "@/lib/avisos";
 
-const VACIO: Aviso = { id: "", titulo: "", texto: "", tono: "info", activo: true };
+const VACIO: Aviso = {
+  id: "",
+  titulo: "",
+  texto: "",
+  tono: "info",
+  activo: true,
+};
 
 export function EditorAvisos() {
   const [avisos, setAvisos] = useState<Aviso[]>(cargarAvisos());
@@ -44,7 +54,9 @@ export function EditorAvisos() {
   };
 
   const alternar = (id: string) =>
-    persistir(avisos.map((a) => (a.id === id ? { ...a, activo: !a.activo } : a)));
+    persistir(
+      avisos.map((a) => (a.id === id ? { ...a, activo: !a.activo } : a)),
+    );
 
   const eliminar = (id: string) => {
     persistir(avisos.filter((a) => a.id !== id));
@@ -61,12 +73,23 @@ export function EditorAvisos() {
         <div className="grid gap-3 sm:grid-cols-[1fr_220px]">
           <label className="grid gap-1 text-sm">
             Título
-            <Input value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} maxLength={80} />
+            <Input
+              value={form.titulo}
+              onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+              maxLength={80}
+            />
           </label>
           <label className="grid gap-1 text-sm">
             Tono
-            <Select value={form.tono} onValueChange={(v) => { if (v) setForm({ ...form, tono: v as Aviso["tono"] }); }}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Select
+              value={form.tono}
+              onValueChange={(v) => {
+                if (v) setForm({ ...form, tono: v as Aviso["tono"] });
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="info">Informativo (azul)</SelectItem>
                 <SelectItem value="exito">Positivo (verde)</SelectItem>
@@ -77,40 +100,74 @@ export function EditorAvisos() {
         </div>
         <label className="grid gap-1 text-sm">
           Texto del aviso
-          <Textarea rows={3} value={form.texto} onChange={(e) => setForm({ ...form, texto: e.target.value })} maxLength={300} />
-          <span className="text-xs text-muted-foreground">{form.texto.length} / 300</span>
+          <Textarea
+            rows={3}
+            value={form.texto}
+            onChange={(e) => setForm({ ...form, texto: e.target.value })}
+            maxLength={300}
+          />
+          <span className="text-xs text-muted-foreground">
+            {form.texto.length} / 300
+          </span>
         </label>
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm">
-            <Checkbox checked={form.activo} onCheckedChange={(v) => setForm({ ...form, activo: v === true })} />
+            <Checkbox
+              checked={form.activo}
+              onCheckedChange={(v) => setForm({ ...form, activo: v === true })}
+            />
             Activo
           </label>
           <Button onClick={guardar} className="ml-auto">
-            <Plus className="mr-2 h-4 w-4" /> {form.id ? "Guardar cambios" : "Publicar aviso"}
+            <Plus className="mr-2 h-4 w-4" />{" "}
+            {form.id ? "Guardar cambios" : "Publicar aviso"}
           </Button>
           {form.id && (
-            <Button variant="outline" onClick={() => setForm(VACIO)}>Cancelar edición</Button>
+            <Button variant="outline" onClick={() => setForm(VACIO)}>
+              Cancelar edición
+            </Button>
           )}
         </div>
       </div>
 
       <div className="grid gap-2">
         {avisos.map((a) => (
-          <div key={a.id} className="flex items-center gap-3 rounded-2xl border bg-card p-4">
+          <div
+            key={a.id}
+            className="flex items-center gap-3 rounded-2xl border bg-card p-4"
+          >
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">{a.titulo}</p>
-              <p className="truncate text-sm text-muted-foreground">{a.texto}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {a.texto}
+              </p>
             </div>
-            <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-              a.activo ? "bg-green-500/15 text-green-700" : "bg-muted text-muted-foreground"
-            }`}>
+            <span
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                a.activo
+                  ? "bg-green-500/15 text-green-700"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
               {a.activo ? "ACTIVO" : "PAUSADO"}
             </span>
-            <Button variant="ghost" size="icon" onClick={() => setForm(a)} aria-label="Editar">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setForm(a)}
+              aria-label="Editar"
+            >
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => alternar(a.id)} aria-label="Activar o pausar">
-              <BellRing className={`h-4 w-4 ${a.activo ? "text-[#004B87]" : "text-muted-foreground"}`} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => alternar(a.id)}
+              aria-label="Activar o pausar"
+            >
+              <BellRing
+                className={`h-4 w-4 ${a.activo ? "text-[#004B87]" : "text-muted-foreground"}`}
+              />
             </Button>
             <Button
               variant="ghost"

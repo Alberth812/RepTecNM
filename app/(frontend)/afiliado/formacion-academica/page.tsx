@@ -46,6 +46,11 @@ export default async function FormacionAcademicaPage() {
   // Si el afiliado nunca capturó nada, `lics`/`posg`/`estancias` llegan como
   // arreglos vacíos
   // `FormacionAcademicaForm` espera para arrancar en blanco.
+  const institucionesOptions = catalogoInstituciones.map((institucion) => ({
+    label: institucion.nombre,
+    value: institucion.id,
+  }));
+
   const defaultValues: Partial<FormacionAcademica> = {
     licenciaturas: lics,
     posgrados: posg,
@@ -64,7 +69,7 @@ export default async function FormacionAcademicaPage() {
       </div>
 
       <FormacionAcademicaForm
-        instituciones={catalogoInstituciones}
+        instituciones={institucionesOptions}
         defaultValues={defaultValues}
       />
       <div>

@@ -26,9 +26,12 @@ export function getTipoPublicacionLabel(
 
 /** Opciones listas para usar en un `<Select>` de filtro. */
 export const TIPO_PUBLICACION_OPTIONS: Array<{
-  value: TipoPublicacionType;
+  value: TipoPublicacionType | "__todos__";
   label: string;
-}> = (Object.values(TipoPublicacion) as TipoPublicacionType[]).map((value) => ({
-  value,
-  label: TIPO_PUBLICACION_LABELS[value],
-}));
+}> = [
+  { value: "__todos__", label: "Todos los tipos" },
+  ...(Object.values(TipoPublicacion) as TipoPublicacionType[]).map((value) => ({
+    value,
+    label: TIPO_PUBLICACION_LABELS[value],
+  })),
+];
