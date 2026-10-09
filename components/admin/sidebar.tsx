@@ -13,6 +13,7 @@ import { GraduationCap,
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -44,8 +45,12 @@ export function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     <div className={cn("flex h-full flex-col bg-background border-r", isMobile && "border-none")}>
       <div className="flex h-16 items-center border-b px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-          <img src="/logo.png" alt="REP-TecNM" className="h-9 w-9 rounded-lg object-cover object-[center_15%] ring-1 ring-border" />
-          <span className="text-lg">REP TecNM</span>
+          <Image src="/logo.png"
+          alt="REP-TecNM - Red de Egresados de Posgrado del Tecnológico Nacional de México"
+          width={150}
+          height={40}
+          className="h-auto w-auto object-contain"
+        />
         </Link>
       </div>
       <nav className="flex-1 space-y-1 p-4">

@@ -149,3 +149,19 @@ function getExtension(file: File): string {
       return "";
   }
 }
+
+export async function getInternalFileUrl(
+  target: StorageTarget,
+  objectKey: string,
+  expiresInSeconds = 900,
+): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: storageConfig.buckets[target].bucket,
+    Key: objectKey,
+  });
+
+  return getSignedUrl(getInternalClient(target), command, {
+    expiresIn: expiresInSeconds,
+  });
+}
+export type { StorageTarget } from './config';

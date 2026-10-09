@@ -1,6 +1,5 @@
 // components/forms/evaluacion-programa-estudios-form.tsx
-//
-//
+
 "use client";
 
 import { useEffect } from "react";
@@ -28,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 import {
   valoracionSchema,
@@ -37,7 +37,6 @@ import {
 // Import de solo-tipo: se elimina en compilación, no mete Drizzle/pg en el
 // bundle del cliente.
 import type { evaluacionProgramaEstudios } from "@/lib/db/schema/evaluacion-programa-estudios";
-import { toast } from "sonner";
 
 export type EvaluacionProgramaEstudiosRow =
   typeof evaluacionProgramaEstudios.$inferSelect;

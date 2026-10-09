@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, User } from "lucide-react";
+import { FileText, Home, User, BookOpen, Mail, LifeBuoy, CreditCard } from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -12,40 +12,48 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/**
- * Fuente única de verdad para los links del sidebar.
- * Cada grupo tiene un título opcional (si no lo lleva, no se renderiza nada
- * arriba de sus items, como en el grupo de "Inicio").
- *
- * Para agregar/quitar/mover un link, solo edita este arreglo: BarraAfiliado.tsx
- * no necesita tocarse.
- */
-
-//
 export const NAV_GROUPS: NavGroup[] = [
   {
     items: [
-      { label: "Inicio", href: "/afiliado/inicio", icon: Home },
-      { label: "Seguimiento", href: "/afiliado/seguimiento", icon: Home },
+      { label: "Inicio", href: "/afiliado/inicio", icon: Home }
     ],
   },
   {
     items: [
       {
-        label: "Mis publicaciones",
+        label: "Seguimiento",
+        href: "/afiliado/seguimiento",
+        icon: FileText,
+      },
+      {
+        label: "Mensajería",
+        href: "/afiliado/mensajeria",
+        icon: Mail,
+      },
+      {
+        label: "Catálogo Profesional",
+        href: "/afiliado/catalogo",
+        icon: BookOpen,
+      },
+      {
+        label: "Mis Publicaciones",
         href: "/afiliado/publicaciones",
         icon: FileText,
       },
       {
-        label: "Repositorio",
-        href: "/publicaciones",
-        icon: FileText,
+        label: "Credencial Digital",
+        href: "/afiliado/credencial",
+        icon: CreditCard,
+      },
+      {
+        label: "Centro de Soporte",
+        href: "/afiliado/soporte",
+        icon: LifeBuoy,
       },
     ],
   },
 ];
 
-// Item fijo al fondo del sidebar (arriba del botón de cerrar sesión).
 export const ACCOUNT_ITEM: NavItem = {
   label: "Cuenta",
   href: "/afiliado/cuenta",

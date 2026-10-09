@@ -1,5 +1,3 @@
-// app/afiliado/evaluacion-programa-estudios/page.tsx
-
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { requireAfiliado } from "@/lib/auth/session";

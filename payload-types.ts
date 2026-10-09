@@ -93,9 +93,11 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | 'es' | 'es'[];
   globals: {
     home: Home;
+    'login-config': LoginConfig;
   };
   globalsSelect: {
     home: HomeSelect<false> | HomeSelect<true>;
+    'login-config': LoginConfigSelect<false> | LoginConfigSelect<true>;
   };
   locale: 'es';
   widgets: {
@@ -557,102 +559,52 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Contenido editorial de la página principal. Este Global controla textos, imágenes y enlaces; no controla layout, estilos Tailwind ni componentes React.
- *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home".
  */
 export interface Home {
   id: string;
-  /**
-   * Slides del carousel principal de la home. El orden de la lista define el orden de aparición; arrastra para reordenar.
-   */
   hero?: {
-    /**
-     * Cada slide se muestra en el orden en que aparece aquí. Arrastra el ícono de la izquierda para reordenar.
-     */
     slides?:
       | {
-          /**
-           * Desmárcalo para ocultar temporalmente este slide sin eliminarlo.
-           */
           activo?: boolean | null;
           etiqueta: string;
           titulo: string;
           texto: string;
           imagen?: (string | null) | Media;
-          /**
-           * Milisegundos que el slide permanece visible antes de avanzar (recomendado 3000–8000).
-           */
           duracion: number;
-          /**
-           * Botón obligatorio.
-           */
           ctaPrincipal: {
-            /**
-             * Texto visible del botón, ej. "Explorar catálogo".
-             */
             label: string;
-            /**
-             * Ruta interna (ej. "/catalogo") o URL externa "https://...". No se permiten esquemas inseguros como "javascript:".
-             */
             href: string;
           };
-          /**
-           * Botón opcional. Si se deja vacío, el frontend no lo muestra.
-           */
           ctaSecundario?: {
-            /**
-             * Texto visible del botón, ej. "Explorar catálogo".
-             */
             label?: string | null;
-            /**
-             * Ruta interna (ej. "/catalogo") o URL externa "https://...". No se permiten esquemas inseguros como "javascript:".
-             */
             href?: string | null;
           };
           id?: string | null;
         }[]
       | null;
   };
-  /**
-   * Sección "Nosotros" de la home.
-   */
   nosotros: {
     titulo: string;
     texto: string;
     imagen1?: (string | null) | Media;
     imagen2?: (string | null) | Media;
   };
-  /**
-   * Sección "Misión" de la home.
-   */
   mision: {
     titulo: string;
     texto: string;
   };
-  /**
-   * Sección "Visión" de la home.
-   */
   vision: {
     titulo: string;
     texto: string;
   };
-  /**
-   * Sección "Afiliación": beneficios, requisitos y proceso.
-   */
   afiliacion: {
     titulo: string;
     descripcion: string;
-    /**
-     * Bloques de contenido (ej. Beneficios, Requisitos, Proceso). Arrastra para reordenar; agrega o elimina según necesites.
-     */
     secciones?:
       | {
           titulo: string;
-          /**
-           * Elementos (bullets) de esta sección. Arrastra para reordenar.
-           */
           items?:
             | {
                 texto: string;
@@ -662,79 +614,52 @@ export interface Home {
           id?: string | null;
         }[]
       | null;
-    /**
-     * Botón principal de la sección de afiliación. Obligatorio.
-     */
     cta: {
-      /**
-       * Texto visible del botón, ej. "Explorar catálogo".
-       */
       label: string;
-      /**
-       * Ruta interna (ej. "/catalogo") o URL externa "https://...". No se permiten esquemas inseguros como "javascript:".
-       */
       href: string;
     };
   };
-  /**
-   * Sección "Qué hacemos" de la home.
-   */
   queHacemos: {
     titulo: string;
     texto: string;
   };
-  /**
-   * Sección opcional: puede dejarse completamente vacía. Arrastra para reordenar los testimonios.
-   */
   testimonios?:
     | {
-        /**
-         * Desmárcalo para ocultar temporalmente este testimonio sin eliminarlo.
-         */
         activo?: boolean | null;
         nombre: string;
         texto: string;
-        /**
-         * Calificación de 1 a 5.
-         */
         puntaje: number;
         foto?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
-  /**
-   * Sección "Contacto" de la home.
-   */
   contacto: {
     titulo: string;
     texto: string;
-    /**
-     * Todas son opcionales. Deja vacío el campo de la red que no uses.
-     */
     redes?: {
-      /**
-       * URL completa de Facebook (https://...). Déjalo vacío si no se usa.
-       */
       facebook?: string | null;
-      /**
-       * URL completa de Instagram (https://...). Déjalo vacío si no se usa.
-       */
       instagram?: string | null;
-      /**
-       * URL completa de LinkedIn (https://...). Déjalo vacío si no se usa.
-       */
       linkedin?: string | null;
-      /**
-       * URL completa de YouTube (https://...). Déjalo vacío si no se usa.
-       */
       youtube?: string | null;
-      /**
-       * URL completa de TikTok (https://...). Déjalo vacío si no se usa.
-       */
       tiktok?: string | null;
     };
   };
   _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Gestión simple de la imagen de fondo para la página de inicio de sesión.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "login-config".
+ */
+export interface LoginConfig {
+  id: string;
+  /**
+   * Sube la imagen que aparecerá en el panel lateral del login. Deja este campo vacío para usar el fondo azul institucional por defecto.
+   */
+  imagenFondo?: (string | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -846,6 +771,16 @@ export interface HomeSelect<T extends boolean = true> {
             };
       };
   _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "login-config_select".
+ */
+export interface LoginConfigSelect<T extends boolean = true> {
+  imagenFondo?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

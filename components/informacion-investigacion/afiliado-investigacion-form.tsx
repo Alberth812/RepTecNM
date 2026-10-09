@@ -35,6 +35,28 @@ import {
   type AfiliadoInvestigacionRow,
 } from "@/lib/validation/afiliados-investigacion/investigacion";
 
+const DEFAULT_VALUES: AfiliadoInvestigacionFormInput = {
+  participacionProduccionConocimiento: null,
+  produccionAcademica: null,
+  otrosProductosAcademicos: null,
+  situacionSni: null,
+  sniPeriodoAnterior: null,
+  sniPeriodoActual: null,
+  redTematicaConacyt: null,
+  nombreRed: null,
+  haRecibidoPremiosReconocimientos: null,
+  detalleReconocimiento: null,
+  perteneceAcademiaSociedad: null,
+  nombreOrganizacion: null,
+};
+
+/** Fila tal como la devuelve `db.query.afiliadosInvestigacion.findFirst(...)`. */
+export interface AfiliadoInvestigacionRecord extends AfiliadoInvestigacionFormOutput {
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 type BooleanFieldName =
   | "participacionProduccionConocimiento"
   | "redTematicaConacyt"
@@ -192,13 +214,25 @@ function ConditionalTextField({
 
 export interface AfiliadoInvestigacionFormProps {
   /**
-   * Fila cruda tal como la devuelve `db.query.afiliadosInvestigacion.findFirst(...)`
-   * desde el Server Component (page.tsx). `null` si el afiliado todavía no
-   * ha llenado esta sección.
+   * Dato ya cargado por el Server Component (page.tsx). `null`/`undefined`
+   * si el afiliado todavía no ha llenado esta sección.
    */
-  initialData: AfiliadoInvestigacionRow | null;
+  initialData?: AfiliadoInvestigacionRecord | null;
   /** Se llama con los datos ya guardados tras un submit exitoso. */
   onSaved?: (data: AfiliadoInvestigacionFormOutput) => void;
+}
+
+function toFormInput(
+  record?: AfiliadoInvestigacionRecord | null,
+): AfiliadoInvestigacionFormInput {
+  if (!record) return DEFAULT_VALUES;
+  const {
+    userId: _userId,
+    createdAt: _createdAt,
+    updatedAt: _updatedAt,
+    ...formValues
+  } = record;
+  return formValues;
 }
 
 export function AfiliadoInvestigacionForm({
@@ -209,10 +243,8 @@ export function AfiliadoInvestigacionForm({
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = React.useState(false);
 
-  // El mapeo fila-de-BD -> valores-de-formulario vive en validations.ts para
-  // poder reusarlo también desde otro Server Component si hiciera falta.
   const defaultValues = React.useMemo(
-    () => toAfiliadoInvestigacionFormValues(initialData),
+    () => toFormInput(initialData),
     [initialData],
   );
 

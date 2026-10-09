@@ -4,8 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  BadgeCheck, BarChart3, Bell, Building2, CalendarCheck, CreditCard, FileText, Flag,
-  LayoutDashboard, LogOut, MessageSquareText, PencilLine, Search, Settings, Users, UserCheck,
+  BadgeCheck,
+  BarChart3,
+  Bell,
+  Building2,
+  CalendarCheck,
+  CreditCard,
+  FileText,
+  Flag,
+  LayoutDashboard,
+  LogOut,
+  MessageSquareText,
+  PencilLine,
+  Search,
+  Settings,
+  Users,
+  UserCheck,
 } from "lucide-react";
 
 import { cargarMensajes } from "@/lib/mensajes";
@@ -13,11 +27,16 @@ import { cargarNotificaciones, leerLeidas } from "@/lib/notificaciones";
 import { BadgeEstado } from "@/components/public/badge-estado";
 import { useRol, type Rol } from "@/lib/use-rol";
 
-export function contarMensajesNoLeidos(): number {
+export async function contarMensajesNoLeidos(): Promise<number> {
   if (typeof window === "undefined") return 0;
+
   const rol = localStorage.getItem("rep-rol");
   if (rol !== "admin" && rol !== "afiliado") return 0;
-  return cargarMensajes().filter((m) => !m.leido && m.para.rol === rol).length;
+
+  const mensajes = await cargarMensajes();
+
+  //return mensajes.filter((m) => !m.leido && m.para.rol === rol).length;
+  return mensajes.filter((m) => !m.leido).length;
 }
 
 export const MENU_AFILIADO = [
@@ -56,17 +75,56 @@ export function SidebarMiembro({ rol }: { rol: Rol }) {
   const [msgNoLeidas, setMsgNoLeidas] = useState(0);
 
   useEffect(() => {
-    if (rol === "visitante") return;
-    if (rol === "afiliado") {
-      const leidas = leerLeidas();
-      setNoLeidas(cargarNotificaciones().filter((n) => !leidas.includes(n.id)).length);
+    if (rol === "visitante") {
+      setNoLeidas(0);
+      setMsgNoLeidas(0);
+      return;
     }
-    setMsgNoLeidas(contarMensajesNoLeidos());
+
+    let cancelado = false;
+
+    async function cargarContadores() {
+      if (rol === "afiliado") {
+        const leidas = leerLeidas();
+        const notificaciones = cargarNotificaciones();
+
+        if (!cancelado) {
+          setNoLeidas(
+            notificaciones.filter((n) => !leidas.includes(n.id)).length,
+          );
+        }
+      } else {
+        setNoLeidas(0);
+      }
+
+      const mensajes = await contarMensajesNoLeidos();
+
+      if (!cancelado) {
+        setMsgNoLeidas(mensajes);
+      }
+    }
+
+    void cargarContadores();
+
+    return () => {
+      cancelado = true;
+    };
   }, [rol, pathname]);
 
-  const nombreReal = nombre || (rol === "admin" ? "Administración RepTecNM" : "María Fernanda López Herrera");
-  const iniciales = nombreReal.split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
-  const items = (rol === "admin" ? MENU_ADMIN : MENU_AFILIADO).filter((it) => it.label !== "Configuración");
+  const nombreReal =
+    nombre ||
+    (rol === "admin"
+      ? "Administración RepTecNM"
+      : "María Fernanda López Herrera");
+  const iniciales = nombreReal
+    .split(" ")
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase();
+  const items = (rol === "admin" ? MENU_ADMIN : MENU_AFILIADO).filter(
+    (it) => it.label !== "Configuración",
+  );
 
   const clase = (href: string) =>
     `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
@@ -106,7 +164,11 @@ export function SidebarMiembro({ rol }: { rol: Rol }) {
             {rol === "admin" ? "Administración" : "Mi espacio"}
           </p>
           {items.map((it) => (
-            <Link key={it.href + it.label} href={it.href} className={clase(it.href)}>
+            <Link
+              key={it.href + it.label}
+              href={it.href}
+              className={clase(it.href)}
+            >
               <it.icon className="h-4 w-4 shrink-0" /> {it.label}
               {it.label === "Notificaciones" && noLeidas > 0 && (
                 <span className="ml-auto rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">

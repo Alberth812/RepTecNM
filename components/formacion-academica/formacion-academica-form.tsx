@@ -1,11 +1,11 @@
 // @/components/formacion-academica/formacion-academica-form.tsx
 //
-// Formulario completo de "Formación Académica". Usa un único useForm con el
+// Formulario completo de "Formacin Acadmica". Usa un nico useForm con el
 // esquema combinado `formacionAcademicaSchema`, y un useFieldArray por cada
-// sección repetible (licenciaturas, posgrados, estanciasPosdoctorales).
+// seccin repetible (licenciaturas, posgrados, estanciasPosdoctorales).
 //
-// El envío a un endpoint real queda pendiente a propósito (ver `handleSubmit`
-// más abajo); por defecto solo hace console.log del payload ya validado.
+// El envo a un endpoint real queda pendiente a propsito (ver `handleSubmit`
+// ms abajo); por defecto solo hace console.log del payload ya validado.
 
 "use client";
 
@@ -30,12 +30,12 @@ import { cn } from "@/lib/utils";
 export type { Institucion };
 
 // ---------------------------------------------------------------------------
-// Filas vacías para cuando el usuario agrega una nueva entrada.
+// Filas vacas para cuando el usuario agrega una nueva entrada.
 // data_model_notes: "El formulario puede comenzar mostrando una sola
-// instancia de cada tipo, pero el modelo de datos debe permitir agregar más
+// instancia de cada tipo, pero el modelo de datos debe permitir agregar ms
 // de una." Los campos requeridos quedan en null/"" hasta que el usuario los
-// completa; zodResolver los marcará como error solo si se intenta enviar así
-// (por eso el cast: son intencionalmente "inválidos" hasta que se completen).
+// completa; zodResolver los marcar como error solo si se intenta enviar as
+// (por eso el cast: son intencionalmente "invlidos" hasta que se completen).
 // ---------------------------------------------------------------------------
 
 const emptyLicenciatura = {
@@ -116,7 +116,7 @@ function buildDefaultValues(
 }
 
 export type FormacionAcademicaFormProps = {
-  /** Catálogo de instituciones para los campos tipo "catalog". */
+  /** Catlogo de instituciones para los campos tipo "catalog". */
   instituciones: Institucion[];
   /** Valores existentes, para editar un perfil ya capturado. */
   defaultValues?: Partial<FormacionAcademica>;
@@ -165,7 +165,7 @@ export function FormacionAcademicaForm({
   const hasErrorIn = (tab: TabValue) => Boolean(errors[SECTION_BY_TAB[tab]]);
 
   function onInvalid(formErrors: FieldErrors<FormacionAcademicaInput>) {
-    //console.log("❌ Errores de validación:", formErrors);
+    //console.log(" Errores de validacin:", formErrors);
     const firstTabWithError = (Object.keys(SECTION_BY_TAB) as TabValue[]).find(
       (tab) => formErrors[SECTION_BY_TAB[tab]],
     );
@@ -192,7 +192,7 @@ export function FormacionAcademicaForm({
 
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        throw new Error(body?.error ?? "No se pudo guardar la información.");
+        throw new Error(body?.error ?? "No se pudo guardar la informacin.");
       }
 
       setSubmitSuccess(true);
@@ -200,7 +200,7 @@ export function FormacionAcademicaForm({
       setSubmitError(
         error instanceof Error
           ? error.message
-          : "No se pudo guardar la información. Intenta de nuevo.",
+          : "No se pudo guardar la informacin. Intenta de nuevo.",
       );
     }
   }
@@ -316,7 +316,7 @@ export function FormacionAcademicaForm({
       ) : null}
       {submitSuccess ? (
         <p className="text-sm text-emerald-600">
-          Formación académica guardada.
+          Formacin acadmica guardada.
         </p>
       ) : null}
 
@@ -324,7 +324,7 @@ export function FormacionAcademicaForm({
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting
             ? "Guardando..."
-            : "Guardar formación académica"}
+            : "Guardar formacin acadmica"}
         </Button>
       </div>
     </form>
