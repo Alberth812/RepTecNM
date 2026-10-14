@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth/auth";
@@ -7,7 +8,7 @@ import { afiliados } from "@/lib/db/schema/afiliados";
 
 async function main() {
   const email = "afiliado@reptecnm.test";
-  const password = "Afiliado123!";
+  const password = process.env.TEST_AFFILIATE_PASSWORD || `Test${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}!`;
   const name = "Afiliado de Prueba";
 
   console.log("Creando usuario base...");

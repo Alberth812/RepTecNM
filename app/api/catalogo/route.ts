@@ -51,13 +51,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (areas.length > 0) {
-      const arr = sql.raw(`ARRAY[${areas.map((a) => `'${a.replace(/'/g, "''")}'`).join(",")}]::text[]`);
-      conditions.push(sql`${afiliados.areaConocimiento} && ${arr}`);
+      conditions.push(sql`${afiliados.areaConocimiento} && ${areas}::text[]`);
     }
 
     if (servicios.length > 0) {
-      const arr = sql.raw(`ARRAY[${servicios.map((s) => `'${s.replace(/'/g, "''")}'`).join(",")}]::text[]`);
-      conditions.push(sql`${afiliados.tipoServicios} && ${arr}`);
+      conditions.push(sql`${afiliados.tipoServicios} && ${servicios}::text[]`);
     }
 
     let searchCond = undefined;
