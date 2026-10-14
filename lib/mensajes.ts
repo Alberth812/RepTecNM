@@ -1,64 +1,64 @@
 export type Mensaje = {
-  id: string;
-  motivo: string;
-  contenido: string;
-  leido: boolean;
-  createdAt: string;
-  nombreRemitente: string;
-  nombreDestinatario: string;
-  datosContacto: {
-    nombre?: string;
-    email?: string;
-    telefono?: string;
-  } | null;
+ id: string;
+ motivo: string;
+ contenido: string;
+ leido: boolean;
+ createdAt: string;
+ nombreRemitente: string;
+ nombreDestinatario: string;
+ datosContacto: {
+ nombre?: string;
+ email?: string;
+ telefono?: string;
+ } | null;
 };
 
 export async function cargarMensajes(tipo: "recibidos" | "enviados" = "recibidos"): Promise<Mensaje[]> {
-  try {
-    const res = await fetch(`/api/mensajes?tipo=${tipo}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("Error al cargar mensajes");
-    const data = await res.json();
-    return data.data || [];
-  } catch (error) {
-    console.error("Error cargando mensajes:", error);
-    return [];
-  }
+ try {
+ const res = await fetch(`/api/mensajes?tipo=${tipo}`, {
+ method: "GET",
+ headers: { "Content-Type": "application/json" },
+ cache: "no-store",
+ });
+ if (!res.ok) throw new Error("Error al cargar mensajes");
+ const data = await res.json();
+ return data.data || [];
+ } catch (error) {
+ console.error("Error cargando mensajes:", error);
+ return [];
+ }
 }
 
 export async function marcarLeido(id: string) {
-  try {
-    const res = await fetch(`/api/mensajes/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accion: "leido" }),
-    });
-    return res.ok;
-  } catch (error) {
-    console.error("Error marcando como leído:", error);
-    return false;
-  }
+ try {
+ const res = await fetch(`/api/mensajes/${id}`, {
+ method: "PATCH",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ accion: "leido" }),
+ });
+ return res.ok;
+ } catch (error) {
+ console.error("Error marcando como leído:", error);
+ return false;
+ }
 }
 
 export async function eliminarMensaje(id: string) {
-  try {
-    const res = await fetch(`/api/mensajes/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accion: "eliminar" }),
-    });
-    
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.error || "Error al eliminar el mensaje");
-    }
-    
-    return true;
-  } catch (error) {
-    console.error("Error eliminando mensaje:", error);
-    throw error;
-  }
+ try {
+ const res = await fetch(`/api/mensajes/${id}`, {
+ method: "PATCH",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ accion: "eliminar" }),
+ });
+ 
+ if (!res.ok) {
+ const errorData = await res.json();
+ throw new Error(errorData.error || "Error al eliminar el mensaje");
+ }
+ 
+ return true;
+ } catch (error) {
+ console.error("Error eliminando mensaje:", error);
+ throw error;
+ }
 }

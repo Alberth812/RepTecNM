@@ -1,6 +1,6 @@
 export interface ApiRequestErrorOptions {
-  issues?: unknown;
-  retryAfterSeconds?: number;
+ issues?: unknown;
+ retryAfterSeconds?: number;
 }
 
 /**
@@ -13,22 +13,22 @@ export interface ApiRequestErrorOptions {
  * para manejar cualquier error de la REST API de forma consistente.
  */
 export class ApiRequestError extends Error {
-  readonly status: number;
-  readonly code: string;
-  readonly issues?: unknown;
-  readonly retryAfterSeconds?: number;
+ readonly status: number;
+ readonly code: string;
+ readonly issues?: unknown;
+ readonly retryAfterSeconds?: number;
 
-  constructor(
-    status: number,
-    code: string,
-    message: string,
-    options?: ApiRequestErrorOptions,
-  ) {
-    super(message);
-    this.name = "ApiRequestError";
-    this.status = status;
-    this.code = code;
-    this.issues = options?.issues;
-    this.retryAfterSeconds = options?.retryAfterSeconds;
-  }
+ constructor(
+ status: number,
+ code: string,
+ message: string,
+ options?: ApiRequestErrorOptions,
+ ) {
+ super(message);
+ this.name = "ApiRequestError";
+ this.status = status;
+ this.code = code;
+ this.issues = options?.issues;
+ this.retryAfterSeconds = options?.retryAfterSeconds;
+ }
 }

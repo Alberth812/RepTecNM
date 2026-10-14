@@ -9,32 +9,32 @@ import { asc, eq } from "drizzle-orm";
 
 import { db } from "@/lib/db/client";
 import {
-  afiliadosEmpleos,
-  afiliadosInformacionLaboral,
+ afiliadosEmpleos,
+ afiliadosInformacionLaboral,
 } from "@/lib/db/schema/informacion-laboral";
 
 export async function getInformacionLaboralSeccion(afiliadoUserId: string) {
-  const [informacionLaboral] = await db
-    .select()
-    .from(afiliadosInformacionLaboral)
-    .where(eq(afiliadosInformacionLaboral.userId, afiliadoUserId))
-    .limit(1);
+ const [informacionLaboral] = await db
+ .select()
+ .from(afiliadosInformacionLaboral)
+ .where(eq(afiliadosInformacionLaboral.userId, afiliadoUserId))
+ .limit(1);
 
-  const historialEmpleos = await db
-    .select()
-    .from(afiliadosEmpleos)
-    .where(eq(afiliadosEmpleos.afiliadoUserId, afiliadoUserId))
-    .orderBy(
-      asc(afiliadosEmpleos.fechaInicioAnio),
-      asc(afiliadosEmpleos.fechaInicioMes),
-    );
+ const historialEmpleos = await db
+ .select()
+ .from(afiliadosEmpleos)
+ .where(eq(afiliadosEmpleos.afiliadoUserId, afiliadoUserId))
+ .orderBy(
+ asc(afiliadosEmpleos.fechaInicioAnio),
+ asc(afiliadosEmpleos.fechaInicioMes),
+ );
 
-  return {
-    informacionLaboral: informacionLaboral ?? null,
-    historialEmpleos,
-  };
+ return {
+ informacionLaboral: informacionLaboral ?? null,
+ historialEmpleos,
+ };
 }
 
 export type InformacionLaboralSeccionRow = Awaited<
-  ReturnType<typeof getInformacionLaboralSeccion>
+ ReturnType<typeof getInformacionLaboralSeccion>
 >;

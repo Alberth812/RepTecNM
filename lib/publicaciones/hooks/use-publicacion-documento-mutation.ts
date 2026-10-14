@@ -9,8 +9,8 @@ import { fetchPublicacionDocumento } from "@/lib/api/publicaciones-client-otro";
  * simultáneas mientras se resuelve.
  */
 export function usePublicacionDocumentoMutation() {
-  return useMutation({
-    mutationFn: (publicacionId: string) =>
-      fetchPublicacionDocumento(publicacionId),
-  });
+ return useMutation({
+ mutationFn: (publicacionId: string) =>
+ fetchPublicacionDocumento(publicacionId),
+ });
 }

@@ -1,11 +1,11 @@
 import {
-  pgTable,
-  pgEnum,
-  text,
-  timestamp,
-  integer,
-  uuid,
-  index,
+ pgTable,
+ pgEnum,
+ text,
+ timestamp,
+ integer,
+ uuid,
+ index,
 } from "drizzle-orm/pg-core";
 import { authEventTypeEnum } from "./enums";
 
@@ -14,13 +14,13 @@ import { authEventTypeEnum } from "./enums";
  * lib/auth/auth.ts) para límites simples de "N solicitudes por ventana y por
  * IP" en SUS endpoints. Pero varias reglas de la sección 3.5 son más finas
  * de lo que ese limitador soporta out-of-the-box:
- *   - ventanas largas (7 días, 48 horas) que conviene persistir en Postgres
- *     en vez de en memoria/caché de sesión corta,
- *   - combinar dimensiones (cuenta + IP a la vez, RF-AUTH-026),
- *   - contar solo eventos "exitosos" (p. ej. RF-AUTH-024 solo cuenta cambios
- *     de contraseña que sí se completaron),
- *   - aplicar a rutas propias (no montadas por better-auth) como
- *     /api/account/change-email/*.
+ * - ventanas largas (7 días, 48 horas) que conviene persistir en Postgres
+ * en vez de en memoria/caché de sesión corta,
+ * - combinar dimensiones (cuenta + IP a la vez, RF-AUTH-026),
+ * - contar solo eventos "exitosos" (p. ej. RF-AUTH-024 solo cuenta cambios
+ * de contraseña que sí se completaron),
+ * - aplicar a rutas propias (no montadas por better-auth) como
+ * /api/account/change-email/*.
  *
  * Para esos casos usamos esta tabla de eventos, tipo "append-only log", y
  * consultamos con COUNT(*) sobre una ventana deslizante. Es simple, auditable
@@ -30,38 +30,38 @@ import { authEventTypeEnum } from "./enums";
  */
 
 export const authEvents = pgTable(
-  "auth_events",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    type: authEventTypeEnum("type").notNull(),
+ "auth_events",
+ {
+ id: uuid("id").primaryKey().defaultRandom(),
+ type: authEventTypeEnum("type").notNull(),
 
-    // Dimensiones disponibles para filtrar. No todas aplican a todo tipo de
-    // evento; se dejan nullable y cada consulta usa las que necesita.
-    userId: text("user_id"),
-    email: text("email"),
-    ipAddress: text("ip_address"),
+ // Dimensiones disponibles para filtrar. No todas aplican a todo tipo de
+ // evento; se dejan nullable y cada consulta usa las que necesita.
+ userId: text("user_id"),
+ email: text("email"),
+ ipAddress: text("ip_address"),
 
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    index("auth_events_type_user_idx").on(
-      table.type,
-      table.userId,
-      table.createdAt,
-    ),
-    index("auth_events_type_email_idx").on(
-      table.type,
-      table.email,
-      table.createdAt,
-    ),
-    index("auth_events_type_ip_idx").on(
-      table.type,
-      table.ipAddress,
-      table.createdAt,
-    ),
-  ],
+ createdAt: timestamp("created_at", { withTimezone: true })
+ .notNull()
+ .defaultNow(),
+ },
+ (table) => [
+ index("auth_events_type_user_idx").on(
+ table.type,
+ table.userId,
+ table.createdAt,
+ ),
+ index("auth_events_type_email_idx").on(
+ table.type,
+ table.email,
+ table.createdAt,
+ ),
+ index("auth_events_type_ip_idx").on(
+ table.type,
+ table.ipAddress,
+ table.createdAt,
+ ),
+ ],
 );
 
 /**
@@ -70,12 +70,12 @@ export const authEvents = pgTable(
  * mutable (contador + hasta cuándo está bloqueada la cuenta), no un historial.
  */
 export const loginLockouts = pgTable("login_lockouts", {
-  // Clave normalizada: lower(email). Ver lib/rate-limit/login-lockout.ts
-  emailKey: text("email_key").primaryKey(),
-  failedCount: integer("failed_count").notNull().default(0),
-  lockedUntil: timestamp("locked_until", { withTimezone: true }),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+ // Clave normalizada: lower(email). Ver lib/rate-limit/login-lockout.ts
+ emailKey: text("email_key").primaryKey(),
+ failedCount: integer("failed_count").notNull().default(0),
+ lockedUntil: timestamp("locked_until", { withTimezone: true }),
+ updatedAt: timestamp("updated_at", { withTimezone: true })
+ .notNull()
+ .defaultNow()
+ .$onUpdate(() => new Date()),
 });

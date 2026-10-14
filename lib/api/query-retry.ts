@@ -9,15 +9,15 @@ import { ApiRequestError } from "@/lib/api/errors-otro";
  * resto de errores (red, 5xx) se reintenta hasta 2 veces.
  */
 export function shouldRetryApiQuery(
-  failureCount: number,
-  error: unknown,
+ failureCount: number,
+ error: unknown,
 ): boolean {
-  if (
-    error instanceof ApiRequestError &&
-    error.status >= 400 &&
-    error.status < 500
-  ) {
-    return false;
-  }
-  return failureCount < 2;
+ if (
+ error instanceof ApiRequestError &&
+ error.status >= 400 &&
+ error.status < 500
+ ) {
+ return false;
+ }
+ return failureCount < 2;
 }

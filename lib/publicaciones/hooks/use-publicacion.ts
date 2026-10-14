@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { obtenerPublicacionRequest } from "@/lib/publicaciones/api/publicaciones-client";
 
 export function publicacionQueryKey(id: string) {
-  return ["publicaciones", "detalle", id] as const;
+ return ["publicaciones", "detalle", id] as const;
 }
 
 /**
@@ -15,9 +15,9 @@ export function publicacionQueryKey(id: string) {
  * está disponible (por ejemplo, mientras se resuelve un parámetro de ruta).
  */
 export function usePublicacion(id: string | undefined) {
-  return useQuery({
-    queryKey: publicacionQueryKey(id ?? ""),
-    queryFn: ({ signal }) => obtenerPublicacionRequest(id as string, signal),
-    enabled: Boolean(id),
-  });
+ return useQuery({
+ queryKey: publicacionQueryKey(id ?? ""),
+ queryFn: ({ signal }) => obtenerPublicacionRequest(id as string, signal),
+ enabled: Boolean(id),
+ });
 }

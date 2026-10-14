@@ -2,15 +2,15 @@
 
 /** Un elemento de `details` cuando el error proviene de la validación de Zod. */
 export interface ApiErrorDetail {
-  path: string;
-  message: string;
+ path: string;
+ message: string;
 }
 
 /** Forma del campo `error` documentada en el contrato de la API. */
 export interface ApiErrorPayload {
-  code: string;
-  message: string;
-  details?: ApiErrorDetail[];
+ code: string;
+ message: string;
+ details?: ApiErrorDetail[];
 }
 
 /**
@@ -22,17 +22,17 @@ export interface ApiErrorPayload {
  * `message`, que es solo texto para mostrar.
  */
 export class ApiRequestError extends Error {
-  readonly status: number;
-  readonly code: string;
-  readonly details?: ApiErrorDetail[];
+ readonly status: number;
+ readonly code: string;
+ readonly details?: ApiErrorDetail[];
 
-  constructor(status: number, payload: ApiErrorPayload) {
-    super(payload.message);
-    this.name = "ApiRequestError";
-    this.status = status;
-    this.code = payload.code;
-    this.details = payload.details;
-  }
+ constructor(status: number, payload: ApiErrorPayload) {
+ super(payload.message);
+ this.name = "ApiRequestError";
+ this.status = status;
+ this.code = payload.code;
+ this.details = payload.details;
+ }
 }
 
 /**
@@ -41,21 +41,21 @@ export class ApiRequestError extends Error {
  * en vez de lanzar durante el parseo.
  */
 export async function parseApiError(
-  response: Response,
+ response: Response,
 ): Promise<ApiRequestError> {
-  let payload: ApiErrorPayload = {
-    code: "UNKNOWN_ERROR",
-    message: "Ocurrió un error inesperado. Inténtalo de nuevo.",
-  };
+ let payload: ApiErrorPayload = {
+ code: "UNKNOWN_ERROR",
+ message: "Ocurrió un error inesperado. Inténtalo de nuevo.",
+ };
 
-  try {
-    const body = (await response.json()) as { error?: ApiErrorPayload };
-    if (body?.error?.code && body.error?.message) {
-      payload = body.error;
-    }
-  } catch {
-    // El cuerpo no era JSON válido; se conserva el payload por defecto.
-  }
+ try {
+ const body = (await response.json()) as { error?: ApiErrorPayload };
+ if (body?.error?.code && body.error?.message) {
+ payload = body.error;
+ }
+ } catch {
+ // El cuerpo no era JSON válido; se conserva el payload por defecto.
+ }
 
-  return new ApiRequestError(response.status, payload);
+ return new ApiRequestError(response.status, payload);
 }

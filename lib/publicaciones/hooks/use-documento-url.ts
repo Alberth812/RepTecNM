@@ -11,7 +11,7 @@ import { obtenerDocumentoUrlRequest } from "@/lib/publicaciones/api/publicacione
  * el usuario hace clic en "Abrir PDF".
  */
 export function useDocumentoUrl(id: string) {
-  return useMutation({
-    mutationFn: () => obtenerDocumentoUrlRequest(id),
-  });
+ return useMutation({
+ mutationFn: () => obtenerDocumentoUrlRequest(id),
+ });
 }

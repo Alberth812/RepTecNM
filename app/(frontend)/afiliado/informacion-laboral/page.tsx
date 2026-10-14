@@ -16,25 +16,25 @@ import { InformacionLaboralFormClient } from "@/components/informacion-laboral/i
 import { mapRowToFormDefaults } from "@/components/informacion-laboral/informacion-laboral-mappers";
 
 export const metadata: Metadata = {
-  title: "Información laboral",
+ title: "Información laboral",
 };
 
 export default async function InformacionLaboralPage() {
-  // Nota: `requireAfiliado()` lanza `ApiError` (forbidden/unauthorized) si la
-  // sesión no es válida o no corresponde a un afiliado. En una página (a
-  // diferencia de un route handler) ese throw termina en tu `error.tsx` más
-  // cercano en vez de convertirse en una respuesta HTTP con status propio.
-  // Si prefieres redirigir a /login en vez de mostrar una página de error,
-  // considera un guard específico para páginas (p. ej. uno que haga
-  // `redirect("/login")` en vez de `throw`).
-  const { afiliado } = await requireAfiliado();
+ // Nota: `requireAfiliado()` lanza `ApiError` (forbidden/unauthorized) si la
+ // sesión no es válida o no corresponde a un afiliado. En una página (a
+ // diferencia de un route handler) ese throw termina en tu `error.tsx` más
+ // cercano en vez de convertirse en una respuesta HTTP con status propio.
+ // Si prefieres redirigir a /login en vez de mostrar una página de error,
+ // considera un guard específico para páginas (p. ej. uno que haga
+ // `redirect("/login")` en vez de `throw`).
+ const { afiliado } = await requireAfiliado();
 
-  const seccion = await getInformacionLaboralSeccion(afiliado.userId);
-  const defaultValues = mapRowToFormDefaults(seccion);
+ const seccion = await getInformacionLaboralSeccion(afiliado.userId);
+ const defaultValues = mapRowToFormDefaults(seccion);
 
-  return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-      <InformacionLaboralFormClient defaultValues={defaultValues} />
-    </div>
-  );
+ return (
+ <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+ <InformacionLaboralFormClient defaultValues={defaultValues} />
+ </div>
+ );
 }

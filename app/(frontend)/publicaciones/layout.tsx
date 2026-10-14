@@ -5,25 +5,25 @@ import { BarraAdmin } from "@/components/barra-admin/BarraAdmin";
 import { BarraAfiliado } from "@/components/barra-afiliado/BarraAfiliado";
 
 type Args = {
-  children: React.ReactNode;
+ children: React.ReactNode;
 };
 
 const Layout = async ({ children }: Args) => {
-  const session = await getCurrentSession();
+ const session = await getCurrentSession();
 
-  if (!session) {
-    return <>{children}</>;
-  }
+ if (!session) {
+ return <>{children}</>;
+ }
 
-  if (session.user.role === "ADMINISTRADOR") {
-    return <BarraAdmin>{children}</BarraAdmin>;
-  }
+ if (session.user.role === "ADMINISTRADOR") {
+ return <BarraAdmin>{children}</BarraAdmin>;
+ }
 
-  if (session.user.role === "AFILIADO") {
-    return <BarraAfiliado>{children}</BarraAfiliado>;
-  }
+ if (session.user.role === "AFILIADO") {
+ return <BarraAfiliado>{children}</BarraAfiliado>;
+ }
 
-  return <>{children}</>;
+ return <>{children}</>;
 };
 
 export default Layout;

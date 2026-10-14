@@ -2,16 +2,16 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import type {
-  BuscarPublicacionesQuery,
-  BusquedaPublicacionesResponse,
+ BuscarPublicacionesQuery,
+ BusquedaPublicacionesResponse,
 } from "@/lib/validation/publicaciones-busqueda";
 import { fetchPublicaciones } from "@/lib/api/publicaciones-client-otro";
 import { shouldRetryApiQuery } from "@/lib/api/query-retry";
 
 export const publicacionesQueryKeys = {
-  all: ["publicaciones"] as const,
-  lista: (query: BuscarPublicacionesQuery) =>
-    [...publicacionesQueryKeys.all, "lista", query] as const,
+ all: ["publicaciones"] as const,
+ lista: (query: BuscarPublicacionesQuery) =>
+ [...publicacionesQueryKeys.all, "lista", query] as const,
 };
 
 /**
@@ -20,12 +20,12 @@ export const publicacionesQueryKeys = {
  * cambio de página o de filtros, evitando parpadeos de layout.
  */
 export function usePublicacionesQuery(
-  query: BuscarPublicacionesQuery,
+ query: BuscarPublicacionesQuery,
 ): UseQueryResult<BusquedaPublicacionesResponse, Error> {
-  return useQuery<BusquedaPublicacionesResponse, Error>({
-    queryKey: publicacionesQueryKeys.lista(query),
-    queryFn: ({ signal }) => fetchPublicaciones(query, signal),
-    placeholderData: keepPreviousData,
-    retry: shouldRetryApiQuery,
-  });
+ return useQuery<BusquedaPublicacionesResponse, Error>({
+ queryKey: publicacionesQueryKeys.lista(query),
+ queryFn: ({ signal }) => fetchPublicaciones(query, signal),
+ placeholderData: keepPreviousData,
+ retry: shouldRetryApiQuery,
+ });
 }

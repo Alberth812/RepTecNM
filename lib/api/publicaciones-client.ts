@@ -4,9 +4,9 @@ import type { MisPublicacionesPaginatedResponse } from "@/lib/validation/publica
 import { parseApiError } from "@/lib/api/errors";
 
 export interface ListarMisPublicacionesParams {
-  q?: string;
-  page: number;
-  pageSize: number;
+ q?: string;
+ page: number;
+ pageSize: number;
 }
 
 /**
@@ -18,50 +18,50 @@ export interface ListarMisPublicacionesParams {
  * el `return` de esta función en consecuencia.
  */
 export async function fetchMisPublicaciones(
-  params: ListarMisPublicacionesParams,
-  signal?: AbortSignal,
+ params: ListarMisPublicacionesParams,
+ signal?: AbortSignal,
 ): Promise<MisPublicacionesPaginatedResponse> {
-  const searchParams = new URLSearchParams();
-  searchParams.set("page", String(params.page));
-  searchParams.set("pageSize", String(params.pageSize));
+ const searchParams = new URLSearchParams();
+ searchParams.set("page", String(params.page));
+ searchParams.set("pageSize", String(params.pageSize));
 
-  if (params.q) {
-    searchParams.set("q", params.q);
-  }
+ if (params.q) {
+ searchParams.set("q", params.q);
+ }
 
-  const response = await fetch(
-    `/api/afiliados/publicaciones?${searchParams.toString()}`,
-    {
-      method: "GET",
-      signal,
-      headers: { Accept: "application/json" },
-    },
-  );
+ const response = await fetch(
+ `/api/afiliados/publicaciones?${searchParams.toString()}`,
+ {
+ method: "GET",
+ signal,
+ headers: { Accept: "application/json" },
+ },
+ );
 
-  if (!response.ok) {
-    throw await parseApiError(response);
-  }
+ if (!response.ok) {
+ throw await parseApiError(response);
+ }
 
-  return (await response.json()) as MisPublicacionesPaginatedResponse;
+ return (await response.json()) as MisPublicacionesPaginatedResponse;
 }
 
 export interface EliminarPublicacionResponse {
-  id: string;
-  eliminada: boolean;
+ id: string;
+ eliminada: boolean;
 }
 
 /** DELETE /api/publicaciones/:id */
 export async function deletePublicacion(
-  id: string,
+ id: string,
 ): Promise<EliminarPublicacionResponse> {
-  const response = await fetch(`/api/publicaciones/${encodeURIComponent(id)}`, {
-    method: "DELETE",
-    headers: { Accept: "application/json" },
-  });
+ const response = await fetch(`/api/publicaciones/${encodeURIComponent(id)}`, {
+ method: "DELETE",
+ headers: { Accept: "application/json" },
+ });
 
-  if (!response.ok) {
-    throw await parseApiError(response);
-  }
+ if (!response.ok) {
+ throw await parseApiError(response);
+ }
 
-  return (await response.json()) as EliminarPublicacionResponse;
+ return (await response.json()) as EliminarPublicacionResponse;
 }

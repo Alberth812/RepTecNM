@@ -9,15 +9,15 @@ import { PUBLICACIONES_MIAS_QUERY_KEY } from "@/lib/publicaciones/hooks/use-crea
 import type { UpdatePublicacionInput } from "@/lib/validation/publicaciones";
 
 export function useActualizarPublicacion(id: string) {
-  const queryClient = useQueryClient();
+ const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (metadata: UpdatePublicacionInput) =>
-      actualizarPublicacionRequest(id, metadata),
-    onSuccess: (publicacion) => {
-      // Refresca tanto el detalle como cualquier listado que lo incluya.
-      queryClient.setQueryData(publicacionQueryKey(id), publicacion);
-      queryClient.invalidateQueries({ queryKey: PUBLICACIONES_MIAS_QUERY_KEY });
-    },
-  });
+ return useMutation({
+ mutationFn: (metadata: UpdatePublicacionInput) =>
+ actualizarPublicacionRequest(id, metadata),
+ onSuccess: (publicacion) => {
+ // Refresca tanto el detalle como cualquier listado que lo incluya.
+ queryClient.setQueryData(publicacionQueryKey(id), publicacion);
+ queryClient.invalidateQueries({ queryKey: PUBLICACIONES_MIAS_QUERY_KEY });
+ },
+ });
 }

@@ -6,75 +6,75 @@ import { requireAdminGeneral } from "@/lib/auth/session";
 import { ApiError } from "@/lib/errors";
 import { handleApiError } from "@/lib/instituciones/handle-api-error";
 import {
-  deleteInstitucion,
-  getInstitucionById,
-  updateInstitucion,
+ deleteInstitucion,
+ getInstitucionById,
+ updateInstitucion,
 } from "@/lib/instituciones/queries/instituciones";
 import {
-  institucionIdParamSchema,
-  updateInstitucionSchema,
+ institucionIdParamSchema,
+ updateInstitucionSchema,
 } from "@/lib/validation/instituciones";
 
 // Next.js 15: los params de una ruta dinámica llegan como Promise.
 // Si tu proyecto está en Next.js 14, cambia esto por `{ params: { id: string } }`
 // y elimina los `await context.params`.
 interface RouteContext {
-  params: Promise<{ id: string }>;
+ params: Promise<{ id: string }>;
 }
 
 export async function GET(_request: NextRequest, context: RouteContext) {
-  try {
-    await requireAdminGeneral();
+ try {
+ await requireAdminGeneral();
 
-    const { id } = institucionIdParamSchema.parse(await context.params);
+ const { id } = institucionIdParamSchema.parse(await context.params);
 
-    const institucion = await getInstitucionById(id);
+ const institucion = await getInstitucionById(id);
 
-    if (!institucion) {
-      throw ApiError.notFound("La institución no existe.");
-    }
+ if (!institucion) {
+ throw ApiError.notFound("La institución no existe.");
+ }
 
-    return NextResponse.json({ data: institucion });
-  } catch (error) {
-    return handleApiError(error);
-  }
+ return NextResponse.json({ data: institucion });
+ } catch (error) {
+ return handleApiError(error);
+ }
 }
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
-  try {
-    await requireAdminGeneral();
+ try {
+ await requireAdminGeneral();
 
-    const { id } = institucionIdParamSchema.parse(await context.params);
-    const body = await request.json();
-    const input = updateInstitucionSchema.parse(body);
+ const { id } = institucionIdParamSchema.parse(await context.params);
+ const body = await request.json();
+ const input = updateInstitucionSchema.parse(body);
 
-    const institucion = await updateInstitucion(id, input);
+ const institucion = await updateInstitucion(id, input);
 
-    if (!institucion) {
-      throw ApiError.notFound("La institución no existe.");
-    }
+ if (!institucion) {
+ throw ApiError.notFound("La institución no existe.");
+ }
 
-    return NextResponse.json({ data: institucion });
-  } catch (error) {
-    return handleApiError(error);
-  }
+ return NextResponse.json({ data: institucion });
+ } catch (error) {
+ return handleApiError(error);
+ }
 }
 
 export async function DELETE(_request: NextRequest, context: RouteContext) {
-  try {
-    await requireAdminGeneral();
+ try {
+ await requireAdminGeneral();
 
-    const { id } = institucionIdParamSchema.parse(await context.params);
+ const { id } = institucionIdParamSchema.parse(await context.params);
 
-    // deleteInstitucion ya traduce la violación de FK (23503) a un 409.
-    const deleted = await deleteInstitucion(id);
+ // deleteInstitucion ya traduce la violación de FK (23503) a un 409.
+ const deleted = await deleteInstitucion(id);
 
-    if (!deleted) {
-      throw ApiError.notFound("La institución no existe.");
-    }
+ if (!deleted) {
+ throw ApiError.notFound("La institución no existe.");
+ }
 
-    return NextResponse.json({ data: { id } });
-  } catch (error) {
-    return handleApiError(error);
-  }
+ return NextResponse.json({ data: { id } });
+ } catch (error) {
+ return handleApiError(error);
+ }
 }

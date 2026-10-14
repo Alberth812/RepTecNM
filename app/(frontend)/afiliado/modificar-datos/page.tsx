@@ -4,9 +4,9 @@ import { obtenerDatosActuales } from "@/lib/actualizar-datos/obtenerDatosActuale
 import { requireAfiliado } from "@/lib/auth/session";
 
 export default async function Page() {
-  const { afiliado } = await requireAfiliado(["ACTIVO", "INACTIVO"]);
+ const { afiliado } = await requireAfiliado(["ACTIVO", "INACTIVO"]);
 
-  const datosActuales = await obtenerDatosActuales(afiliado.userId);
+ const datosActuales = await obtenerDatosActuales(afiliado.userId);
 
-  return <ModificarDatosForm initialData={datosActuales} />;
+ return <ModificarDatosForm initialData={datosActuales} />;
 }

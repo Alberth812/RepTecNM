@@ -10,8 +10,8 @@ import { formatBytes } from "@/lib/utils";
 import type { PublicacionArchivoResponse } from "@/lib/validation/publicaciones";
 
 export interface DocumentoActualCardProps {
-  publicacionId: string;
-  archivo: PublicacionArchivoResponse;
+ publicacionId: string;
+ archivo: PublicacionArchivoResponse;
 }
 
 /**
@@ -25,52 +25,52 @@ export interface DocumentoActualCardProps {
  * directo de un gesto del usuario.
  */
 export function DocumentoActualCard({
-  publicacionId,
-  archivo,
+ publicacionId,
+ archivo,
 }: DocumentoActualCardProps) {
-  const documentoMutation = useDocumentoUrl(publicacionId);
+ const documentoMutation = useDocumentoUrl(publicacionId);
 
-  function handleAbrir() {
-    const ventana = window.open("", "_blank", "noopener,noreferrer");
+ function handleAbrir() {
+ const ventana = window.open("", "_blank", "noopener,noreferrer");
 
-    documentoMutation.mutate(undefined, {
-      onSuccess: (documento) => {
-        if (ventana) {
-          ventana.location.href = documento.url;
-        } else {
-          toast.error("Habilita las ventanas emergentes para abrir el PDF.");
-        }
-      },
-      onError: () => {
-        ventana?.close();
-        toast.error("No se pudo generar el enlace del documento.");
-      },
-    });
-  }
+ documentoMutation.mutate(undefined, {
+ onSuccess: (documento) => {
+ if (ventana) {
+ ventana.location.href = documento.url;
+ } else {
+ toast.error("Habilita las ventanas emergentes para abrir el PDF.");
+ }
+ },
+ onError: () => {
+ ventana?.close();
+ toast.error("No se pudo generar el enlace del documento.");
+ },
+ });
+ }
 
-  return (
-    <div className="flex items-center gap-3 rounded-md border border-input p-3">
-      <FileText className="size-5 shrink-0 text-muted-foreground" aria-hidden />
-      <div className="min-w-0 flex-1">
-        <p
-          className="truncate text-sm font-medium"
-          title={archivo.originalName}
-        >
-          {archivo.originalName}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          {formatBytes(archivo.size)}
-        </p>
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={handleAbrir}
-        disabled={documentoMutation.isPending}
-      >
-        {documentoMutation.isPending ? "Generando enlace…" : "Abrir PDF"}
-      </Button>
-    </div>
-  );
+ return (
+ <div className="flex items-center gap-3 rounded-md border border-input p-3">
+ <FileText className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+ <div className="min-w-0 flex-1">
+ <p
+ className="truncate text-sm font-medium"
+ title={archivo.originalName}
+ >
+ {archivo.originalName}
+ </p>
+ <p className="text-xs text-muted-foreground">
+ {formatBytes(archivo.size)}
+ </p>
+ </div>
+ <Button
+ type="button"
+ variant="outline"
+ size="sm"
+ onClick={handleAbrir}
+ disabled={documentoMutation.isPending}
+ >
+ {documentoMutation.isPending ? "Generando enlace…" : "Abrir PDF"}
+ </Button>
+ </div>
+ );
 }

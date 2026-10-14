@@ -13,42 +13,42 @@ import { ROLES } from "@/lib/constants";
  * administradores, membership_status para afiliados).
  */
 export async function GET() {
-  try {
-    const session = await requireSession();
+ try {
+ const session = await requireSession();
 
-    if (session.user.role === ROLES.ADMINISTRADOR) {
-      const [profile] = await db
-        .select({
-          subtype: administradores.subtype,
-          isRoot: administradores.isRoot,
-        })
-        .from(administradores)
-        .where(eq(administradores.userId, session.user.id))
-        .limit(1);
+ if (session.user.role === ROLES.ADMINISTRADOR) {
+ const [profile] = await db
+ .select({
+ subtype: administradores.subtype,
+ isRoot: administradores.isRoot,
+ })
+ .from(administradores)
+ .where(eq(administradores.userId, session.user.id))
+ .limit(1);
 
-      return ok({
-        id: session.user.id,
-        email: session.user.email,
-        role: session.user.role,
-        subtype: profile?.subtype ?? null,
-        isRoot: profile?.isRoot ?? false,
-      });
-    }
+ return ok({
+ id: session.user.id,
+ email: session.user.email,
+ role: session.user.role,
+ subtype: profile?.subtype ?? null,
+ isRoot: profile?.isRoot ?? false,
+ });
+ }
 
-    const [profile] = await db
-      .select({ membershipStatus: afiliados.membershipStatus, folio: afiliados.folio })
-      .from(afiliados)
-      .where(eq(afiliados.userId, session.user.id))
-      .limit(1);
+ const [profile] = await db
+ .select({ membershipStatus: afiliados.membershipStatus, folio: afiliados.folio })
+ .from(afiliados)
+ .where(eq(afiliados.userId, session.user.id))
+ .limit(1);
 
-    return ok({
-      id: session.user.id,
-      email: session.user.email,
-      role: session.user.role,
-      folio: profile.folio,
-      membershipStatus: profile?.membershipStatus ?? null,
-    });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return ok({
+ id: session.user.id,
+ email: session.user.email,
+ role: session.user.role,
+ folio: profile.folio,
+ membershipStatus: profile?.membershipStatus ?? null,
+ });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }

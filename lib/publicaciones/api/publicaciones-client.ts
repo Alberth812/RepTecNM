@@ -1,13 +1,13 @@
 // lib/publicaciones/api/publicaciones-client.ts
 import type {
-  PublicacionDetalleResponse,
-  PublicacionDocumentoResponse,
-  UpdatePublicacionInput,
+ PublicacionDetalleResponse,
+ PublicacionDocumentoResponse,
+ UpdatePublicacionInput,
 } from "@/lib/validation/publicaciones";
 
 export interface ApiErrorDetail {
-  path: string;
-  message: string;
+ path: string;
+ message: string;
 }
 
 /**
@@ -20,44 +20,44 @@ export interface ApiErrorDetail {
  * usuario siempre es el que vino del servidor, nunca uno inventado aquí.
  */
 export class ApiRequestError extends Error {
-  readonly status: number;
-  readonly code: string;
-  readonly details?: ApiErrorDetail[];
+ readonly status: number;
+ readonly code: string;
+ readonly details?: ApiErrorDetail[];
 
-  constructor(params: {
-    status: number;
-    code: string;
-    message: string;
-    details?: ApiErrorDetail[];
-  }) {
-    super(params.message);
-    this.name = "ApiRequestError";
-    this.status = params.status;
-    this.code = params.code;
-    this.details = params.details;
-  }
+ constructor(params: {
+ status: number;
+ code: string;
+ message: string;
+ details?: ApiErrorDetail[];
+ }) {
+ super(params.message);
+ this.name = "ApiRequestError";
+ this.status = params.status;
+ this.code = params.code;
+ this.details = params.details;
+ }
 }
 
 interface ApiErrorPayload {
-  error: {
-    code: string;
-    message: string;
-    details?: ApiErrorDetail[];
-  };
+ error: {
+ code: string;
+ message: string;
+ details?: ApiErrorDetail[];
+ };
 }
 
 function isApiErrorPayload(value: unknown): value is ApiErrorPayload {
-  if (typeof value !== "object" || value === null) return false;
-  const maybeEnvelope = value as { error?: unknown };
-  if (typeof maybeEnvelope.error !== "object" || maybeEnvelope.error === null) {
-    return false;
-  }
-  const error = maybeEnvelope.error as { code?: unknown; message?: unknown };
-  return typeof error.code === "string" && typeof error.message === "string";
+ if (typeof value !== "object" || value === null) return false;
+ const maybeEnvelope = value as { error?: unknown };
+ if (typeof maybeEnvelope.error !== "object" || maybeEnvelope.error === null) {
+ return false;
+ }
+ const error = maybeEnvelope.error as { code?: unknown; message?: unknown };
+ return typeof error.code === "string" && typeof error.message === "string";
 }
 
 const FALLBACK_ERROR_MESSAGE =
-  "Ocurrió un error inesperado. Inténtalo nuevamente.";
+ "Ocurrió un error inesperado. Inténtalo nuevamente.";
 
 /**
  * Interpreta una `Response` no exitosa según el contrato de error de la API
@@ -67,27 +67,27 @@ const FALLBACK_ERROR_MESSAGE =
  * inventan mensajes específicos por status.
  */
 async function throwApiRequestError(response: Response): Promise<never> {
-  let payload: unknown = null;
-  try {
-    payload = await response.json();
-  } catch {
-    // El servidor no devolvió un cuerpo JSON válido.
-  }
+ let payload: unknown = null;
+ try {
+ payload = await response.json();
+ } catch {
+ // El servidor no devolvió un cuerpo JSON válido.
+ }
 
-  if (isApiErrorPayload(payload)) {
-    throw new ApiRequestError({
-      status: response.status,
-      code: payload.error.code,
-      message: payload.error.message,
-      details: payload.error.details,
-    });
-  }
+ if (isApiErrorPayload(payload)) {
+ throw new ApiRequestError({
+ status: response.status,
+ code: payload.error.code,
+ message: payload.error.message,
+ details: payload.error.details,
+ });
+ }
 
-  throw new ApiRequestError({
-    status: response.status,
-    code: "UNKNOWN_ERROR",
-    message: FALLBACK_ERROR_MESSAGE,
-  });
+ throw new ApiRequestError({
+ status: response.status,
+ code: "UNKNOWN_ERROR",
+ message: FALLBACK_ERROR_MESSAGE,
+ });
 }
 
 /**
@@ -98,20 +98,20 @@ async function throwApiRequestError(response: Response): Promise<never> {
  * status.
  */
 export async function crearPublicacionRequest(
-  formData: FormData,
-  signal?: AbortSignal,
+ formData: FormData,
+ signal?: AbortSignal,
 ): Promise<PublicacionDetalleResponse> {
-  const response = await fetch("/api/publicaciones", {
-    method: "POST",
-    body: formData,
-    signal,
-  });
+ const response = await fetch("/api/publicaciones", {
+ method: "POST",
+ body: formData,
+ signal,
+ });
 
-  if (!response.ok) {
-    await throwApiRequestError(response);
-  }
+ if (!response.ok) {
+ await throwApiRequestError(response);
+ }
 
-  return (await response.json()) as PublicacionDetalleResponse;
+ return (await response.json()) as PublicacionDetalleResponse;
 }
 
 /**
@@ -120,19 +120,19 @@ export async function crearPublicacionRequest(
  * Solo publicaciones ACTIVO; requiere sesión (afiliado o administrador).
  */
 export async function obtenerPublicacionRequest(
-  id: string,
-  signal?: AbortSignal,
+ id: string,
+ signal?: AbortSignal,
 ): Promise<PublicacionDetalleResponse> {
-  const response = await fetch(`/api/publicaciones/${id}`, {
-    method: "GET",
-    signal,
-  });
+ const response = await fetch(`/api/publicaciones/${id}`, {
+ method: "GET",
+ signal,
+ });
 
-  if (!response.ok) {
-    await throwApiRequestError(response);
-  }
+ if (!response.ok) {
+ await throwApiRequestError(response);
+ }
 
-  return (await response.json()) as PublicacionDetalleResponse;
+ return (await response.json()) as PublicacionDetalleResponse;
 }
 
 /**
@@ -144,22 +144,22 @@ export async function obtenerPublicacionRequest(
  * esta vía con un 400.
  */
 export async function actualizarPublicacionRequest(
-  id: string,
-  metadata: UpdatePublicacionInput,
-  signal?: AbortSignal,
+ id: string,
+ metadata: UpdatePublicacionInput,
+ signal?: AbortSignal,
 ): Promise<PublicacionDetalleResponse> {
-  const response = await fetch(`/api/publicaciones/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(metadata),
-    signal,
-  });
+ const response = await fetch(`/api/publicaciones/${id}`, {
+ method: "PATCH",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify(metadata),
+ signal,
+ });
 
-  if (!response.ok) {
-    await throwApiRequestError(response);
-  }
+ if (!response.ok) {
+ await throwApiRequestError(response);
+ }
 
-  return (await response.json()) as PublicacionDetalleResponse;
+ return (await response.json()) as PublicacionDetalleResponse;
 }
 
 /**
@@ -170,17 +170,17 @@ export async function actualizarPublicacionRequest(
  * expira a los `expiresInSeconds` segundos.
  */
 export async function obtenerDocumentoUrlRequest(
-  id: string,
-  signal?: AbortSignal,
+ id: string,
+ signal?: AbortSignal,
 ): Promise<PublicacionDocumentoResponse> {
-  const response = await fetch(`/api/publicaciones/${id}/documento`, {
-    method: "GET",
-    signal,
-  });
+ const response = await fetch(`/api/publicaciones/${id}/documento`, {
+ method: "GET",
+ signal,
+ });
 
-  if (!response.ok) {
-    await throwApiRequestError(response);
-  }
+ if (!response.ok) {
+ await throwApiRequestError(response);
+ }
 
-  return (await response.json()) as PublicacionDocumentoResponse;
+ return (await response.json()) as PublicacionDocumentoResponse;
 }

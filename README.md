@@ -54,9 +54,9 @@ El diagrama se genera desde `docs/estructura.puml` (PlantUML). Para regenerarlo:
 
 ~~~bash
 curl -X POST https://kroki.io/plantuml/png \
-  -H "Content-Type: text/plain" \
-  --data-binary @docs/estructura.puml \
-  -o docs/estructura.png
+ -H "Content-Type: text/plain" \
+ --data-binary @docs/estructura.puml \
+ -o docs/estructura.png
 ~~~
 
 ## Rutas principales
@@ -118,10 +118,10 @@ curl -X POST https://kroki.io/plantuml/png \
 ## Scripts disponibles
 
 ~~~bash
-pnpm dev     # servidor de desarrollo en http://localhost:3000
-pnpm build   # build de producción
-pnpm start   # servidor de producción
-pnpm lint    # ESLint
+pnpm dev # servidor de desarrollo en http://localhost:3000
+pnpm build # build de producción
+pnpm start # servidor de producción
+pnpm lint # ESLint
 ~~~
 
 ## Colaboración
@@ -129,9 +129,9 @@ pnpm lint    # ESLint
 Protocolo de trabajo del equipo:
 
 ~~~bash
-git pull --rebase origin main   # antes de empezar y antes de cada push
+git pull --rebase origin main # antes de empezar y antes de cada push
 git add .
-git commit -m "tipo: descripcion clara"   # tipos: feat, fix, docs, qa
+git commit -m "tipo: descripcion clara" # tipos: feat, fix, docs, qa
 git push
 ~~~
 

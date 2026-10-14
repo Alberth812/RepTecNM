@@ -2,8 +2,8 @@
 import { z } from "zod";
 
 import {
-  TipoPublicacion,
-  type TipoPublicacionType,
+ TipoPublicacion,
+ type TipoPublicacionType,
 } from "@/lib/validation/publicaciones";
 
 /**
@@ -19,27 +19,27 @@ import {
  * `.superRefine(refineTipoPublicacion)` directamente en ambos esquemas.
  */
 export function refineTipoPublicacionCliente(
-  data: { tipo: TipoPublicacionType; tipoOtro: string | null | undefined },
-  ctx: z.RefinementCtx,
+ data: { tipo: TipoPublicacionType; tipoOtro: string | null | undefined },
+ ctx: z.RefinementCtx,
 ) {
-  if (data.tipo === TipoPublicacion.OTRO) {
-    if (!data.tipoOtro) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["tipoOtro"],
-        message:
-          'Debe especificar el tipo de publicación cuando selecciona "Otro".',
-      });
-      return;
-    }
+ if (data.tipo === TipoPublicacion.OTRO) {
+ if (!data.tipoOtro) {
+ ctx.addIssue({
+ code: z.ZodIssueCode.custom,
+ path: ["tipoOtro"],
+ message:
+ 'Debe especificar el tipo de publicación cuando selecciona "Otro".',
+ });
+ return;
+ }
 
-    if (data.tipoOtro.length < 3 || data.tipoOtro.length > 50) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["tipoOtro"],
-        message:
-          'La especificación de "Otro" debe tener entre 3 y 50 caracteres.',
-      });
-    }
-  }
+ if (data.tipoOtro.length < 3 || data.tipoOtro.length > 50) {
+ ctx.addIssue({
+ code: z.ZodIssueCode.custom,
+ path: ["tipoOtro"],
+ message:
+ 'La especificación de "Otro" debe tener entre 3 y 50 caracteres.',
+ });
+ }
+ }
 }

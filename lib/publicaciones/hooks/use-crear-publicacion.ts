@@ -13,12 +13,12 @@ import { crearPublicacionRequest } from "@/lib/publicaciones/api/publicaciones-c
 export const PUBLICACIONES_MIAS_QUERY_KEY = ["publicaciones", "mias"] as const;
 
 export function useCrearPublicacion() {
-  const queryClient = useQueryClient();
+ const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (formData: FormData) => crearPublicacionRequest(formData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: PUBLICACIONES_MIAS_QUERY_KEY });
-    },
-  });
+ return useMutation({
+ mutationFn: (formData: FormData) => crearPublicacionRequest(formData),
+ onSuccess: () => {
+ queryClient.invalidateQueries({ queryKey: PUBLICACIONES_MIAS_QUERY_KEY });
+ },
+ });
 }

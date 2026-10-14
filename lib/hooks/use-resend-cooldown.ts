@@ -10,29 +10,29 @@ import { useCallback, useEffect, useState } from "react";
  * `retryAfterSeconds` real para corregir el conteo local.
  */
 export function useResendCooldown() {
-  const [availableAt, setAvailableAt] = useState<number | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState(0);
+ const [availableAt, setAvailableAt] = useState<number | null>(null);
+ const [secondsLeft, setSecondsLeft] = useState(0);
 
-  useEffect(() => {
-    if (!availableAt) {
-      setSecondsLeft(0);
-      return;
-    }
+ useEffect(() => {
+ if (!availableAt) {
+ setSecondsLeft(0);
+ return;
+ }
 
-    const tick = () => {
-      const remaining = Math.max(0, Math.ceil((availableAt - Date.now()) / 1000));
-      setSecondsLeft(remaining);
-      if (remaining <= 0) setAvailableAt(null);
-    };
+ const tick = () => {
+ const remaining = Math.max(0, Math.ceil((availableAt - Date.now()) / 1000));
+ setSecondsLeft(remaining);
+ if (remaining <= 0) setAvailableAt(null);
+ };
 
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [availableAt]);
+ tick();
+ const id = setInterval(tick, 1000);
+ return () => clearInterval(id);
+ }, [availableAt]);
 
-  const startCooldown = useCallback((seconds: number) => {
-    setAvailableAt(Date.now() + seconds * 1000);
-  }, []);
+ const startCooldown = useCallback((seconds: number) => {
+ setAvailableAt(Date.now() + seconds * 1000);
+ }, []);
 
-  return { secondsLeft, canResend: secondsLeft <= 0, startCooldown };
+ return { secondsLeft, canResend: secondsLeft <= 0, startCooldown };
 }

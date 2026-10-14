@@ -12,13 +12,13 @@ import { RegistroFormOutput } from "./schema";
  */
 
 export function buildRegistroFormData(values: RegistroFormOutput): FormData {
-  const { fotografia, comprobante_membresia, ...rest } = values;
-  const formData = new FormData();
-  formData.append("payload", JSON.stringify(rest));
-  if (fotografia) formData.append("fotografia", fotografia);
-  if (comprobante_membresia)
-    formData.append("comprobante_membresia", comprobante_membresia);
-  return formData;
+ const { fotografia, comprobante_membresia, ...rest } = values;
+ const formData = new FormData();
+ formData.append("payload", JSON.stringify(rest));
+ if (fotografia) formData.append("fotografia", fotografia);
+ if (comprobante_membresia)
+ formData.append("comprobante_membresia", comprobante_membresia);
+ return formData;
 }
 
 /**
@@ -27,20 +27,20 @@ export function buildRegistroFormData(values: RegistroFormOutput): FormData {
  * (o `.safeParseAsync`) antes de confiar en el resultado.
  */
 export function parseRegistroFormData(
-  formData: FormData,
+ formData: FormData,
 ): Record<string, unknown> {
-  const payloadRaw = formData.get("payload");
-  const rest = typeof payloadRaw === "string" ? JSON.parse(payloadRaw) : {};
-  const fotografia = formData.get("fotografia");
-  const comprobanteMembresia = formData.get("comprobante_membresia");
+ const payloadRaw = formData.get("payload");
+ const rest = typeof payloadRaw === "string" ? JSON.parse(payloadRaw) : {};
+ const fotografia = formData.get("fotografia");
+ const comprobanteMembresia = formData.get("comprobante_membresia");
 
-  return {
-    ...rest,
-    fotografia:
-      fotografia instanceof File && fotografia.size > 0 ? fotografia : null,
-    comprobante_membresia:
-      comprobanteMembresia instanceof File && comprobanteMembresia.size > 0
-        ? comprobanteMembresia
-        : null,
-  };
+ return {
+ ...rest,
+ fotografia:
+ fotografia instanceof File && fotografia.size > 0 ? fotografia : null,
+ comprobante_membresia:
+ comprobanteMembresia instanceof File && comprobanteMembresia.size > 0
+ ? comprobanteMembresia
+ : null,
+ };
 }

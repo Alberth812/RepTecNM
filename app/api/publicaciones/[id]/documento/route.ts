@@ -18,13 +18,13 @@ type RouteContext = { params: Promise<{ id: string }> };
  * marca `no-store` (vía jsonResponse) porque contiene una credencial temporal.
  */
 export async function GET(_request: NextRequest, { params }: RouteContext) {
-  try {
-    await requireSession();
-    const id = await parseIdParam(params);
+ try {
+ await requireSession();
+ const id = await parseIdParam(params);
 
-    const documento = await generarUrlDocumento(id);
-    return jsonResponse(documento);
-  } catch (error) {
-    return handleRouteError(error, "GET /api/publicaciones/[id]/documento");
-  }
+ const documento = await generarUrlDocumento(id);
+ return jsonResponse(documento);
+ } catch (error) {
+ return handleRouteError(error, "GET /api/publicaciones/[id]/documento");
+ }
 }

@@ -4,8 +4,8 @@ import { type NextRequest } from "next/server";
 import { requireAdminGeneral } from "@/lib/auth/session";
 import { toggleAdminStatusSchema } from "@/lib/validation/admin-management";
 import {
-  deactivateAdminRecord,
-  getAdminByUserId,
+ deactivateAdminRecord,
+ getAdminByUserId,
 } from "@/lib/admins/queries/admins";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 import { ApiError } from "@/lib/errors";
@@ -21,41 +21,41 @@ import { ApiError } from "@/lib/errors";
  * isActive (ver deactivateAdminRecord).
  */
 export async function POST(request: NextRequest) {
-  try {
-    const { session } = await requireAdminGeneral();
-    const { userId } = toggleAdminStatusSchema.parse(await request.json());
+ try {
+ const { session } = await requireAdminGeneral();
+ const { userId } = toggleAdminStatusSchema.parse(await request.json());
 
-    if (userId === session.user.id) {
-      throw ApiError.forbidden(
-        "No puedes desactivar tu propia cuenta de administrador.",
-        "CANNOT_MODIFY_SELF",
-      );
-    }
+ if (userId === session.user.id) {
+ throw ApiError.forbidden(
+ "No puedes desactivar tu propia cuenta de administrador.",
+ "CANNOT_MODIFY_SELF",
+ );
+ }
 
-    const target = await getAdminByUserId(userId);
-    if (!target) {
-      throw ApiError.notFound("El administrador indicado no existe.");
-    }
+ const target = await getAdminByUserId(userId);
+ if (!target) {
+ throw ApiError.notFound("El administrador indicado no existe.");
+ }
 
-    if (target.isRoot) {
-      throw ApiError.forbidden(
-        "El administrador raíz no puede ser desactivado.",
-        "ROOT_ADMIN_PROTECTED",
-      );
-    }
+ if (target.isRoot) {
+ throw ApiError.forbidden(
+ "El administrador raíz no puede ser desactivado.",
+ "ROOT_ADMIN_PROTECTED",
+ );
+ }
 
-    const updated = await deactivateAdminRecord(userId);
-    if (!updated) {
-      throw ApiError.notFound("El administrador indicado no existe.");
-    }
+ const updated = await deactivateAdminRecord(userId);
+ if (!updated) {
+ throw ApiError.notFound("El administrador indicado no existe.");
+ }
 
-    return ok({
-      admin: {
-        userId: updated.userId,
-        isActive: updated.isActive,
-      },
-    });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return ok({
+ admin: {
+ userId: updated.userId,
+ isActive: updated.isActive,
+ },
+ });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }

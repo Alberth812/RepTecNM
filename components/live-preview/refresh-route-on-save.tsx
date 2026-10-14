@@ -4,11 +4,11 @@ import { RefreshRouteOnSave as PayloadLivePreview } from "@payloadcms/live-previ
 import { useRouter } from "next/navigation";
 
 export const LivePreviewListener: React.FC = () => {
-  const router = useRouter();
-  return (
-    <PayloadLivePreview
-      refresh={router.refresh}
-      serverURL={getClientSideURL()}
-    />
-  );
+ const router = useRouter();
+ return (
+ <PayloadLivePreview
+ refresh={router.refresh}
+ serverURL={getClientSideURL()}
+ />
+ );
 };

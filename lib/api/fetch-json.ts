@@ -1,34 +1,34 @@
 import { ApiRequestError } from "./http-error";
 
 interface ErrorPayload {
-  error?: {
-    code?: string;
-    message?: string;
-    issues?: unknown;
-  };
+ error?: {
+ code?: string;
+ message?: string;
+ issues?: unknown;
+ };
 }
 
 async function throwApiRequestError(res: Response): Promise<never> {
-  let payload: ErrorPayload | null = null;
-  try {
-    payload = (await res.json()) as ErrorPayload;
-  } catch {
-    // Respuesta sin body JSON (por ejemplo, un 500 genérico sin detalles).
-  }
+ let payload: ErrorPayload | null = null;
+ try {
+ payload = (await res.json()) as ErrorPayload;
+ } catch {
+ // Respuesta sin body JSON (por ejemplo, un 500 genérico sin detalles).
+ }
 
-  const retryAfterHeader = res.headers.get("Retry-After");
+ const retryAfterHeader = res.headers.get("Retry-After");
 
-  throw new ApiRequestError(
-    res.status,
-    payload?.error?.code ?? "UNKNOWN_ERROR",
-    payload?.error?.message ?? "Ocurrió un error inesperado.",
-    {
-      issues: payload?.error?.issues,
-      retryAfterSeconds: retryAfterHeader
-        ? Number(retryAfterHeader)
-        : undefined,
-    },
-  );
+ throw new ApiRequestError(
+ res.status,
+ payload?.error?.code ?? "UNKNOWN_ERROR",
+ payload?.error?.message ?? "Ocurrió un error inesperado.",
+ {
+ issues: payload?.error?.issues,
+ retryAfterSeconds: retryAfterHeader
+ ? Number(retryAfterHeader)
+ : undefined,
+ },
+ );
 }
 
 /**
@@ -38,26 +38,26 @@ async function throwApiRequestError(res: Response): Promise<never> {
  * con esto; no hace falta configurar CORS).
  */
 export async function postJson<TResponse>(
-  url: string,
-  body: unknown,
+ url: string,
+ body: unknown,
 ): Promise<TResponse> {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(body),
-  });
+ const res = await fetch(url, {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ credentials: "include",
+ body: JSON.stringify(body),
+ });
 
-  if (!res.ok) await throwApiRequestError(res);
-  return (await res.json()) as TResponse;
+ if (!res.ok) await throwApiRequestError(res);
+ return (await res.json()) as TResponse;
 }
 
 export async function getJson<TResponse>(url: string): Promise<TResponse> {
-  const res = await fetch(url, {
-    method: "GET",
-    credentials: "include",
-  });
+ const res = await fetch(url, {
+ method: "GET",
+ credentials: "include",
+ });
 
-  if (!res.ok) await throwApiRequestError(res);
-  return (await res.json()) as TResponse;
+ if (!res.ok) await throwApiRequestError(res);
+ return (await res.json()) as TResponse;
 }

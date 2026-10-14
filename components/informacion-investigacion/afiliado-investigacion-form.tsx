@@ -10,66 +10,66 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
+ Field,
+ FieldDescription,
+ FieldError,
+ FieldGroup,
+ FieldLabel,
+ FieldLegend,
+ FieldSeparator,
+ FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 
 import {
-  PRODUCCION_ACADEMICA_OPTIONS,
-  SITUACION_SNI_OPTIONS,
+ PRODUCCION_ACADEMICA_OPTIONS,
+ SITUACION_SNI_OPTIONS,
 } from "@/lib/validation/afiliados-investigacion/investigacion-options";
 import {
-  afiliadoInvestigacionSchema,
-  toAfiliadoInvestigacionFormValues,
-  type AfiliadoInvestigacionFormInput,
-  type AfiliadoInvestigacionFormOutput,
-  type AfiliadoInvestigacionRow,
+ afiliadoInvestigacionSchema,
+ toAfiliadoInvestigacionFormValues,
+ type AfiliadoInvestigacionFormInput,
+ type AfiliadoInvestigacionFormOutput,
+ type AfiliadoInvestigacionRow,
 } from "@/lib/validation/afiliados-investigacion/investigacion";
 
 const DEFAULT_VALUES: AfiliadoInvestigacionFormInput = {
-  participacionProduccionConocimiento: null,
-  produccionAcademica: null,
-  otrosProductosAcademicos: null,
-  situacionSni: null,
-  sniPeriodoAnterior: null,
-  sniPeriodoActual: null,
-  redTematicaConacyt: null,
-  nombreRed: null,
-  haRecibidoPremiosReconocimientos: null,
-  detalleReconocimiento: null,
-  perteneceAcademiaSociedad: null,
-  nombreOrganizacion: null,
+ participacionProduccionConocimiento: null,
+ produccionAcademica: null,
+ otrosProductosAcademicos: null,
+ situacionSni: null,
+ sniPeriodoAnterior: null,
+ sniPeriodoActual: null,
+ redTematicaConacyt: null,
+ nombreRed: null,
+ haRecibidoPremiosReconocimientos: null,
+ detalleReconocimiento: null,
+ perteneceAcademiaSociedad: null,
+ nombreOrganizacion: null,
 };
 
 /** Fila tal como la devuelve `db.query.afiliadosInvestigacion.findFirst(...)`. */
 export interface AfiliadoInvestigacionRecord extends AfiliadoInvestigacionFormOutput {
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
+ userId: string;
+ createdAt: Date;
+ updatedAt: Date;
 }
 
 type BooleanFieldName =
-  | "participacionProduccionConocimiento"
-  | "redTematicaConacyt"
-  | "haRecibidoPremiosReconocimientos"
-  | "perteneceAcademiaSociedad";
+ | "participacionProduccionConocimiento"
+ | "redTematicaConacyt"
+ | "haRecibidoPremiosReconocimientos"
+ | "perteneceAcademiaSociedad";
 
 type TextFieldName =
-  | "otrosProductosAcademicos"
-  | "sniPeriodoAnterior"
-  | "sniPeriodoActual"
-  | "nombreRed"
-  | "detalleReconocimiento"
-  | "nombreOrganizacion";
+ | "otrosProductosAcademicos"
+ | "sniPeriodoAnterior"
+ | "sniPeriodoActual"
+ | "nombreRed"
+ | "detalleReconocimiento"
+ | "nombreOrganizacion";
 
 // ---------------------------------------------------------------------------
 // Sub-componentes reutilizables (no exportados: son de uso interno del form)
@@ -81,64 +81,64 @@ type TextFieldName =
  * interruptor arranque en "apagado" pareciendo ya una respuesta.
  */
 function YesNoField({
-  control,
-  name,
-  legend,
-  description,
+ control,
+ name,
+ legend,
+ description,
 }: {
-  control: Control<AfiliadoInvestigacionFormInput>;
-  name: BooleanFieldName;
-  legend: string;
-  description?: string;
+ control: Control<AfiliadoInvestigacionFormInput>;
+ name: BooleanFieldName;
+ legend: string;
+ description?: string;
 }) {
-  return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field, fieldState }) => (
-        <FieldSet>
-          <FieldLegend variant="label">{legend}</FieldLegend>
-          {description ? (
-            <FieldDescription>{description}</FieldDescription>
-          ) : null}
-          <RadioGroup
-            name={field.name}
-            value={
-              field.value === true
-                ? "true"
-                : field.value === false
-                  ? "false"
-                  : undefined
-            }
-            onValueChange={(value) => field.onChange(value === "true")}
-            className="flex flex-row gap-6"
-          >
-            <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-              <RadioGroupItem
-                value="true"
-                id={`${field.name}-si`}
-                aria-invalid={fieldState.invalid}
-              />
-              <FieldLabel htmlFor={`${field.name}-si`} className="font-normal">
-                Sí
-              </FieldLabel>
-            </Field>
-            <Field orientation="horizontal" data-invalid={fieldState.invalid}>
-              <RadioGroupItem
-                value="false"
-                id={`${field.name}-no`}
-                aria-invalid={fieldState.invalid}
-              />
-              <FieldLabel htmlFor={`${field.name}-no`} className="font-normal">
-                No
-              </FieldLabel>
-            </Field>
-          </RadioGroup>
-          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-        </FieldSet>
-      )}
-    />
-  );
+ return (
+ <Controller
+ name={name}
+ control={control}
+ render={({ field, fieldState }) => (
+ <FieldSet>
+ <FieldLegend variant="label">{legend}</FieldLegend>
+ {description ? (
+ <FieldDescription>{description}</FieldDescription>
+ ) : null}
+ <RadioGroup
+ name={field.name}
+ value={
+ field.value === true
+ ? "true"
+ : field.value === false
+ ? "false"
+ : undefined
+ }
+ onValueChange={(value) => field.onChange(value === "true")}
+ className="flex flex-row gap-6"
+ >
+ <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+ <RadioGroupItem
+ value="true"
+ id={`${field.name}-si`}
+ aria-invalid={fieldState.invalid}
+ />
+ <FieldLabel htmlFor={`${field.name}-si`} className="font-normal">
+ Sí
+ </FieldLabel>
+ </Field>
+ <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+ <RadioGroupItem
+ value="false"
+ id={`${field.name}-no`}
+ aria-invalid={fieldState.invalid}
+ />
+ <FieldLabel htmlFor={`${field.name}-no`} className="font-normal">
+ No
+ </FieldLabel>
+ </Field>
+ </RadioGroup>
+ {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+ </FieldSet>
+ )}
+ />
+ );
 }
 
 /**
@@ -148,64 +148,64 @@ function YesNoField({
  * incluso mientras el campo no está montado.
  */
 function ConditionalTextField({
-  control,
-  name,
-  label,
-  description,
-  visible,
-  multiline = false,
-  maxLength,
+ control,
+ name,
+ label,
+ description,
+ visible,
+ multiline = false,
+ maxLength,
 }: {
-  control: Control<AfiliadoInvestigacionFormInput>;
-  name: TextFieldName;
-  label: string;
-  description?: string;
-  visible: boolean;
-  multiline?: boolean;
-  maxLength: number;
+ control: Control<AfiliadoInvestigacionFormInput>;
+ name: TextFieldName;
+ label: string;
+ description?: string;
+ visible: boolean;
+ multiline?: boolean;
+ maxLength: number;
 }) {
-  if (!visible) return null;
+ if (!visible) return null;
 
-  return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field, fieldState }) =>
-        multiline ? (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
-            <Textarea
-              {...field}
-              value={field.value ?? ""}
-              id={field.name}
-              maxLength={maxLength}
-              aria-invalid={fieldState.invalid}
-              className="min-h-24"
-            />
-            {description ? (
-              <FieldDescription>{description}</FieldDescription>
-            ) : null}
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        ) : (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
-            <Input
-              {...field}
-              value={field.value ?? ""}
-              id={field.name}
-              maxLength={maxLength}
-              aria-invalid={fieldState.invalid}
-            />
-            {description ? (
-              <FieldDescription>{description}</FieldDescription>
-            ) : null}
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )
-      }
-    />
-  );
+ return (
+ <Controller
+ name={name}
+ control={control}
+ render={({ field, fieldState }) =>
+ multiline ? (
+ <Field data-invalid={fieldState.invalid}>
+ <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+ <Textarea
+ {...field}
+ value={field.value ?? ""}
+ id={field.name}
+ maxLength={maxLength}
+ aria-invalid={fieldState.invalid}
+ className="min-h-24"
+ />
+ {description ? (
+ <FieldDescription>{description}</FieldDescription>
+ ) : null}
+ {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+ </Field>
+ ) : (
+ <Field data-invalid={fieldState.invalid}>
+ <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+ <Input
+ {...field}
+ value={field.value ?? ""}
+ id={field.name}
+ maxLength={maxLength}
+ aria-invalid={fieldState.invalid}
+ />
+ {description ? (
+ <FieldDescription>{description}</FieldDescription>
+ ) : null}
+ {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+ </Field>
+ )
+ }
+ />
+ );
 }
 
 // ---------------------------------------------------------------------------
@@ -213,388 +213,388 @@ function ConditionalTextField({
 // ---------------------------------------------------------------------------
 
 export interface AfiliadoInvestigacionFormProps {
-  /**
-   * Dato ya cargado por el Server Component (page.tsx). `null`/`undefined`
-   * si el afiliado todavía no ha llenado esta sección.
-   */
-  initialData?: AfiliadoInvestigacionRecord | null;
-  /** Se llama con los datos ya guardados tras un submit exitoso. */
-  onSaved?: (data: AfiliadoInvestigacionFormOutput) => void;
+ /**
+ * Dato ya cargado por el Server Component (page.tsx). `null`/`undefined`
+ * si el afiliado todavía no ha llenado esta sección.
+ */
+ initialData?: AfiliadoInvestigacionRecord | null;
+ /** Se llama con los datos ya guardados tras un submit exitoso. */
+ onSaved?: (data: AfiliadoInvestigacionFormOutput) => void;
 }
 
 function toFormInput(
-  record?: AfiliadoInvestigacionRecord | null,
+ record?: AfiliadoInvestigacionRecord | null,
 ): AfiliadoInvestigacionFormInput {
-  if (!record) return DEFAULT_VALUES;
-  const {
-    userId: _userId,
-    createdAt: _createdAt,
-    updatedAt: _updatedAt,
-    ...formValues
-  } = record;
-  return formValues;
+ if (!record) return DEFAULT_VALUES;
+ const {
+ userId: _userId,
+ createdAt: _createdAt,
+ updatedAt: _updatedAt,
+ ...formValues
+ } = record;
+ return formValues;
 }
 
 export function AfiliadoInvestigacionForm({
-  initialData,
-  onSaved,
+ initialData,
+ onSaved,
 }: AfiliadoInvestigacionFormProps) {
-  const router = useRouter();
-  const [submitError, setSubmitError] = React.useState<string | null>(null);
-  const [submitSuccess, setSubmitSuccess] = React.useState(false);
+ const router = useRouter();
+ const [submitError, setSubmitError] = React.useState<string | null>(null);
+ const [submitSuccess, setSubmitSuccess] = React.useState(false);
 
-  const defaultValues = React.useMemo(
-    () => toFormInput(initialData),
-    [initialData],
-  );
+ const defaultValues = React.useMemo(
+ () => toFormInput(initialData),
+ [initialData],
+ );
 
-  // z.input como TFieldValues (lo que RHF guarda mientras se llena el form)
-  // y z.output como TTransformedValues (lo que recibe onSubmit, ya validado
-  // y normalizado por los `transform` del schema).
-  const form = useForm<
-    AfiliadoInvestigacionFormInput,
-    unknown,
-    AfiliadoInvestigacionFormOutput
-  >({
-    resolver: zodResolver(afiliadoInvestigacionSchema),
-    defaultValues,
-    mode: "onBlur",
-  });
+ // z.input como TFieldValues (lo que RHF guarda mientras se llena el form)
+ // y z.output como TTransformedValues (lo que recibe onSubmit, ya validado
+ // y normalizado por los `transform` del schema).
+ const form = useForm<
+ AfiliadoInvestigacionFormInput,
+ unknown,
+ AfiliadoInvestigacionFormOutput
+ >({
+ resolver: zodResolver(afiliadoInvestigacionSchema),
+ defaultValues,
+ mode: "onBlur",
+ });
 
-  const { control, handleSubmit, watch, setValue, reset, formState } = form;
+ const { control, handleSubmit, watch, setValue, reset, formState } = form;
 
-  // Si `initialData` cambia (p. ej. tras `router.refresh()` luego de
-  // guardar), sincroniza el form con lo que realmente quedó persistido.
-  React.useEffect(() => {
-    reset(defaultValues);
-  }, [defaultValues, reset]);
+ // Si `initialData` cambia (p. ej. tras `router.refresh()` luego de
+ // guardar), sincroniza el form con lo que realmente quedó persistido.
+ React.useEffect(() => {
+ reset(defaultValues);
+ }, [defaultValues, reset]);
 
-  // --- Visibilidad condicional (visible_when de la especificación) ---
-  const participacion = watch("participacionProduccionConocimiento");
-  const situacionSni = watch("situacionSni");
-  const redTematica = watch("redTematicaConacyt");
-  const haRecibidoPremios = watch("haRecibidoPremiosReconocimientos");
-  const perteneceAcademia = watch("perteneceAcademiaSociedad");
+ // --- Visibilidad condicional (visible_when de la especificación) ---
+ const participacion = watch("participacionProduccionConocimiento");
+ const situacionSni = watch("situacionSni");
+ const redTematica = watch("redTematicaConacyt");
+ const haRecibidoPremios = watch("haRecibidoPremiosReconocimientos");
+ const perteneceAcademia = watch("perteneceAcademiaSociedad");
 
-  const produccionVisible = participacion === true;
-  const sniAnteriorVisible =
-    situacionSni === "anterior" || situacionSni === "anterior_y_actual";
-  const sniActualVisible =
-    situacionSni === "actual" || situacionSni === "anterior_y_actual";
-  const nombreRedVisible = redTematica === true;
-  const detalleReconocimientoVisible = haRecibidoPremios === true;
-  const nombreOrganizacionVisible = perteneceAcademia === true;
+ const produccionVisible = participacion === true;
+ const sniAnteriorVisible =
+ situacionSni === "anterior" || situacionSni === "anterior_y_actual";
+ const sniActualVisible =
+ situacionSni === "actual" || situacionSni === "anterior_y_actual";
+ const nombreRedVisible = redTematica === true;
+ const detalleReconocimientoVisible = haRecibidoPremios === true;
+ const nombreOrganizacionVisible = perteneceAcademia === true;
 
-  // --- clear_when_hidden: limpiar el estado del form apenas se oculta ---
-  React.useEffect(() => {
-    if (!produccionVisible) {
-      setValue("produccionAcademica", null, { shouldValidate: false });
-      setValue("otrosProductosAcademicos", null, { shouldValidate: false });
-    }
-  }, [produccionVisible, setValue]);
+ // --- clear_when_hidden: limpiar el estado del form apenas se oculta ---
+ React.useEffect(() => {
+ if (!produccionVisible) {
+ setValue("produccionAcademica", null, { shouldValidate: false });
+ setValue("otrosProductosAcademicos", null, { shouldValidate: false });
+ }
+ }, [produccionVisible, setValue]);
 
-  React.useEffect(() => {
-    if (!sniAnteriorVisible)
-      setValue("sniPeriodoAnterior", null, { shouldValidate: false });
-  }, [sniAnteriorVisible, setValue]);
+ React.useEffect(() => {
+ if (!sniAnteriorVisible)
+ setValue("sniPeriodoAnterior", null, { shouldValidate: false });
+ }, [sniAnteriorVisible, setValue]);
 
-  React.useEffect(() => {
-    if (!sniActualVisible)
-      setValue("sniPeriodoActual", null, { shouldValidate: false });
-  }, [sniActualVisible, setValue]);
+ React.useEffect(() => {
+ if (!sniActualVisible)
+ setValue("sniPeriodoActual", null, { shouldValidate: false });
+ }, [sniActualVisible, setValue]);
 
-  React.useEffect(() => {
-    if (!nombreRedVisible)
-      setValue("nombreRed", null, { shouldValidate: false });
-  }, [nombreRedVisible, setValue]);
+ React.useEffect(() => {
+ if (!nombreRedVisible)
+ setValue("nombreRed", null, { shouldValidate: false });
+ }, [nombreRedVisible, setValue]);
 
-  React.useEffect(() => {
-    if (!detalleReconocimientoVisible) {
-      setValue("detalleReconocimiento", null, { shouldValidate: false });
-    }
-  }, [detalleReconocimientoVisible, setValue]);
+ React.useEffect(() => {
+ if (!detalleReconocimientoVisible) {
+ setValue("detalleReconocimiento", null, { shouldValidate: false });
+ }
+ }, [detalleReconocimientoVisible, setValue]);
 
-  React.useEffect(() => {
-    if (!nombreOrganizacionVisible) {
-      setValue("nombreOrganizacion", null, { shouldValidate: false });
-    }
-  }, [nombreOrganizacionVisible, setValue]);
+ React.useEffect(() => {
+ if (!nombreOrganizacionVisible) {
+ setValue("nombreOrganizacion", null, { shouldValidate: false });
+ }
+ }, [nombreOrganizacionVisible, setValue]);
 
-  async function onSubmit(data: AfiliadoInvestigacionFormOutput) {
-    setSubmitError(null);
-    setSubmitSuccess(false);
-    try {
-      const response = await fetch("/api/afiliados/investigacion", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+ async function onSubmit(data: AfiliadoInvestigacionFormOutput) {
+ setSubmitError(null);
+ setSubmitSuccess(false);
+ try {
+ const response = await fetch("/api/afiliados/investigacion", {
+ method: "PUT",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify(data),
+ });
 
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.error ?? "No se pudo guardar la información.");
-      }
+ if (!response.ok) {
+ const body = await response.json().catch(() => null);
+ throw new Error(body?.error ?? "No se pudo guardar la información.");
+ }
 
-      const { data: saved } = (await response.json()) as {
-        data: AfiliadoInvestigacionFormOutput;
-      };
-      setSubmitSuccess(true);
-      onSaved?.(saved);
-      // Vuelve a ejecutar el Server Component (page.tsx): re-consulta la BD
-      // y baja el registro ya persistido como `initialData` actualizado.
-      router.refresh();
-    } catch (error) {
-      setSubmitError(
-        error instanceof Error
-          ? error.message
-          : "No se pudo guardar la información.",
-      );
-    }
-  }
+ const { data: saved } = (await response.json()) as {
+ data: AfiliadoInvestigacionFormOutput;
+ };
+ setSubmitSuccess(true);
+ onSaved?.(saved);
+ // Vuelve a ejecutar el Server Component (page.tsx): re-consulta la BD
+ // y baja el registro ya persistido como `initialData` actualizado.
+ router.refresh();
+ } catch (error) {
+ setSubmitError(
+ error instanceof Error
+ ? error.message
+ : "No se pudo guardar la información.",
+ );
+ }
+ }
 
-  return (
-    <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {submitError ? (
-        <Alert variant="destructive">
-          <AlertTitle>No se pudo guardar</AlertTitle>
-          <AlertDescription>{submitError}</AlertDescription>
-        </Alert>
-      ) : null}
+ return (
+ <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+ {submitError ? (
+ <Alert variant="destructive">
+ <AlertTitle>No se pudo guardar</AlertTitle>
+ <AlertDescription>{submitError}</AlertDescription>
+ </Alert>
+ ) : null}
 
-      {submitSuccess ? (
-        <Alert>
-          <AlertTitle>Guardado</AlertTitle>
-          <AlertDescription>
-            Tu información de investigación se guardó correctamente.
-          </AlertDescription>
-        </Alert>
-      ) : null}
+ {submitSuccess ? (
+ <Alert>
+ <AlertTitle>Guardado</AlertTitle>
+ <AlertDescription>
+ Tu información de investigación se guardó correctamente.
+ </AlertDescription>
+ </Alert>
+ ) : null}
 
-      <FieldGroup>
-        {/* Bloque 1: producción académica */}
-        <FieldSet>
-          <FieldLegend>Producción académica</FieldLegend>
-          <FieldDescription>
-            Actividades de producción de conocimientos y publicaciones después
-            de concluir estudios de posgrado.
-          </FieldDescription>
-          <FieldGroup>
-            <YesNoField
-              control={control}
-              name="participacionProduccionConocimiento"
-              legend="Después de haber concluido los estudios de posgrado, ¿participó en actividades de producción de conocimientos y publicaciones?"
-            />
+ <FieldGroup>
+ {/* Bloque 1: producción académica */}
+ <FieldSet>
+ <FieldLegend>Producción académica</FieldLegend>
+ <FieldDescription>
+ Actividades de producción de conocimientos y publicaciones después
+ de concluir estudios de posgrado.
+ </FieldDescription>
+ <FieldGroup>
+ <YesNoField
+ control={control}
+ name="participacionProduccionConocimiento"
+ legend="Después de haber concluido los estudios de posgrado, ¿participó en actividades de producción de conocimientos y publicaciones?"
+ />
 
-            {produccionVisible ? (
-              <Controller
-                name="produccionAcademica"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <FieldSet>
-                    <FieldLegend variant="label">
-                      Especifique en cuáles actividades participa o ha
-                      participado
-                    </FieldLegend>
-                    <FieldGroup data-slot="checkbox-group">
-                      {PRODUCCION_ACADEMICA_OPTIONS.map((option) => {
-                        const current = field.value ?? [];
-                        const checked = current.includes(option.value);
-                        return (
-                          <Field key={option.value} orientation="horizontal">
-                            <Checkbox
-                              id={`produccion-academica-${option.value}`}
-                              name={field.name}
-                              checked={checked}
-                              aria-invalid={fieldState.invalid}
-                              onCheckedChange={(isChecked) => {
-                                const next =
-                                  isChecked === true
-                                    ? [...current, option.value]
-                                    : current.filter(
-                                        (value) => value !== option.value,
-                                      );
-                                field.onChange(next.length === 0 ? null : next);
-                              }}
-                            />
-                            <FieldLabel
-                              htmlFor={`produccion-academica-${option.value}`}
-                              className="font-normal"
-                            >
-                              {option.label}
-                            </FieldLabel>
-                          </Field>
-                        );
-                      })}
-                    </FieldGroup>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </FieldSet>
-                )}
-              />
-            ) : null}
+ {produccionVisible ? (
+ <Controller
+ name="produccionAcademica"
+ control={control}
+ render={({ field, fieldState }) => (
+ <FieldSet>
+ <FieldLegend variant="label">
+ Especifique en cuáles actividades participa o ha
+ participado
+ </FieldLegend>
+ <FieldGroup data-slot="checkbox-group">
+ {PRODUCCION_ACADEMICA_OPTIONS.map((option) => {
+ const current = field.value ?? [];
+ const checked = current.includes(option.value);
+ return (
+ <Field key={option.value} orientation="horizontal">
+ <Checkbox
+ id={`produccion-academica-${option.value}`}
+ name={field.name}
+ checked={checked}
+ aria-invalid={fieldState.invalid}
+ onCheckedChange={(isChecked) => {
+ const next =
+ isChecked === true
+ ? [...current, option.value]
+ : current.filter(
+ (value) => value !== option.value,
+ );
+ field.onChange(next.length === 0 ? null : next);
+ }}
+ />
+ <FieldLabel
+ htmlFor={`produccion-academica-${option.value}`}
+ className="font-normal"
+ >
+ {option.label}
+ </FieldLabel>
+ </Field>
+ );
+ })}
+ </FieldGroup>
+ {fieldState.invalid && (
+ <FieldError errors={[fieldState.error]} />
+ )}
+ </FieldSet>
+ )}
+ />
+ ) : null}
 
-            <ConditionalTextField
-              control={control}
-              name="otrosProductosAcademicos"
-              label="Si realizó otra actividad que desee mencionar, especifique"
-              description="Describa brevemente la actividad de producción académica (máx. 1000 caracteres)."
-              visible={produccionVisible}
-              multiline
-              maxLength={1000}
-            />
-          </FieldGroup>
-        </FieldSet>
+ <ConditionalTextField
+ control={control}
+ name="otrosProductosAcademicos"
+ label="Si realizó otra actividad que desee mencionar, especifique"
+ description="Describa brevemente la actividad de producción académica (máx. 1000 caracteres)."
+ visible={produccionVisible}
+ multiline
+ maxLength={1000}
+ />
+ </FieldGroup>
+ </FieldSet>
 
-        <FieldSeparator />
+ <FieldSeparator />
 
-        {/* Bloque 2: SNI */}
-        <FieldSet>
-          <FieldLegend>
-            Sistema Nacional de Investigadoras e Investigadores (SNI)
-          </FieldLegend>
-          <FieldGroup>
-            <Controller
-              name="situacionSni"
-              control={control}
-              render={({ field, fieldState }) => (
-                <FieldSet>
-                  <FieldLegend variant="label">
-                    Indique su relación con el Sistema Nacional de
-                    Investigadoras e Investigadores
-                  </FieldLegend>
-                  <RadioGroup
-                    name={field.name}
-                    value={field.value ?? undefined}
-                    onValueChange={field.onChange}
-                  >
-                    {SITUACION_SNI_OPTIONS.map((option) => (
-                      <Field
-                        key={option.value}
-                        orientation="horizontal"
-                        data-invalid={fieldState.invalid}
-                      >
-                        <RadioGroupItem
-                          value={option.value}
-                          id={`situacion-sni-${option.value}`}
-                          aria-invalid={fieldState.invalid}
-                        />
-                        <FieldLabel
-                          htmlFor={`situacion-sni-${option.value}`}
-                          className="font-normal"
-                        >
-                          {option.label}
-                        </FieldLabel>
-                      </Field>
-                    ))}
-                  </RadioGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </FieldSet>
-              )}
-            />
+ {/* Bloque 2: SNI */}
+ <FieldSet>
+ <FieldLegend>
+ Sistema Nacional de Investigadoras e Investigadores (SNI)
+ </FieldLegend>
+ <FieldGroup>
+ <Controller
+ name="situacionSni"
+ control={control}
+ render={({ field, fieldState }) => (
+ <FieldSet>
+ <FieldLegend variant="label">
+ Indique su relación con el Sistema Nacional de
+ Investigadoras e Investigadores
+ </FieldLegend>
+ <RadioGroup
+ name={field.name}
+ value={field.value ?? undefined}
+ onValueChange={field.onChange}
+ >
+ {SITUACION_SNI_OPTIONS.map((option) => (
+ <Field
+ key={option.value}
+ orientation="horizontal"
+ data-invalid={fieldState.invalid}
+ >
+ <RadioGroupItem
+ value={option.value}
+ id={`situacion-sni-${option.value}`}
+ aria-invalid={fieldState.invalid}
+ />
+ <FieldLabel
+ htmlFor={`situacion-sni-${option.value}`}
+ className="font-normal"
+ >
+ {option.label}
+ </FieldLabel>
+ </Field>
+ ))}
+ </RadioGroup>
+ {fieldState.invalid && (
+ <FieldError errors={[fieldState.error]} />
+ )}
+ </FieldSet>
+ )}
+ />
 
-            <ConditionalTextField
-              control={control}
-              name="sniPeriodoAnterior"
-              label="Especifique el nivel y periodo anterior"
-              description="Indique el nivel/categoría y el periodo correspondiente (máx. 300 caracteres)."
-              visible={sniAnteriorVisible}
-              multiline
-              maxLength={300}
-            />
+ <ConditionalTextField
+ control={control}
+ name="sniPeriodoAnterior"
+ label="Especifique el nivel y periodo anterior"
+ description="Indique el nivel/categoría y el periodo correspondiente (máx. 300 caracteres)."
+ visible={sniAnteriorVisible}
+ multiline
+ maxLength={300}
+ />
 
-            <ConditionalTextField
-              control={control}
-              name="sniPeriodoActual"
-              label="Especifique el nivel y periodo actual"
-              description="Indique el nivel/categoría y el periodo correspondiente (máx. 300 caracteres)."
-              visible={sniActualVisible}
-              multiline
-              maxLength={300}
-            />
-          </FieldGroup>
-        </FieldSet>
+ <ConditionalTextField
+ control={control}
+ name="sniPeriodoActual"
+ label="Especifique el nivel y periodo actual"
+ description="Indique el nivel/categoría y el periodo correspondiente (máx. 300 caracteres)."
+ visible={sniActualVisible}
+ multiline
+ maxLength={300}
+ />
+ </FieldGroup>
+ </FieldSet>
 
-        <FieldSeparator />
+ <FieldSeparator />
 
-        {/* Bloque 3: red temática CONACYT */}
-        <FieldSet>
-          <FieldLegend>Redes temáticas</FieldLegend>
-          <FieldGroup>
-            <YesNoField
-              control={control}
-              name="redTematicaConacyt"
-              legend="¿Participa en alguna red temática del CONACYT?"
-            />
-            <ConditionalTextField
-              control={control}
-              name="nombreRed"
-              label="Especifique el nombre de la red temática"
-              visible={nombreRedVisible}
-              maxLength={200}
-            />
-          </FieldGroup>
-        </FieldSet>
+ {/* Bloque 3: red temática CONACYT */}
+ <FieldSet>
+ <FieldLegend>Redes temáticas</FieldLegend>
+ <FieldGroup>
+ <YesNoField
+ control={control}
+ name="redTematicaConacyt"
+ legend="¿Participa en alguna red temática del CONACYT?"
+ />
+ <ConditionalTextField
+ control={control}
+ name="nombreRed"
+ label="Especifique el nombre de la red temática"
+ visible={nombreRedVisible}
+ maxLength={200}
+ />
+ </FieldGroup>
+ </FieldSet>
 
-        <FieldSeparator />
+ <FieldSeparator />
 
-        {/* Bloque 4: premios y reconocimientos */}
-        <FieldSet>
-          <FieldLegend>Premios y reconocimientos</FieldLegend>
-          <FieldGroup>
-            <YesNoField
-              control={control}
-              name="haRecibidoPremiosReconocimientos"
-              legend="¿Ha recibido premios, reconocimientos o distinciones por su ejercicio profesional o de otra índole?"
-            />
-            <ConditionalTextField
-              control={control}
-              name="detalleReconocimiento"
-              label="Especifique la institución que le otorgó el reconocimiento y de qué tipo fue"
-              description="Institución otorgante, reconocimiento recibido y, si corresponde, el año (máx. 1000 caracteres)."
-              visible={detalleReconocimientoVisible}
-              multiline
-              maxLength={1000}
-            />
-          </FieldGroup>
-        </FieldSet>
+ {/* Bloque 4: premios y reconocimientos */}
+ <FieldSet>
+ <FieldLegend>Premios y reconocimientos</FieldLegend>
+ <FieldGroup>
+ <YesNoField
+ control={control}
+ name="haRecibidoPremiosReconocimientos"
+ legend="¿Ha recibido premios, reconocimientos o distinciones por su ejercicio profesional o de otra índole?"
+ />
+ <ConditionalTextField
+ control={control}
+ name="detalleReconocimiento"
+ label="Especifique la institución que le otorgó el reconocimiento y de qué tipo fue"
+ description="Institución otorgante, reconocimiento recibido y, si corresponde, el año (máx. 1000 caracteres)."
+ visible={detalleReconocimientoVisible}
+ multiline
+ maxLength={1000}
+ />
+ </FieldGroup>
+ </FieldSet>
 
-        <FieldSeparator />
+ <FieldSeparator />
 
-        {/* Bloque 5: academias / sociedades */}
-        <FieldSet>
-          <FieldLegend>Pertenencia a academias o sociedades</FieldLegend>
-          <FieldGroup>
-            <YesNoField
-              control={control}
-              name="perteneceAcademiaSociedad"
-              legend="¿Pertenece a alguna academia, sociedad u organización profesional?"
-            />
-            <ConditionalTextField
-              control={control}
-              name="nombreOrganizacion"
-              label="Especifique el nombre de la academia, sociedad u organización"
-              visible={nombreOrganizacionVisible}
-              maxLength={250}
-            />
-          </FieldGroup>
-        </FieldSet>
-      </FieldGroup>
+ {/* Bloque 5: academias / sociedades */}
+ <FieldSet>
+ <FieldLegend>Pertenencia a academias o sociedades</FieldLegend>
+ <FieldGroup>
+ <YesNoField
+ control={control}
+ name="perteneceAcademiaSociedad"
+ legend="¿Pertenece a alguna academia, sociedad u organización profesional?"
+ />
+ <ConditionalTextField
+ control={control}
+ name="nombreOrganizacion"
+ label="Especifique el nombre de la academia, sociedad u organización"
+ visible={nombreOrganizacionVisible}
+ maxLength={250}
+ />
+ </FieldGroup>
+ </FieldSet>
+ </FieldGroup>
 
-      <Field orientation="horizontal">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => reset(defaultValues)}
-        >
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={formState.isSubmitting}>
-          {formState.isSubmitting ? "Guardando…" : "Guardar"}
-        </Button>
-      </Field>
-    </form>
-  );
+ <Field orientation="horizontal">
+ <Button
+ type="button"
+ variant="outline"
+ onClick={() => reset(defaultValues)}
+ >
+ Cancelar
+ </Button>
+ <Button type="submit" disabled={formState.isSubmitting}>
+ {formState.isSubmitting ? "Guardando…" : "Guardar"}
+ </Button>
+ </Field>
+ </form>
+ );
 }

@@ -1,13 +1,13 @@
 const EXTENSION_MIME_FALLBACK: Record<string, string> = {
-  jpg: "image/jpeg",
-  jpeg: "image/jpeg",
-  png: "image/png",
-  pdf: "application/pdf",
+ jpg: "image/jpeg",
+ jpeg: "image/jpeg",
+ png: "image/png",
+ pdf: "application/pdf",
 };
 
 function guessMimeFromFilename(filename: string): string | undefined {
-  const ext = filename.split(".").pop()?.toLowerCase();
-  return ext ? EXTENSION_MIME_FALLBACK[ext] : undefined;
+ const ext = filename.split(".").pop()?.toLowerCase();
+ return ext ? EXTENSION_MIME_FALLBACK[ext] : undefined;
 }
 
 /**
@@ -24,15 +24,15 @@ function guessMimeFromFilename(filename: string): string | undefined {
  * decide cómo degradar la experiencia.
  */
 export async function urlToFile(url: string, filename: string): Promise<File> {
-  const response = await fetch(url);
+ const response = await fetch(url);
 
-  if (!response.ok) {
-    throw new Error(`No se pudo descargar el archivo (HTTP ${response.status}).`);
-  }
+ if (!response.ok) {
+ throw new Error(`No se pudo descargar el archivo (HTTP ${response.status}).`);
+ }
 
-  const blob = await response.blob();
-  const isGenericType = !blob.type || blob.type === "application/octet-stream";
-  const type = isGenericType ? guessMimeFromFilename(filename) ?? blob.type : blob.type;
+ const blob = await response.blob();
+ const isGenericType = !blob.type || blob.type === "application/octet-stream";
+ const type = isGenericType ? guessMimeFromFilename(filename) ?? blob.type : blob.type;
 
-  return new File([blob], filename, { type });
+ return new File([blob], filename, { type });
 }

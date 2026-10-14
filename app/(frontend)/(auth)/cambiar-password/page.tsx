@@ -4,11 +4,11 @@ import { requireSession } from "@/lib/auth/session";
 
 // Se debe cambiar esto
 export default async function Page() {
-  try {
-    await requireSession();
-  } catch {
-    redirect("/login");
-  }
+ try {
+ await requireSession();
+ } catch {
+ redirect("/login");
+ }
 
-  return <ChangePasswordForm />;
+ return <ChangePasswordForm />;
 }

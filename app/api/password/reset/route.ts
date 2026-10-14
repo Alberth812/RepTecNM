@@ -21,48 +21,48 @@ import { countAuthEvents, recordAuthEvent } from "@/lib/rate-limit/limiter";
  * better-auth.
  */
 export async function POST(request: NextRequest) {
-  try {
-    const body = resetPasswordSchema.parse(await request.json());
+ try {
+ const body = resetPasswordSchema.parse(await request.json());
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, body.email))
-      .limit(1);
+ const [user] = await db
+ .select()
+ .from(users)
+ .where(eq(users.email, body.email))
+ .limit(1);
 
-    if (user) {
-      const completedInWindow = await countAuthEvents(
-        "PASSWORD_RESET_COMPLETED",
-        { column: "userId", value: user.id },
-        AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT_WINDOW_MS,
-      );
-      if (completedInWindow >= AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT) {
-        throw ApiError.rateLimited(
-          "Alcanzaste el máximo de cambios de contraseña permitidos esta semana. Intenta de nuevo más tarde.",
-          Math.ceil(
-            AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT_WINDOW_MS / 1000,
-          ),
-          "PASSWORD_CHANGE_LIMIT",
-        );
-      }
-    }
+ if (user) {
+ const completedInWindow = await countAuthEvents(
+ "PASSWORD_RESET_COMPLETED",
+ { column: "userId", value: user.id },
+ AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT_WINDOW_MS,
+ );
+ if (completedInWindow >= AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT) {
+ throw ApiError.rateLimited(
+ "Alcanzaste el máximo de cambios de contraseña permitidos esta semana. Intenta de nuevo más tarde.",
+ Math.ceil(
+ AUTH_RULES.PASSWORD_CHANGE_MAX_PER_ACCOUNT_WINDOW_MS / 1000,
+ ),
+ "PASSWORD_CHANGE_LIMIT",
+ );
+ }
+ }
 
-    // RF-AUTH-010 (mayúscula+número+símbolo) ya lo valida resetPasswordSchema
-    // (usa el mismo passwordSchema del registro).
-    await auth.api.resetPassword({
-      body: { token: body.token, newPassword: body.newPassword },
-    });
+ // RF-AUTH-010 (mayúscula+número+símbolo) ya lo valida resetPasswordSchema
+ // (usa el mismo passwordSchema del registro).
+ await auth.api.resetPassword({
+ body: { token: body.token, newPassword: body.newPassword },
+ });
 
-    if (user) {
-      await recordAuthEvent({
-        type: "PASSWORD_RESET_COMPLETED",
-        userId: user.id,
-        email: body.email,
-      });
-    }
+ if (user) {
+ await recordAuthEvent({
+ type: "PASSWORD_RESET_COMPLETED",
+ userId: user.id,
+ email: body.email,
+ });
+ }
 
-    return ok({ message: "Tu contraseña se actualizó correctamente." });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return ok({ message: "Tu contraseña se actualizó correctamente." });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }

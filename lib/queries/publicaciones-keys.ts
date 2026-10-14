@@ -7,8 +7,8 @@ import type { ListarMisPublicacionesParams } from "@/lib/api/publicaciones-clien
  * que se disparan tras eliminar.
  */
 export const publicacionesKeys = {
-  all: ["afiliado", "publicaciones"] as const,
-  lists: () => [...publicacionesKeys.all, "list"] as const,
-  list: (params: ListarMisPublicacionesParams) =>
-    [...publicacionesKeys.lists(), params] as const,
+ all: ["afiliado", "publicaciones"] as const,
+ lists: () => [...publicacionesKeys.all, "list"] as const,
+ list: (params: ListarMisPublicacionesParams) =>
+ [...publicacionesKeys.lists(), params] as const,
 };

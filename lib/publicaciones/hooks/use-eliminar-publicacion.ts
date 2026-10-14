@@ -12,12 +12,12 @@ import { publicacionesKeys } from "@/lib/queries/publicaciones-keys";
  * cambio sin importar en qué página/búsqueda se encuentre el usuario.
  */
 export function useEliminarPublicacion() {
-  const queryClient = useQueryClient();
+ const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (id: string) => deletePublicacion(id),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: publicacionesKeys.all });
-    },
-  });
+ return useMutation({
+ mutationFn: (id: string) => deletePublicacion(id),
+ onSuccess: () => {
+ void queryClient.invalidateQueries({ queryKey: publicacionesKeys.all });
+ },
+ });
 }

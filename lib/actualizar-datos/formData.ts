@@ -12,10 +12,10 @@ import { RegistroFormOutput } from "./schema";
  */
 
 export function buildRegistroFormData(values: RegistroFormOutput): FormData {
-  const { ...rest } = values;
-  const formData = new FormData();
-  formData.append("payload", JSON.stringify(rest));
-  return formData;
+ const { ...rest } = values;
+ const formData = new FormData();
+ formData.append("payload", JSON.stringify(rest));
+ return formData;
 }
 
 /**
@@ -24,11 +24,11 @@ export function buildRegistroFormData(values: RegistroFormOutput): FormData {
  * (o `.safeParseAsync`) antes de confiar en el resultado.
  */
 export function parseRegistroFormData(
-  formData: FormData,
+ formData: FormData,
 ): Record<string, unknown> {
-  const payloadRaw = formData.get("payload");
-  const rest = typeof payloadRaw === "string" ? JSON.parse(payloadRaw) : {};
-  return {
-    ...rest,
-  };
+ const payloadRaw = formData.get("payload");
+ const rest = typeof payloadRaw === "string" ? JSON.parse(payloadRaw) : {};
+ return {
+ ...rest,
+ };
 }

@@ -14,11 +14,11 @@ import { refineTipoPublicacionCliente } from "@/lib/publicaciones/schemas/refine
  * que este formulario ni siquiera lo incluye como campo.
  */
 export const editarPublicacionFormSchema =
-  publicacionBaseMetadataSchema.superRefine(refineTipoPublicacionCliente);
+ publicacionBaseMetadataSchema.superRefine(refineTipoPublicacionCliente);
 
 export type EditarPublicacionFormInput = z.input<
-  typeof editarPublicacionFormSchema
+ typeof editarPublicacionFormSchema
 >;
 export type EditarPublicacionFormOutput = z.output<
-  typeof editarPublicacionFormSchema
+ typeof editarPublicacionFormSchema
 >;

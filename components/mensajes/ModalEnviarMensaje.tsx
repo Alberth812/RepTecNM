@@ -11,278 +11,278 @@ import { toast } from "sonner";
 const MAX_DIGITOS_TELEFONO = 12;
 const MAX_PALABRAS = 600;
 const MAX_LONGITUD_CAMPOS = {
-  nombre: 100,
-  correo: 255,
-  telefono: 20,
-  motivo: 150,
-  mensaje: 10000,
+ nombre: 100,
+ correo: 255,
+ telefono: 20,
+ motivo: 150,
+ mensaje: 10000,
 };
 
 interface ModalEnviarMensajeProps {
-  destinatarioId: string;
-  destinatarioNombre: string;
-  isOpen: boolean;
-  onClose: () => void;
+ destinatarioId: string;
+ destinatarioNombre: string;
+ isOpen: boolean;
+ onClose: () => void;
 }
 
 export function ModalEnviarMensaje({
-  destinatarioId,
-  destinatarioNombre,
-  isOpen,
-  onClose,
+ destinatarioId,
+ destinatarioNombre,
+ isOpen,
+ onClose,
 }: ModalEnviarMensajeProps) {
-  const [enviando, setEnviando] = useState(false);
-  const [errores, setErrores] = useState<Record<string, string>>({});
-  const [formData, setFormData] = useState({
-    motivo: "",
-    contenido: "",
-    nombreParaRespuesta: "",
-    correoParaRespuesta: "",
-    telefonoParaRespuesta: "",
-  });
+ const [enviando, setEnviando] = useState(false);
+ const [errores, setErrores] = useState<Record<string, string>>({});
+ const [formData, setFormData] = useState({
+ motivo: "",
+ contenido: "",
+ nombreParaRespuesta: "",
+ correoParaRespuesta: "",
+ telefonoParaRespuesta: "",
+ });
 
-  const conteoPalabras = useMemo(() => {
-    if (!formData.contenido.trim()) return 0;
-    return formData.contenido.trim().split(/\s+/).filter((p) => p.length > 0).length;
-  }, [formData.contenido]);
+ const conteoPalabras = useMemo(() => {
+ if (!formData.contenido.trim()) return 0;
+ return formData.contenido.trim().split(/\s+/).filter((p) => p.length > 0).length;
+ }, [formData.contenido]);
 
-  const excedePalabras = conteoPalabras > MAX_PALABRAS;
+ const excedePalabras = conteoPalabras > MAX_PALABRAS;
 
-  const handleTelefonoChange = (valor: string) => {
-    let limpio = valor.replace(/\D/g, "");
-    if (limpio.length > MAX_DIGITOS_TELEFONO) {
-      limpio = limpio.slice(0, MAX_DIGITOS_TELEFONO);
-    }
-    setFormData({ ...formData, telefonoParaRespuesta: limpio });
-    if (errores.telefonoParaRespuesta) {
-      setErrores({ ...errores, telefonoParaRespuesta: "" });
-    }
-  };
+ const handleTelefonoChange = (valor: string) => {
+ let limpio = valor.replace(/\D/g, "");
+ if (limpio.length > MAX_DIGITOS_TELEFONO) {
+ limpio = limpio.slice(0, MAX_DIGITOS_TELEFONO);
+ }
+ setFormData({ ...formData, telefonoParaRespuesta: limpio });
+ if (errores.telefonoParaRespuesta) {
+ setErrores({ ...errores, telefonoParaRespuesta: "" });
+ }
+ };
 
-  const validarFormulario = (): boolean => {
-    const nuevosErrores: Record<string, string> = {};
+ const validarFormulario = (): boolean => {
+ const nuevosErrores: Record<string, string> = {};
 
-    if (formData.nombreParaRespuesta.trim().length < 2) {
-      nuevosErrores.nombreParaRespuesta = "El nombre es obligatorio (mínimo 2 caracteres)";
-    } else if (formData.nombreParaRespuesta.length > MAX_LONGITUD_CAMPOS.nombre) {
-      nuevosErrores.nombreParaRespuesta = `Nombre demasiado largo`;
-    } else if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]+$/.test(formData.nombreParaRespuesta)) {
-      // Permitimos letras, espacios, puntos, guiones y apóstrofes
-    }
+ if (formData.nombreParaRespuesta.trim().length < 2) {
+ nuevosErrores.nombreParaRespuesta = "El nombre es obligatorio (mínimo 2 caracteres)";
+ } else if (formData.nombreParaRespuesta.length > MAX_LONGITUD_CAMPOS.nombre) {
+ nuevosErrores.nombreParaRespuesta = `Nombre demasiado largo`;
+ } else if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s.'-]+$/.test(formData.nombreParaRespuesta)) {
+ // Permitimos letras, espacios, puntos, guiones y apóstrofes
+ }
 
-    if (!formData.correoParaRespuesta.trim()) {
-      nuevosErrores.correoParaRespuesta = "El correo electrónico es obligatorio";
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.correoParaRespuesta)) {
-        nuevosErrores.correoParaRespuesta = "Correo no válido";
-      }
-    }
+ if (!formData.correoParaRespuesta.trim()) {
+ nuevosErrores.correoParaRespuesta = "El correo electrónico es obligatorio";
+ } else {
+ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+ if (!emailRegex.test(formData.correoParaRespuesta)) {
+ nuevosErrores.correoParaRespuesta = "Correo no válido";
+ }
+ }
 
-    if (formData.telefonoParaRespuesta) {
-      if (formData.telefonoParaRespuesta.length < 10) {
-        nuevosErrores.telefonoParaRespuesta = "Teléfono debe tener 10-12 dígitos";
-      }
-    }
+ if (formData.telefonoParaRespuesta) {
+ if (formData.telefonoParaRespuesta.length < 10) {
+ nuevosErrores.telefonoParaRespuesta = "Teléfono debe tener 10-12 dígitos";
+ }
+ }
 
-    if (formData.motivo.trim().length < 5) {
-      nuevosErrores.motivo = "El motivo debe tener al menos 5 caracteres";
-    }
+ if (formData.motivo.trim().length < 5) {
+ nuevosErrores.motivo = "El motivo debe tener al menos 5 caracteres";
+ }
 
-    if (formData.contenido.trim().length < 10) {
-      nuevosErrores.contenido = "El mensaje debe tener al menos 10 caracteres";
-    } else if (excedePalabras) {
-      nuevosErrores.contenido = `El mensaje no puede exceder ${MAX_PALABRAS} palabras`;
-    }
+ if (formData.contenido.trim().length < 10) {
+ nuevosErrores.contenido = "El mensaje debe tener al menos 10 caracteres";
+ } else if (excedePalabras) {
+ nuevosErrores.contenido = `El mensaje no puede exceder ${MAX_PALABRAS} palabras`;
+ }
 
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
-  };
+ setErrores(nuevosErrores);
+ return Object.keys(nuevosErrores).length === 0;
+ };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrores({});
+ const handleSubmit = async (e: React.FormEvent) => {
+ e.preventDefault();
+ setErrores({});
 
-    if (!validarFormulario()) {
-      toast.error("Corrige los errores del formulario");
-      return;
-    }
+ if (!validarFormulario()) {
+ toast.error("Corrige los errores del formulario");
+ return;
+ }
 
-    setEnviando(true);
+ setEnviando(true);
 
-    try {
-      const response = await fetch("/api/mensajes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          destinatarioId,
-          nombreParaRespuesta: formData.nombreParaRespuesta,
-          correoParaRespuesta: formData.correoParaRespuesta,
-          telefonoParaRespuesta: formData.telefonoParaRespuesta || null,
-          motivo: formData.motivo,
-          contenido: formData.contenido,
-        }),
-      });
+ try {
+ const response = await fetch("/api/mensajes", {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({
+ destinatarioId,
+ nombreParaRespuesta: formData.nombreParaRespuesta,
+ correoParaRespuesta: formData.correoParaRespuesta,
+ telefonoParaRespuesta: formData.telefonoParaRespuesta || null,
+ motivo: formData.motivo,
+ contenido: formData.contenido,
+ }),
+ });
 
-      const data = await response.json();
+ const data = await response.json();
 
-      if (!response.ok) {
-        console.error("Detalles del error de validación:", data.detalles);
-        const errorMsg = data.detalles 
-          ? data.detalles.map((d: any) => `${d.campo}: ${d.mensaje}`).join(" | ")
-          : (data.error || "Error al enviar");
-        throw new Error(errorMsg);
-      }
+ if (!response.ok) {
+ console.error("Detalles del error de validación:", data.detalles);
+ const errorMsg = data.detalles 
+ ? data.detalles.map((d: any) => `${d.campo}: ${d.mensaje}`).join(" | ")
+ : (data.error || "Error al enviar");
+ throw new Error(errorMsg);
+ }
 
-      toast.success("Mensaje enviado correctamente");
-      onClose();
-      setFormData({
-        motivo: "",
-        contenido: "",
-        nombreParaRespuesta: "",
-        correoParaRespuesta: "",
-        telefonoParaRespuesta: "",
-      });
-    } catch (error: any) {
-      console.error("Error al enviar mensaje:", error);
-      toast.error(error.message || "Error al enviar el mensaje");
-    } finally {
-      setEnviando(false);
-    }
-  };
+ toast.success("Mensaje enviado correctamente");
+ onClose();
+ setFormData({
+ motivo: "",
+ contenido: "",
+ nombreParaRespuesta: "",
+ correoParaRespuesta: "",
+ telefonoParaRespuesta: "",
+ });
+ } catch (error: unknown) {
+ console.error("Error al enviar mensaje:", error);
+ toast.error(error.message || "Error al enviar el mensaje");
+ } finally {
+ setEnviando(false);
+ }
+ };
 
-  if (!isOpen) return null;
+ if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 sticky top-0 bg-white rounded-t-lg z-10">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Enviar mensaje</h2>
-            <p className="text-sm text-slate-600">Para: {destinatarioNombre}</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 transition-colors"
-            disabled={enviando}
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+ return (
+ <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+ <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl max-h-[90vh] overflow-y-auto">
+ <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 sticky top-0 bg-white rounded-t-lg z-10">
+ <div>
+ <h2 className="text-lg font-semibold text-slate-900">Enviar mensaje</h2>
+ <p className="text-sm text-slate-600">Para: {destinatarioNombre}</p>
+ </div>
+ <button
+ onClick={onClose}
+ className="text-slate-400 hover:text-slate-600 transition-colors"
+ disabled={enviando}
+ >
+ <X className="h-5 w-5" />
+ </button>
+ </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#004B87]" />
-              Tus datos de contacto
-            </h3>
+ <form onSubmit={handleSubmit} className="p-6 space-y-5">
+ <div className="space-y-4">
+ <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+ <span className="w-1.5 h-1.5 rounded-full bg-[#004B87]" />
+ Tus datos de contacto
+ </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="nombre">Nombre completo *</Label>
-              <Input
-                id="nombre"
-                placeholder="Ej: Juan Pérez"
-                value={formData.nombreParaRespuesta}
-                onChange={(e) => setFormData({ ...formData, nombreParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.nombre) })}
-                maxLength={MAX_LONGITUD_CAMPOS.nombre}
-                disabled={enviando}
-              />
-              {errores.nombreParaRespuesta && <p className="text-sm text-red-500">{errores.nombreParaRespuesta}</p>}
-            </div>
+ <div className="space-y-2">
+ <Label htmlFor="nombre">Nombre completo *</Label>
+ <Input
+ id="nombre"
+ placeholder="Ej: Juan Pérez"
+ value={formData.nombreParaRespuesta}
+ onChange={(e) => setFormData({ ...formData, nombreParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.nombre) })}
+ maxLength={MAX_LONGITUD_CAMPOS.nombre}
+ disabled={enviando}
+ />
+ {errores.nombreParaRespuesta && <p className="text-sm text-red-500">{errores.nombreParaRespuesta}</p>}
+ </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="correo">Correo electrónico *</Label>
-                <Input
-                  id="correo"
-                  type="email"
-                  placeholder="ejemplo@correo.com"
-                  value={formData.correoParaRespuesta}
-                  onChange={(e) => setFormData({ ...formData, correoParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.correo) })}
-                  maxLength={MAX_LONGITUD_CAMPOS.correo}
-                  disabled={enviando}
-                />
-                {errores.correoParaRespuesta && <p className="text-sm text-red-500">{errores.correoParaRespuesta}</p>}
-              </div>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ <div className="space-y-2">
+ <Label htmlFor="correo">Correo electrónico *</Label>
+ <Input
+ id="correo"
+ type="email"
+ placeholder="ejemplo@correo.com"
+ value={formData.correoParaRespuesta}
+ onChange={(e) => setFormData({ ...formData, correoParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.correo) })}
+ maxLength={MAX_LONGITUD_CAMPOS.correo}
+ disabled={enviando}
+ />
+ {errores.correoParaRespuesta && <p className="text-sm text-red-500">{errores.correoParaRespuesta}</p>}
+ </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="telefono">Teléfono (opcional)</Label>
-                <Input
-                  id="telefono"
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="\d*"
-                  placeholder="5512345678"
-                  value={formData.telefonoParaRespuesta}
-                  onChange={(e) => handleTelefonoChange(e.target.value)}
-                  maxLength={MAX_DIGITOS_TELEFONO}
-                  disabled={enviando}
-                />
-                {errores.telefonoParaRespuesta && <p className="text-sm text-red-500">{errores.telefonoParaRespuesta}</p>}
-              </div>
-            </div>
-          </div>
+ <div className="space-y-2">
+ <Label htmlFor="telefono">Teléfono (opcional)</Label>
+ <Input
+ id="telefono"
+ type="tel"
+ inputMode="numeric"
+ pattern="\d*"
+ placeholder="5512345678"
+ value={formData.telefonoParaRespuesta}
+ onChange={(e) => handleTelefonoChange(e.target.value)}
+ maxLength={MAX_DIGITOS_TELEFONO}
+ disabled={enviando}
+ />
+ {errores.telefonoParaRespuesta && <p className="text-sm text-red-500">{errores.telefonoParaRespuesta}</p>}
+ </div>
+ </div>
+ </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="motivo">Motivo del mensaje *</Label>
-            <select
-              id="motivo"
-              value={formData.motivo}
-              onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
-              disabled={enviando}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#004B87]"
-            >
-              <option value="">Selecciona un motivo</option>
-              <option value="Consulta profesional">Consulta profesional</option>
-              <option value="Solicitud de servicios">Solicitud de servicios</option>
-              <option value="Oferta de empleo">Oferta de empleo</option>
-              <option value="Colaboración académica">Colaboración académica</option>
-              <option value="Otro">Otro</option>
-            </select>
-            {errores.motivo && <p className="text-sm text-red-500">{errores.motivo}</p>}
-          </div>
+ <div className="space-y-2">
+ <Label htmlFor="motivo">Motivo del mensaje *</Label>
+ <select
+ id="motivo"
+ value={formData.motivo}
+ onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
+ disabled={enviando}
+ className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#004B87]"
+ >
+ <option value="">Selecciona un motivo</option>
+ <option value="Consulta profesional">Consulta profesional</option>
+ <option value="Solicitud de servicios">Solicitud de servicios</option>
+ <option value="Oferta de empleo">Oferta de empleo</option>
+ <option value="Colaboración académica">Colaboración académica</option>
+ <option value="Otro">Otro</option>
+ </select>
+ {errores.motivo && <p className="text-sm text-red-500">{errores.motivo}</p>}
+ </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="contenido">Mensaje *</Label>
-            <Textarea
-              id="contenido"
-              placeholder="Describe brevemente el motivo de tu contacto..."
-              value={formData.contenido}
-              onChange={(e) => setFormData({ ...formData, contenido: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.mensaje) })}
-              rows={5}
-              maxLength={MAX_LONGITUD_CAMPOS.mensaje}
-              disabled={enviando}
-              className={`resize-none ${excedePalabras ? "border-red-500" : ""}`}
-            />
-            <div className="flex justify-between items-center text-xs text-slate-500">
-              <span>El destinatario usará tus datos de contacto para responderte</span>
-              <span className={excedePalabras ? "text-red-500 font-semibold" : ""}>
-                {conteoPalabras}/{MAX_PALABRAS} palabras
-              </span>
-            </div>
-            {errores.contenido && <p className="text-sm text-red-500">{errores.contenido}</p>}
-          </div>
+ <div className="space-y-2">
+ <Label htmlFor="contenido">Mensaje *</Label>
+ <Textarea
+ id="contenido"
+ placeholder="Describe brevemente el motivo de tu contacto..."
+ value={formData.contenido}
+ onChange={(e) => setFormData({ ...formData, contenido: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.mensaje) })}
+ rows={5}
+ maxLength={MAX_LONGITUD_CAMPOS.mensaje}
+ disabled={enviando}
+ className={`resize-none ${excedePalabras ? "border-red-500" : ""}`}
+ />
+ <div className="flex justify-between items-center text-xs text-slate-500">
+ <span>El destinatario usará tus datos de contacto para responderte</span>
+ <span className={excedePalabras ? "text-red-500 font-semibold" : ""}>
+ {conteoPalabras}/{MAX_PALABRAS} palabras
+ </span>
+ </div>
+ {errores.contenido && <p className="text-sm text-red-500">{errores.contenido}</p>}
+ </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <Button type="button" variant="outline" onClick={onClose} disabled={enviando}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={enviando || excedePalabras} className="bg-[#004B87] hover:bg-[#003a68]">
-              {enviando ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Enviar Mensaje
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+ <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+ <Button type="button" variant="outline" onClick={onClose} disabled={enviando}>
+ Cancelar
+ </Button>
+ <Button type="submit" disabled={enviando || excedePalabras} className="bg-[#004B87] hover:bg-[#003a68]">
+ {enviando ? (
+ <>
+ <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+ Enviando...
+ </>
+ ) : (
+ <>
+ <Send className="mr-2 h-4 w-4" />
+ Enviar Mensaje
+ </>
+ )}
+ </Button>
+ </div>
+ </form>
+ </div>
+ </div>
+ );
 }

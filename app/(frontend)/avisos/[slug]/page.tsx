@@ -8,65 +8,65 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
 type Args = {
-  params: Promise<{
-    slug: string;
-  }>;
+ params: Promise<{
+ slug: string;
+ }>;
 };
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
-  const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
+ const { slug } = await params;
+ const decodedSlug = decodeURIComponent(slug);
 
-  const aviso = await queryAvisoBySlug(decodedSlug);
+ const aviso = await queryAvisoBySlug(decodedSlug);
 
-  if (!aviso) {
-    return {
-      title: "Aviso no encontrado",
-    };
-  }
+ if (!aviso) {
+ return {
+ title: "Aviso no encontrado",
+ };
+ }
 
-  return {
-    title: aviso.title,
-  };
+ return {
+ title: aviso.title,
+ };
 }
 
 export default async function AvisoPage({
-  params,
+ params,
 }: {
-  params: Promise<{ slug: string }>;
+ params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
+ const { slug } = await params;
+ const decodedSlug = decodeURIComponent(slug);
 
-  const { isEnabled: draft } = await draftMode();
-  const aviso = await queryAvisoBySlug(decodedSlug);
+ const { isEnabled: draft } = await draftMode();
+ const aviso = await queryAvisoBySlug(decodedSlug);
 
-  if (!aviso) {
-    notFound();
-  }
+ if (!aviso) {
+ notFound();
+ }
 
-  const publishedDate = new Intl.DateTimeFormat("es", {
-    dateStyle: "long",
-  }).format(new Date(aviso.publishedAt));
+ const publishedDate = new Intl.DateTimeFormat("es", {
+ dateStyle: "long",
+ }).format(new Date(aviso.publishedAt));
 
-  return (
-    <article className="mx-auto max-w-3xl px-4 py-16">
-      {draft ? <LivePreviewListener /> : null}
+ return (
+ <article className="mx-auto max-w-3xl px-4 py-16">
+ {draft ? <LivePreviewListener /> : null}
 
-      <header className="mb-10">
-        <AvisoBadges
-          important={Boolean(aviso.important)}
-          expiresAt={aviso.expiresAt ?? null}
-        />
+ <header className="mb-10">
+ <AvisoBadges
+ important={Boolean(aviso.important)}
+ expiresAt={aviso.expiresAt ?? null}
+ />
 
-        <h1 className="mt-3 text-4xl font-medium leading-tight text-foreground">
-          {aviso.title}
-        </h1>
+ <h1 className="mt-3 text-4xl font-medium leading-tight text-foreground">
+ {aviso.title}
+ </h1>
 
-        <p className="mt-3 text-sm text-muted-foreground">{publishedDate}</p>
-      </header>
+ <p className="mt-3 text-sm text-muted-foreground">{publishedDate}</p>
+ </header>
 
-      <RichText content={aviso.content} />
-    </article>
-  );
+ <RichText content={aviso.content} />
+ </article>
+ );
 }

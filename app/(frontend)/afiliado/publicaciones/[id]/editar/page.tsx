@@ -22,38 +22,38 @@ import { EditarPublicacionForm } from "@/components/publicaciones/editar-publica
 import { publicacionIdParamSchema } from "@/lib/validation/publicaciones";
 
 interface EditarPublicacionPageProps {
-  params: Promise<{ id: string }>;
+ params: Promise<{ id: string }>;
 }
 
 export default function EditarPublicacionPage({
-  params,
+ params,
 }: EditarPublicacionPageProps) {
-  const { id } = use(params);
-  const router = useRouter();
+ const { id } = use(params);
+ const router = useRouter();
 
-  const parsedId = publicacionIdParamSchema.safeParse({ id });
-  if (!parsedId.success) {
-    notFound();
-  }
+ const parsedId = publicacionIdParamSchema.safeParse({ id });
+ if (!parsedId.success) {
+ notFound();
+ }
 
-  return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-8 space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Editar publicación
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Actualiza los metadatos de tu publicación. El documento PDF no puede
-          sustituirse desde aquí.
-        </p>
-      </div>
+ return (
+ <main className="mx-auto max-w-3xl px-4 py-10">
+ <div className="mb-8 space-y-1">
+ <h1 className="text-2xl font-semibold tracking-tight">
+ Editar publicación
+ </h1>
+ <p className="text-sm text-muted-foreground">
+ Actualiza los metadatos de tu publicación. El documento PDF no puede
+ sustituirse desde aquí.
+ </p>
+ </div>
 
-      <EditarPublicacionForm
-        publicacionId={id}
-        onSuccess={() => {
-          router.push(`/publicaciones/${id}`);
-        }}
-      />
-    </main>
-  );
+ <EditarPublicacionForm
+ publicacionId={id}
+ onSuccess={() => {
+ router.push(`/publicaciones/${id}`);
+ }}
+ />
+ </main>
+ );
 }

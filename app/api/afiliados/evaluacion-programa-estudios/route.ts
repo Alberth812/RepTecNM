@@ -10,31 +10,31 @@ import { evaluacionProgramaEstudiosSchema } from "@/lib/validation/evaluacion-pr
 import { eq } from "drizzle-orm";
 
 function toErrorResponse(error: unknown) {
-  if (error instanceof ApiError) {
-    return NextResponse.json(
-      { error: error.message },
-      {
-        status: (error as { statusCode?: number }).statusCode ?? 500,
-      },
-    );
-  }
+ if (error instanceof ApiError) {
+ return NextResponse.json(
+ { error: error.message },
+ {
+ status: (error as { statusCode?: number }).statusCode ?? 500,
+ },
+ );
+ }
 
-  if (error instanceof z.ZodError) {
-    return NextResponse.json(
-      {
-        error: "Datos inválidos",
-        issues: error.flatten().fieldErrors,
-      },
-      { status: 400 },
-    );
-  }
+ if (error instanceof z.ZodError) {
+ return NextResponse.json(
+ {
+ error: "Datos inválidos",
+ issues: error.flatten().fieldErrors,
+ },
+ { status: 400 },
+ );
+ }
 
-  console.error(error);
+ console.error(error);
 
-  return NextResponse.json(
-    { error: "Error interno del servidor" },
-    { status: 500 },
-  );
+ return NextResponse.json(
+ { error: "Error interno del servidor" },
+ { status: 500 },
+ );
 }
 
 /**
@@ -42,21 +42,21 @@ function toErrorResponse(error: unknown) {
  * del afiliado autenticado, o `data: null` si todavía no existe.
  */
 export async function GET() {
-  try {
-    const { afiliado } = await requireAfiliado();
+ try {
+ const { afiliado } = await requireAfiliado();
 
-    const [evaluacion] = await db
-      .select()
-      .from(evaluacionProgramaEstudios)
-      .where(eq(evaluacionProgramaEstudios.userId, afiliado.userId))
-      .limit(1);
+ const [evaluacion] = await db
+ .select()
+ .from(evaluacionProgramaEstudios)
+ .where(eq(evaluacionProgramaEstudios.userId, afiliado.userId))
+ .limit(1);
 
-    return NextResponse.json({
-      data: evaluacion ?? null,
-    });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return NextResponse.json({
+ data: evaluacion ?? null,
+ });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }
 
 /**
@@ -64,28 +64,28 @@ export async function GET() {
  * del afiliado autenticado.
  */
 export async function POST(request: NextRequest) {
-  try {
-    const { afiliado } = await requireAfiliado();
+ try {
+ const { afiliado } = await requireAfiliado();
 
-    const json = await request.json();
-    const parsed = evaluacionProgramaEstudiosSchema.parse(json);
+ const json = await request.json();
+ const parsed = evaluacionProgramaEstudiosSchema.parse(json);
 
-    const [evaluacion] = await db
-      .insert(evaluacionProgramaEstudios)
-      .values({
-        userId: afiliado.userId,
-        ...parsed,
-      })
-      .onConflictDoUpdate({
-        target: evaluacionProgramaEstudios.userId,
-        set: parsed,
-      })
-      .returning();
+ const [evaluacion] = await db
+ .insert(evaluacionProgramaEstudios)
+ .values({
+ userId: afiliado.userId,
+ ...parsed,
+ })
+ .onConflictDoUpdate({
+ target: evaluacionProgramaEstudios.userId,
+ set: parsed,
+ })
+ .returning();
 
-    return NextResponse.json({
-      data: evaluacion,
-    });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return NextResponse.json({
+ data: evaluacion,
+ });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }

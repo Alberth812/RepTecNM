@@ -17,62 +17,62 @@ import LoginConfig from "./payload/globals/LoginConfig";
 //const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default buildConfig({
-  secret: process.env.PAYLOAD_SECRET!,
-  serverURL: process.env.PAYLOAD_SERVER_URL,
+ secret: process.env.PAYLOAD_SECRET!,
+ serverURL: process.env.PAYLOAD_SERVER_URL,
 
-  editor: lexicalEditor(),
+ editor: lexicalEditor(),
 
-  collections: [CmsAdmins, Posts, Media, Avisos],
+ collections: [CmsAdmins, Posts, Media, Avisos],
 
-  globals: [Home, LoginConfig],
+ globals: [Home, LoginConfig],
 
-  localization: {
-    locales: ["es"],
-    defaultLocale: "es",
-  },
+ localization: {
+ locales: ["es"],
+ defaultLocale: "es",
+ },
 
-  i18n: {
-    supportedLanguages: {
-      es,
-    },
-    fallbackLanguage: "es",
-  },
+ i18n: {
+ supportedLanguages: {
+ es,
+ },
+ fallbackLanguage: "es",
+ },
 
-  admin: {
-    user: CmsAdmins.slug, // evita que Payload cree su propio "users"
-  },
+ admin: {
+ user: CmsAdmins.slug, // evita que Payload cree su propio "users"
+ },
 
-  // Rutas raíz: por defecto Payload usa /admin y /api.
-  // Usamos contenido-api para no interferir con la API de backend
-  routes: {
-    admin: "/contenido",
-    api: "/contenido-api",
-  },
+ // Rutas raíz: por defecto Payload usa /admin y /api.
+ // Usamos contenido-api para no interferir con la API de backend
+ routes: {
+ admin: "/contenido",
+ api: "/contenido-api",
+ },
 
-  // No usamos GraphQL en esta primera prueba: menos superficie, menos rutas.
-  graphQL: { disable: true },
+ // No usamos GraphQL en esta primera prueba: menos superficie, menos rutas.
+ graphQL: { disable: true },
 
-  db: mongooseAdapter({
-    // Mongoose-specific arguments go here.
-    // URL is required.
-    url: process.env.DATABASE_URI!,
-  }),
+ db: mongooseAdapter({
+ // Mongoose-specific arguments go here.
+ // URL is required.
+ url: process.env.DATABASE_URI!,
+ }),
 
-  plugins: [
-    s3Storage({
-      collections: { media: true },
-      bucket: process.env.S3_CMS_BUCKET!,
-      config: {
-        credentials: {
-          accessKeyId: process.env.S3_CMS_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.S3_CMS_SECRET_ACCESS_KEY!,
-        },
-        region: process.env.S3_REGION,
-        endpoint: process.env.S3_INTERNAL_ENDPOINT,
-        forcePathStyle: true,
-      },
-    }),
-  ],
+ plugins: [
+ s3Storage({
+ collections: { media: true },
+ bucket: process.env.S3_CMS_BUCKET!,
+ config: {
+ credentials: {
+ accessKeyId: process.env.S3_CMS_ACCESS_KEY_ID!,
+ secretAccessKey: process.env.S3_CMS_SECRET_ACCESS_KEY!,
+ },
+ region: process.env.S3_REGION,
+ endpoint: process.env.S3_INTERNAL_ENDPOINT,
+ forcePathStyle: true,
+ },
+ }),
+ ],
 
-  sharp,
+ sharp,
 });

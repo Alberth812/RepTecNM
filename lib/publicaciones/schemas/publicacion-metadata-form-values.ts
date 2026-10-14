@@ -13,5 +13,5 @@ import type { publicacionBaseMetadataSchema } from "@/lib/validation/publicacion
  * `updatePublicacionSchema` en el servidor).
  */
 export type PublicacionMetadataFormValues = z.input<
-  typeof publicacionBaseMetadataSchema
+ typeof publicacionBaseMetadataSchema
 >;

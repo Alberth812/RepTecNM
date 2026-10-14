@@ -14,35 +14,35 @@ import { ok, toErrorResponse } from "@/lib/http/responses";
  * cliente.
  */
 export async function GET(request: NextRequest) {
-  try {
-    const { session } = await requireAdminGeneral();
+ try {
+ const { session } = await requireAdminGeneral();
 
-    const { searchParams } = new URL(request.url);
-    const query = adminListQuerySchema.parse({
-      search: searchParams.get("search") || undefined,
-      subtype: searchParams.get("subtype") || undefined,
-      isActive: searchParams.get("isActive") || undefined,
-      sortBy: searchParams.get("sortBy") || undefined,
-      sortOrder: searchParams.get("sortOrder") || undefined,
-      page: searchParams.get("page") || undefined,
-      pageSize: searchParams.get("pageSize") || undefined,
-    });
+ const { searchParams } = new URL(request.url);
+ const query = adminListQuerySchema.parse({
+ search: searchParams.get("search") || undefined,
+ subtype: searchParams.get("subtype") || undefined,
+ isActive: searchParams.get("isActive") || undefined,
+ sortBy: searchParams.get("sortBy") || undefined,
+ sortOrder: searchParams.get("sortOrder") || undefined,
+ page: searchParams.get("page") || undefined,
+ pageSize: searchParams.get("pageSize") || undefined,
+ });
 
-    const { admins, total } = await listAdmins({
-      ...query,
-      excludeUserId: session.user.id,
-    });
+ const { admins, total } = await listAdmins({
+ ...query,
+ excludeUserId: session.user.id,
+ });
 
-    return ok({
-      admins,
-      pagination: {
-        page: query.page,
-        pageSize: query.pageSize,
-        total,
-        totalPages: Math.max(1, Math.ceil(total / query.pageSize)),
-      },
-    });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return ok({
+ admins,
+ pagination: {
+ page: query.page,
+ pageSize: query.pageSize,
+ total,
+ totalPages: Math.max(1, Math.ceil(total / query.pageSize)),
+ },
+ });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }

@@ -13,18 +13,18 @@ import { BarraAdmin } from "@/components/barra-admin/BarraAdmin";
 type Args = { children: React.ReactNode };
 
 const serverFunction: ServerFunctionClient = async function (args) {
-  "use server";
-  return handleServerFunctions({ ...args, config, importMap });
+ "use server";
+ return handleServerFunctions({ ...args, config, importMap });
 };
 
 const Layout = ({ children }: Args) => (
-  <RootLayout
-    config={config}
-    importMap={importMap}
-    serverFunction={serverFunction}
-  >
-    <BarraAdmin>{children}</BarraAdmin>
-  </RootLayout>
+ <RootLayout
+ config={config}
+ importMap={importMap}
+ serverFunction={serverFunction}
+ >
+ <BarraAdmin>{children}</BarraAdmin>
+ </RootLayout>
 );
 
 export default Layout;

@@ -1,8 +1,8 @@
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
 interface ZodIssueLike {
-  path?: Array<string | number>;
-  message?: string;
+ path?: Array<string | number>;
+ message?: string;
 }
 
 /**
@@ -15,20 +15,20 @@ interface ZodIssueLike {
  * Devuelve `true` si logró aplicar al menos un error de campo.
  */
 export function applyServerValidationErrors<TValues extends FieldValues>(
-  form: UseFormReturn<TValues>,
-  issues: unknown,
+ form: UseFormReturn<TValues>,
+ issues: unknown,
 ): boolean {
-  if (!Array.isArray(issues)) return false;
+ if (!Array.isArray(issues)) return false;
 
-  let applied = false;
-  for (const rawIssue of issues as ZodIssueLike[]) {
-    const path = rawIssue?.path?.join(".");
-    if (!path || !rawIssue?.message) continue;
-    form.setError(path as Path<TValues>, {
-      type: "server",
-      message: rawIssue.message,
-    });
-    applied = true;
-  }
-  return applied;
+ let applied = false;
+ for (const rawIssue of issues as ZodIssueLike[]) {
+ const path = rawIssue?.path?.join(".");
+ if (!path || !rawIssue?.message) continue;
+ form.setError(path as Path<TValues>, {
+ type: "server",
+ message: rawIssue.message,
+ });
+ applied = true;
+ }
+ return applied;
 }

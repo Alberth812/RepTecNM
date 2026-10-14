@@ -3,9 +3,9 @@
 
 /** Cuenta palabras separadas por espacios en blanco, ignorando espacios repetidos. */
 export function countWords(text: string): number {
-  const trimmed = text.trim();
-  if (trimmed === "") return 0;
-  return trimmed.split(/\s+/).length;
+ const trimmed = text.trim();
+ if (trimmed === "") return 0;
+ return trimmed.split(/\s+/).length;
 }
 
 /** Teléfono mexicano: exactamente 10 dígitos, sin espacios, guiones ni paréntesis. */
@@ -15,15 +15,15 @@ export const PHONE_REGEX = /^\d{10}$/;
 export const ORCID_REGEX = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
 
 export const PHOTO_MIME_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
+ "image/jpeg",
+ "image/jpg",
+ "image/png",
 ] as const;
 export const COMPROBANTE_MIME_TYPES = [
-  "application/pdf",
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
+ "application/pdf",
+ "image/jpeg",
+ "image/jpg",
+ "image/png",
 ] as const;
 
 export const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
@@ -43,25 +43,25 @@ export const PHOTO_ASPECT_TOLERANCE = 0.02;
  * Solo funciona en un entorno con `Image`/`URL.createObjectURL` (cliente).
  */
 export function getImageDimensions(
-  file: File,
+ file: File,
 ): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("No se pudo leer la imagen."));
-    };
-    img.src = url;
-  });
+ return new Promise((resolve, reject) => {
+ const url = URL.createObjectURL(file);
+ const img = new Image();
+ img.onload = () => {
+ URL.revokeObjectURL(url);
+ resolve({ width: img.naturalWidth, height: img.naturalHeight });
+ };
+ img.onerror = () => {
+ URL.revokeObjectURL(url);
+ reject(new Error("No se pudo leer la imagen."));
+ };
+ img.src = url;
+ });
 }
 
 export function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+ if (bytes < 1024) return `${bytes} B`;
+ if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+ return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

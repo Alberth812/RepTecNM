@@ -9,9 +9,9 @@ import { getClientIp } from "@/lib/http/client-ip";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 import { AUTH_RULES, MESSAGES, ROLES } from "@/lib/constants";
 import {
-  countAuthEvents,
-  enforceRollingLimit,
-  recordAuthEvent,
+ countAuthEvents,
+ enforceRollingLimit,
+ recordAuthEvent,
 } from "@/lib/rate-limit/limiter";
 
 const BLOCKED_MEMBERSHIP_STATUSES = new Set(["RECHAZADO", "SUSPENDIDO"]);
@@ -29,75 +29,75 @@ const BLOCKED_MEMBERSHIP_STATUSES = new Set(["RECHAZADO", "SUSPENDIDO"]);
  * la cuenta existe).
  */
 export async function POST(request: NextRequest) {
-  try {
-    const { email } = forgotPasswordSchema.parse(await request.json());
-    const ip = getClientIp(request);
+ try {
+ const { email } = forgotPasswordSchema.parse(await request.json());
+ const ip = getClientIp(request);
 
-    // IP: aplica siempre, independientemente de si el correo existe.
-    await enforceRollingLimit({
-      type: "PASSWORD_RESET_REQUESTED",
-      dimension: { column: "ipAddress", value: ip },
-      windowMs: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP_WINDOW_MS,
-      max: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP,
-      message:
-        "Demasiadas solicitudes desde esta red. Intenta de nuevo más tarde.",
-    });
+ // IP: aplica siempre, independientemente de si el correo existe.
+ await enforceRollingLimit({
+ type: "PASSWORD_RESET_REQUESTED",
+ dimension: { column: "ipAddress", value: ip },
+ windowMs: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP_WINDOW_MS,
+ max: AUTH_RULES.PASSWORD_RESET_MAX_PER_IP,
+ message:
+ "Demasiadas solicitudes desde esta red. Intenta de nuevo más tarde.",
+ });
 
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+ const [user] = await db
+ .select()
+ .from(users)
+ .where(eq(users.email, email))
+ .limit(1);
 
-    let eligible = false;
-    if (user && user.emailVerified) {
-      if (user.role === ROLES.AFILIADO) {
-        const [afiliado] = await db
-          .select({ membershipStatus: afiliados.membershipStatus })
-          .from(afiliados)
-          .where(eq(afiliados.userId, user.id))
-          .limit(1);
-        eligible =
-          !afiliado ||
-          !BLOCKED_MEMBERSHIP_STATUSES.has(afiliado.membershipStatus);
-      } else {
-        // Administradores no tienen membership_status; solo se exige correo
-        // verificado, lo cual ya es siempre cierto para ellos (RF-AUTH-013).
-        eligible = true;
-      }
-    }
+ let eligible = false;
+ if (user && user.emailVerified) {
+ if (user.role === ROLES.AFILIADO) {
+ const [afiliado] = await db
+ .select({ membershipStatus: afiliados.membershipStatus })
+ .from(afiliados)
+ .where(eq(afiliados.userId, user.id))
+ .limit(1);
+ eligible =
+ !afiliado ||
+ !BLOCKED_MEMBERSHIP_STATUSES.has(afiliado.membershipStatus);
+ } else {
+ // Administradores no tienen membership_status; solo se exige correo
+ // verificado, lo cual ya es siempre cierto para ellos (RF-AUTH-013).
+ eligible = true;
+ }
+ }
 
-    if (eligible && user) {
-      const attemptsInWindow = await countAuthEvents(
-        "PASSWORD_RESET_REQUESTED",
-        { column: "userId", value: user.id },
-        AUTH_RULES.PASSWORD_RESET_MAX_PER_ACCOUNT_WINDOW_MS,
-      );
+ if (eligible && user) {
+ const attemptsInWindow = await countAuthEvents(
+ "PASSWORD_RESET_REQUESTED",
+ { column: "userId", value: user.id },
+ AUTH_RULES.PASSWORD_RESET_MAX_PER_ACCOUNT_WINDOW_MS,
+ );
 
-      if (attemptsInWindow < AUTH_RULES.PASSWORD_RESET_MAX_PER_ACCOUNT) {
-        await auth.api.requestPasswordReset({ body: { email } });
-        await recordAuthEvent({
-          type: "PASSWORD_RESET_REQUESTED",
-          userId: user.id,
-          email,
-          ipAddress: ip,
-        });
-      }
-      // Si ya alcanzó el tope de 5/7 días, no se envía correo ni se registra
-      // un nuevo evento (para no extender artificialmente la ventana), pero
-      // igual respondemos el mensaje uniforme más abajo.
-    } else {
-      // Cuenta inexistente / no verificada / RECHAZADO / SUSPENDIDO: no se
-      // envía nada, pero sí dejamos rastro para el límite por IP.
-      await recordAuthEvent({
-        type: "PASSWORD_RESET_REQUESTED",
-        email,
-        ipAddress: ip,
-      });
-    }
+ if (attemptsInWindow < AUTH_RULES.PASSWORD_RESET_MAX_PER_ACCOUNT) {
+ await auth.api.requestPasswordReset({ body: { email } });
+ await recordAuthEvent({
+ type: "PASSWORD_RESET_REQUESTED",
+ userId: user.id,
+ email,
+ ipAddress: ip,
+ });
+ }
+ // Si ya alcanzó el tope de 5/7 días, no se envía correo ni se registra
+ // un nuevo evento (para no extender artificialmente la ventana), pero
+ // igual respondemos el mensaje uniforme más abajo.
+ } else {
+ // Cuenta inexistente / no verificada / RECHAZADO / SUSPENDIDO: no se
+ // envía nada, pero sí dejamos rastro para el límite por IP.
+ await recordAuthEvent({
+ type: "PASSWORD_RESET_REQUESTED",
+ email,
+ ipAddress: ip,
+ });
+ }
 
-    return ok({ message: MESSAGES.PASSWORD_RESET_UNIFORM });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return ok({ message: MESSAGES.PASSWORD_RESET_UNIFORM });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }

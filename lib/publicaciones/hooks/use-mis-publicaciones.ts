@@ -13,9 +13,9 @@ import { publicacionesKeys } from "@/lib/queries/publicaciones-keys";
  * (con opacidad reducida en la UI) en vez de un parpadeo a estado de carga.
  */
 export function useMisPublicaciones(params: ListarMisPublicacionesParams) {
-  return useQuery({
-    queryKey: publicacionesKeys.list(params),
-    queryFn: ({ signal }) => fetchMisPublicaciones(params, signal),
-    placeholderData: keepPreviousData,
-  });
+ return useQuery({
+ queryKey: publicacionesKeys.list(params),
+ queryFn: ({ signal }) => fetchMisPublicaciones(params, signal),
+ placeholderData: keepPreviousData,
+ });
 }

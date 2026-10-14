@@ -7,21 +7,21 @@ import type { instituciones } from "@/lib/db/schema/instituciones";
 export type Institucion = InferSelectModel<typeof instituciones>;
 
 export interface PaginationMeta {
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
+ page: number;
+ pageSize: number;
+ total: number;
+ totalPages: number;
 }
 
 export interface InstitucionesListResponse {
-  data: Institucion[];
-  pagination: PaginationMeta;
+ data: Institucion[];
+ pagination: PaginationMeta;
 }
 
 export interface ApiErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    issues?: unknown;
-  };
+ error: {
+ code: string;
+ message: string;
+ issues?: unknown;
+ };
 }

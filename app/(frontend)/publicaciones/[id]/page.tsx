@@ -1,12 +1,12 @@
 import { PublicacionDetallePageClient } from "@/components/publicaciones/general/publicacion-detalle-page-client";
 
 interface PublicacionDetallePageProps {
-  params: Promise<{ id: string }>;
+ params: Promise<{ id: string }>;
 }
 
 export default async function PublicacionDetallePage({
-  params,
+ params,
 }: PublicacionDetallePageProps) {
-  const { id } = await params;
-  return <PublicacionDetallePageClient id={id} />;
+ const { id } = await params;
+ return <PublicacionDetallePageClient id={id} />;
 }

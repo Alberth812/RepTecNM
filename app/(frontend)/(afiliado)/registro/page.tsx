@@ -7,54 +7,54 @@ import { mapSnapshotToFormInput } from "@/lib/db/solicitudes/mapSnapshotToFormIn
 import RegistroEnviado from "@/components/afilliate/registro/ui/RegistroEnviado";
 
 export default async function Page() {
-  const { afiliado } = await requireAfiliado([
-    "NO_INICIADA",
-    "PENDIENTE_APROBACION",
-    "REQUIERE_CORRECCION",
-  ]);
+ const { afiliado } = await requireAfiliado([
+ "NO_INICIADA",
+ "PENDIENTE_APROBACION",
+ "REQUIERE_CORRECCION",
+ ]);
 
-  if (afiliado.membershipStatus === "NO_INICIADA") {
-    return <RegistroForm />;
-  }
+ if (afiliado.membershipStatus === "NO_INICIADA") {
+ return <RegistroForm />;
+ }
 
-  if (afiliado.membershipStatus === "PENDIENTE_APROBACION") {
-    return <RegistroEnviado />;
-  }
+ if (afiliado.membershipStatus === "PENDIENTE_APROBACION") {
+ return <RegistroEnviado />;
+ }
 
-  if (afiliado.membershipStatus === "REQUIERE_CORRECCION") {
-    const solicitud = await obtenerSolicitudActualParaAfiliado(afiliado.userId);
+ if (afiliado.membershipStatus === "REQUIERE_CORRECCION") {
+ const solicitud = await obtenerSolicitudActualParaAfiliado(afiliado.userId);
 
-    // No debería pasar (no hay REQUIERE_CORRECCION sin solicitud previa),
-    // pero por seguridad caemos al formulario vacío en vez de tronar.
-    if (!solicitud) {
-      return <RegistroForm />;
-    }
+ // No debería pasar (no hay REQUIERE_CORRECCION sin solicitud previa),
+ // pero por seguridad caemos al formulario vacío en vez de tronar.
+ if (!solicitud) {
+ return <RegistroForm />;
+ }
 
-    const [fotografiaUrl, comprobanteUrl] = await Promise.all([
-      getFileUrl("afiliados", solicitud.fotografia.objectKey),
-      getFileUrl("afiliados", solicitud.comprobanteMembresia.objectKey),
-    ]);
+ const [fotografiaUrl, comprobanteUrl] = await Promise.all([
+ getFileUrl("afiliados", solicitud.fotografia.objectKey),
+ getFileUrl("afiliados", solicitud.comprobanteMembresia.objectKey),
+ ]);
 
-    return (
-      <RegistroForm
-        initialData={mapSnapshotToFormInput(solicitud.datos)}
-        observaciones={solicitud.revisionObservaciones}
-        archivosActuales={{
-          fotografia: {
-            originalName: solicitud.fotografia.originalName,
-            url: fotografiaUrl,
-          },
-          comprobanteMembresia: {
-            originalName: solicitud.comprobanteMembresia.originalName,
-            url: comprobanteUrl,
-          },
-        }}
-      />
-    );
-  }
+ return (
+ <RegistroForm
+ initialData={mapSnapshotToFormInput(solicitud.datos)}
+ observaciones={solicitud.revisionObservaciones}
+ archivosActuales={{
+ fotografia: {
+ originalName: solicitud.fotografia.originalName,
+ url: fotografiaUrl,
+ },
+ comprobanteMembresia: {
+ originalName: solicitud.comprobanteMembresia.originalName,
+ url: comprobanteUrl,
+ },
+ }}
+ />
+ );
+ }
 
-  // ACTIVO, RECHAZADO, INACTIVO, SUSPENDIDO, BAJA:
-  // ya los manejas en otro lado según comentaste — deja aquí tu
-  // componente/mensaje correspondiente para esos casos.
-  return <p>No puedes hacer un registro debido a tu estado de membresía</p>;
+ // ACTIVO, RECHAZADO, INACTIVO, SUSPENDIDO, BAJA:
+ // ya los manejas en otro lado según comentaste — deja aquí tu
+ // componente/mensaje correspondiente para esos casos.
+ return <p>No puedes hacer un registro debido a tu estado de membresía</p>;
 }

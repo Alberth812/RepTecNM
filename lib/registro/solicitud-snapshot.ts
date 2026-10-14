@@ -2,14 +2,14 @@
 import type { RegistroFormOutput } from "./schema";
 
 export type SolicitudDatosSnapshot = Omit<
-  RegistroFormOutput,
-  "fotografia" | "comprobante_membresia"
+ RegistroFormOutput,
+ "fotografia" | "comprobante_membresia"
 >;
 
 /** Quita los `File` validados; esos van a `archivos`, no al JSONB. */
 export function toSolicitudSnapshot(
-  data: RegistroFormOutput,
+ data: RegistroFormOutput,
 ): SolicitudDatosSnapshot {
-  const { fotografia, comprobante_membresia, ...resto } = data;
-  return resto;
+ const { fotografia, comprobante_membresia, ...resto } = data;
+ return resto;
 }

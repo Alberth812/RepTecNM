@@ -13,20 +13,20 @@ import type { NextRequest } from "next/server";
  * desarrollo, sin proxy, se cae a "127.0.0.1".
  */
 export function getClientIp(request: NextRequest): string {
-  const headerName = process.env.TRUSTED_IP_HEADER ?? "x-forwarded-for";
-  const raw = request.headers.get(headerName);
+ const headerName = process.env.TRUSTED_IP_HEADER ?? "x-forwarded-for";
+ const raw = request.headers.get(headerName);
 
-  if (!raw && process.env.NODE_ENV === "production") {
-    throw new Error(`Missing trusted client IP header: ${headerName}`);
-  }
+ if (!raw && process.env.NODE_ENV === "production") {
+ throw new Error(`Missing trusted client IP header: ${headerName}`);
+ }
 
-  if (!raw) return "127.0.0.1";
+ if (!raw) return "127.0.0.1";
 
-  // x-forwarded-for puede traer una cadena "clientIp, proxy1, proxy2"; sin
-  // una lista de proxies confiables no es seguro tomar el primero a ciegas,
-  // pero para desarrollo/proyectos de un solo proxy conocido es razonable.
-  // Si usas varios proxies, apunta TRUSTED_IP_HEADER a un header de un solo
-  // valor (p. ej. x-real-ip o cf-connecting-ip) en su lugar.
-  const first = raw.split(",")[0]?.trim();
-  return first || "127.0.0.1";
+ // x-forwarded-for puede traer una cadena "clientIp, proxy1, proxy2"; sin
+ // una lista de proxies confiables no es seguro tomar el primero a ciegas,
+ // pero para desarrollo/proyectos de un solo proxy conocido es razonable.
+ // Si usas varios proxies, apunta TRUSTED_IP_HEADER a un header de un solo
+ // valor (p. ej. x-real-ip o cf-connecting-ip) en su lugar.
+ const first = raw.split(",")[0]?.trim();
+ return first || "127.0.0.1";
 }

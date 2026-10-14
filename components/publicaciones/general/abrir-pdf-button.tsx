@@ -7,7 +7,7 @@ import { usePublicacionDocumentoMutation } from "@/lib/publicaciones/hooks/use-p
 import { getApiErrorMessage } from "@/lib/api/errors-otro";
 
 interface AbrirPdfButtonProps {
-  publicacionId: string;
+ publicacionId: string;
 }
 
 /**
@@ -16,42 +16,42 @@ interface AbrirPdfButtonProps {
  * éxito, abre el PDF en una pestaña nueva; si falla, muestra `error.message`.
  */
 export function AbrirPdfButton({ publicacionId }: AbrirPdfButtonProps) {
-  const documentoMutation = usePublicacionDocumentoMutation();
+ const documentoMutation = usePublicacionDocumentoMutation();
 
-  function handleClick() {
-    if (documentoMutation.isPending) return;
+ function handleClick() {
+ if (documentoMutation.isPending) return;
 
-    documentoMutation.mutate(publicacionId, {
-      onSuccess: (documento) => {
-        window.open(documento.url, "_blank", "noopener,noreferrer");
-      },
-    });
-  }
+ documentoMutation.mutate(publicacionId, {
+ onSuccess: (documento) => {
+ window.open(documento.url, "_blank", "noopener,noreferrer");
+ },
+ });
+ }
 
-  return (
-    <div className="flex flex-col gap-2">
-      <Button
-        onClick={handleClick}
-        disabled={documentoMutation.isPending}
-        className="w-fit"
-      >
-        {documentoMutation.isPending ? (
-          <>
-            <Loader2Icon className="size-4 animate-spin" aria-hidden="true" />
-            Abriendo PDF…
-          </>
-        ) : (
-          <>
-            <FileTextIcon className="size-4" aria-hidden="true" />
-            Abrir PDF
-          </>
-        )}
-      </Button>
-      {documentoMutation.isError && (
-        <p role="alert" className="text-sm text-destructive">
-          {getApiErrorMessage(documentoMutation.error)}
-        </p>
-      )}
-    </div>
-  );
+ return (
+ <div className="flex flex-col gap-2">
+ <Button
+ onClick={handleClick}
+ disabled={documentoMutation.isPending}
+ className="w-fit"
+ >
+ {documentoMutation.isPending ? (
+ <>
+ <Loader2Icon className="size-4 animate-spin" aria-hidden="true" />
+ Abriendo PDF…
+ </>
+ ) : (
+ <>
+ <FileTextIcon className="size-4" aria-hidden="true" />
+ Abrir PDF
+ </>
+ )}
+ </Button>
+ {documentoMutation.isError && (
+ <p role="alert" className="text-sm text-destructive">
+ {getApiErrorMessage(documentoMutation.error)}
+ </p>
+ )}
+ </div>
+ );
 }

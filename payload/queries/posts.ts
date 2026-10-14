@@ -4,31 +4,31 @@ import { draftMode } from "next/headers";
 import { cache } from "react";
 
 export const queryPostBySlug = cache(async (slug: string) => {
-  const { isEnabled: draft } = await draftMode();
+ const { isEnabled: draft } = await draftMode();
 
-  const payload = await getPayload({
-    config: configPromise,
-  });
+ const payload = await getPayload({
+ config: configPromise,
+ });
 
-  const result = await payload.find({
-    collection: "posts",
+ const result = await payload.find({
+ collection: "posts",
 
-    where: {
-      slug: {
-        equals: slug,
-      },
-    },
+ where: {
+ slug: {
+ equals: slug,
+ },
+ },
 
-    draft,
+ draft,
 
-    // Permite leer drafts únicamente desde Draft Mode.
-    overrideAccess: draft,
+ // Permite leer drafts únicamente desde Draft Mode.
+ overrideAccess: draft,
 
-    limit: 1,
+ limit: 1,
 
-    // Ajusta esto según las relaciones que realmente necesites.
-    depth: 1,
-  });
+ // Ajusta esto según las relaciones que realmente necesites.
+ depth: 1,
+ });
 
-  return result.docs[0] ?? null;
+ return result.docs[0] ?? null;
 });

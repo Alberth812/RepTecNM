@@ -14,19 +14,19 @@ import { afiliadoInvestigacionSchema } from "@/lib/validation/afiliados-investig
  * (o `data: null` si todavía no ha llenado esta sección).
  */
 export async function GET() {
-  try {
-    const { afiliado } = await requireAfiliado();
+ try {
+ const { afiliado } = await requireAfiliado();
 
-    const registro = await db.query.afiliadosInvestigacion.findFirst({
-      where: {
-        userId: afiliado.userId,
-      },
-    });
+ const registro = await db.query.afiliadosInvestigacion.findFirst({
+ where: {
+ userId: afiliado.userId,
+ },
+ });
 
-    return NextResponse.json({ data: registro ?? null });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return NextResponse.json({ data: registro ?? null });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }
 
 /**
@@ -35,43 +35,43 @@ export async function GET() {
  * incluyendo las reglas cruzadas (superRefine).
  */
 export async function PUT(request: NextRequest) {
-  try {
-    const { afiliado } = await requireAfiliado();
+ try {
+ const { afiliado } = await requireAfiliado();
 
-    let json: unknown;
-    try {
-      json = await request.json();
-    } catch {
-      return NextResponse.json(
-        { error: "Cuerpo de la petición inválido (se esperaba JSON)." },
-        { status: 400 },
-      );
-    }
+ let json: unknown;
+ try {
+ json = await request.json();
+ } catch {
+ return NextResponse.json(
+ { error: "Cuerpo de la petición inválido (se esperaba JSON)." },
+ { status: 400 },
+ );
+ }
 
-    const parsed = afiliadoInvestigacionSchema.safeParse(json);
-    if (!parsed.success) {
-      return NextResponse.json(
-        {
-          error: "Los datos de investigación no son válidos.",
-          fieldErrors: parsed.error.flatten().fieldErrors,
-        },
-        { status: 400 },
-      );
-    }
+ const parsed = afiliadoInvestigacionSchema.safeParse(json);
+ if (!parsed.success) {
+ return NextResponse.json(
+ {
+ error: "Los datos de investigación no son válidos.",
+ fieldErrors: parsed.error.flatten().fieldErrors,
+ },
+ { status: 400 },
+ );
+ }
 
-    const [registro] = await db
-      .insert(afiliadosInvestigacion)
-      .values({ userId: afiliado.userId, ...parsed.data })
-      .onConflictDoUpdate({
-        target: afiliadosInvestigacion.userId,
-        set: { ...parsed.data, updatedAt: new Date() },
-      })
-      .returning();
+ const [registro] = await db
+ .insert(afiliadosInvestigacion)
+ .values({ userId: afiliado.userId, ...parsed.data })
+ .onConflictDoUpdate({
+ target: afiliadosInvestigacion.userId,
+ set: { ...parsed.data, updatedAt: new Date() },
+ })
+ .returning();
 
-    return NextResponse.json({ data: registro });
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+ return NextResponse.json({ data: registro });
+ } catch (error) {
+ return toErrorResponse(error);
+ }
 }
 
 /**
@@ -83,16 +83,16 @@ export async function PUT(request: NextRequest) {
  * esta función y dejar que el error se propague en su lugar.
  */
 function toErrorResponse(error: unknown) {
-  if (error instanceof ApiError) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: error.status },
-    );
-  }
+ if (error instanceof ApiError) {
+ return NextResponse.json(
+ { error: error.message },
+ { status: error.status },
+ );
+ }
 
-  console.error("[api/afiliados/investigacion]", error);
-  return NextResponse.json(
-    { error: "Ocurrió un error inesperado." },
-    { status: 500 },
-  );
+ console.error("[api/afiliados/investigacion]", error);
+ return NextResponse.json(
+ { error: "Ocurrió un error inesperado." },
+ { status: 500 },
+ );
 }

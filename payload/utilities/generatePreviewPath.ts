@@ -2,22 +2,22 @@
 import type { CollectionSlug } from "payload";
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
-  posts: "/posts",
-  avisos: "/avisos",
+ posts: "/posts",
+ avisos: "/avisos",
 };
 
 type Args = {
-  collection: keyof typeof collectionPrefixMap;
-  slug: string;
+ collection: keyof typeof collectionPrefixMap;
+ slug: string;
 };
 
 export function generatePreviewPath({ collection, slug }: Args) {
-  const encodedParams = new URLSearchParams({
-    slug,
-    collection,
-    path: `${collectionPrefixMap[collection]}/${slug}`,
-    previewSecret: process.env.PAYLOAD_PREVIEW_SECRET ?? "",
-  });
+ const encodedParams = new URLSearchParams({
+ slug,
+ collection,
+ path: `${collectionPrefixMap[collection]}/${slug}`,
+ previewSecret: process.env.PAYLOAD_PREVIEW_SECRET ?? "",
+ });
 
-  return `${process.env.NEXT_PUBLIC_APP_URL}/next/preview?${encodedParams.toString()}`;
+ return `${process.env.NEXT_PUBLIC_APP_URL}/next/preview?${encodedParams.toString()}`;
 }

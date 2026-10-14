@@ -11,69 +11,69 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 let transporter: nodemailer.Transporter | null = null;
 
 function getTransporter() {
-  if (transporter) return transporter;
+ if (transporter) return transporter;
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT ?? 1025);
-  const secure = process.env.SMTP_SECURE === "true";
+ const host = process.env.SMTP_HOST;
+ const port = Number(process.env.SMTP_PORT ?? 1025);
+ const secure = process.env.SMTP_SECURE === "true";
 
-  if (!host) {
-    throw new Error(
-      "Configuración SMTP incompleta. Define SMTP_HOST y SMTP_PORT.",
-    );
-  }
+ if (!host) {
+ throw new Error(
+ "Configuración SMTP incompleta. Define SMTP_HOST y SMTP_PORT.",
+ );
+ }
 
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+ const user = process.env.SMTP_USER;
+ const pass = process.env.SMTP_PASS;
 
-  const transportOptions: SMTPTransport.Options = {
-    host,
-    port,
-    secure,
-  };
+ const transportOptions: SMTPTransport.Options = {
+ host,
+ port,
+ secure,
+ };
 
-  // Only configure authentication when the SMTP provider requires it.
-  if (user && pass) {
-    transportOptions.auth = {
-      user,
-      pass,
-    };
-  }
+ // Only configure authentication when the SMTP provider requires it.
+ if (user && pass) {
+ transportOptions.auth = {
+ user,
+ pass,
+ };
+ }
 
-  transporter = nodemailer.createTransport(transportOptions);
+ transporter = nodemailer.createTransport(transportOptions);
 
-  return transporter;
+ return transporter;
 }
 
 export type SendEmailInput = {
-  to: string;
-  subject: string;
-  text: string;
-  html?: string;
+ to: string;
+ subject: string;
+ text: string;
+ html?: string;
 };
 
 export async function sendEmail({
-  to,
-  subject,
-  text,
-  html,
+ to,
+ subject,
+ text,
+ html,
 }: SendEmailInput): Promise<void> {
-  const from = process.env.SMTP_FROM ?? "no-reply@localhost";
+ const from = process.env.SMTP_FROM ?? "no-reply@localhost";
 
-  // Nota de seguridad (RF-AUTH plugin docs): se recomienda no hacer await
-  // del envío de correo dentro del propio callback de better-auth para
-  // evitar ataques de temporización. Aquí sí hacemos await porque estamos
-  // en un entorno Node de vida larga (no serverless de corta duración) y
-  // preferimos poder capturar/loggear errores de envío explícitamente; si
-  // se despliega en un runtime serverless, envolver esta llamada con
-  // `ctx.context.runInBackground` (better-auth) o el `waitUntil` de la
-  // plataforma.
+ // Nota de seguridad (RF-AUTH plugin docs): se recomienda no hacer await
+ // del envío de correo dentro del propio callback de better-auth para
+ // evitar ataques de temporización. Aquí sí hacemos await porque estamos
+ // en un entorno Node de vida larga (no serverless de corta duración) y
+ // preferimos poder capturar/loggear errores de envío explícitamente; si
+ // se despliega en un runtime serverless, envolver esta llamada con
+ // `ctx.context.runInBackground` (better-auth) o el `waitUntil` de la
+ // plataforma.
 
-  await getTransporter().sendMail({
-    from,
-    to,
-    subject,
-    text,
-    html,
-  });
+ await getTransporter().sendMail({
+ from,
+ to,
+ subject,
+ text,
+ html,
+ });
 }
