@@ -13,640 +13,640 @@
  * via the `definition` "supportedTimezones".
  */
 export type SupportedTimezones =
- | 'Pacific/Midway'
- | 'Pacific/Niue'
- | 'Pacific/Honolulu'
- | 'Pacific/Rarotonga'
- | 'America/Anchorage'
- | 'Pacific/Gambier'
- | 'America/Los_Angeles'
- | 'America/Tijuana'
- | 'America/Denver'
- | 'America/Phoenix'
- | 'America/Chicago'
- | 'America/Guatemala'
- | 'America/New_York'
- | 'America/Bogota'
- | 'America/Caracas'
- | 'America/Santiago'
- | 'America/Buenos_Aires'
- | 'America/Sao_Paulo'
- | 'Atlantic/South_Georgia'
- | 'Atlantic/Azores'
- | 'Atlantic/Cape_Verde'
- | 'Europe/London'
- | 'Europe/Berlin'
- | 'Africa/Lagos'
- | 'Europe/Athens'
- | 'Africa/Cairo'
- | 'Europe/Moscow'
- | 'Asia/Riyadh'
- | 'Asia/Dubai'
- | 'Asia/Baku'
- | 'Asia/Karachi'
- | 'Asia/Tashkent'
- | 'Asia/Calcutta'
- | 'Asia/Dhaka'
- | 'Asia/Almaty'
- | 'Asia/Jakarta'
- | 'Asia/Bangkok'
- | 'Asia/Shanghai'
- | 'Asia/Singapore'
- | 'Asia/Tokyo'
- | 'Asia/Seoul'
- | 'Australia/Brisbane'
- | 'Australia/Sydney'
- | 'Pacific/Guam'
- | 'Pacific/Noumea'
- | 'Pacific/Auckland'
- | 'Pacific/Fiji';
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Brisbane'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
 
 export interface Config {
- auth: {
- 'cms-admins': CmsAdminAuthOperations;
- };
- blocks: {};
- collections: {
- 'cms-admins': CmsAdmin;
- posts: Post;
- media: Media;
- avisos: Aviso;
- 'payload-kv': PayloadKv;
- 'payload-locked-documents': PayloadLockedDocument;
- 'payload-preferences': PayloadPreference;
- 'payload-migrations': PayloadMigration;
- };
- collectionsJoins: {};
- collectionsSelect: {
- 'cms-admins': CmsAdminsSelect<false> | CmsAdminsSelect<true>;
- posts: PostsSelect<false> | PostsSelect<true>;
- media: MediaSelect<false> | MediaSelect<true>;
- avisos: AvisosSelect<false> | AvisosSelect<true>;
- 'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
- 'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
- 'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
- 'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
- };
- db: {
- defaultIDType: string;
- };
- fallbackLocale: ('false' | 'none' | 'null') | false | null | 'es' | 'es'[];
- globals: {
- home: Home;
- 'login-config': LoginConfig;
- };
- globalsSelect: {
- home: HomeSelect<false> | HomeSelect<true>;
- 'login-config': LoginConfigSelect<false> | LoginConfigSelect<true>;
- };
- locale: 'es';
- widgets: {
- collections: CollectionsWidget;
- };
- user: CmsAdmin;
- jobs: {
- tasks: unknown;
- workflows: unknown;
- };
+  auth: {
+    'cms-admins': CmsAdminAuthOperations;
+  };
+  blocks: {};
+  collections: {
+    'cms-admins': CmsAdmin;
+    posts: Post;
+    media: Media;
+    avisos: Aviso;
+    'payload-kv': PayloadKv;
+    'payload-locked-documents': PayloadLockedDocument;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
+  };
+  collectionsJoins: {};
+  collectionsSelect: {
+    'cms-admins': CmsAdminsSelect<false> | CmsAdminsSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    avisos: AvisosSelect<false> | AvisosSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+  };
+  db: {
+    defaultIDType: string;
+  };
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'es' | 'es'[];
+  globals: {
+    home: Home;
+    'login-config': LoginConfig;
+  };
+  globalsSelect: {
+    home: HomeSelect<false> | HomeSelect<true>;
+    'login-config': LoginConfigSelect<false> | LoginConfigSelect<true>;
+  };
+  locale: 'es';
+  widgets: {
+    collections: CollectionsWidget;
+  };
+  user: CmsAdmin;
+  jobs: {
+    tasks: unknown;
+    workflows: unknown;
+  };
 }
 export interface CmsAdminAuthOperations {
- forgotPassword: {
- email: string;
- password: string;
- };
- login: {
- email: string;
- password: string;
- };
- registerFirstUser: {
- email: string;
- password: string;
- };
- unlock: {
- email: string;
- password: string;
- };
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cms-admins".
  */
 export interface CmsAdmin {
- id: string;
- user_id: string;
- email: string;
- name?: string | null;
- updatedAt: string;
- createdAt: string;
- collection: 'cms-admins';
+  id: string;
+  user_id: string;
+  email: string;
+  name?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  collection: 'cms-admins';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
 export interface Post {
- id: string;
- title: string;
- /**
- * Imagen principal del post mostrada como imagen de fondo.
- */
- heroImage: string | Media;
- content: {
- root: {
- type: string;
- children: {
- type: any;
- version: number;
- [k: string]: unknown;
- }[];
- direction: ('ltr' | 'rtl') | null;
- format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
- indent: number;
- version: number;
- };
- [k: string]: unknown;
- };
- /**
- * No puede ser una fecha futura.
- */
- publishedAt: string;
- /**
- * When enabled, the slug will auto-generate from the title field on save and autosave.
- */
- generateSlug?: boolean | null;
- slug: string;
- updatedAt: string;
- createdAt: string;
- _status?: ('draft' | 'published') | null;
+  id: string;
+  title: string;
+  /**
+   * Imagen principal del post mostrada como imagen de fondo.
+   */
+  heroImage: string | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * No puede ser una fecha futura.
+   */
+  publishedAt: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
- id: string;
- /**
- * Texto alternativo (accesibilidad / SEO).
- */
- alt?: string | null;
- updatedAt: string;
- createdAt: string;
- url?: string | null;
- thumbnailURL?: string | null;
- filename?: string | null;
- mimeType?: string | null;
- filesize?: number | null;
- width?: number | null;
- height?: number | null;
- focalX?: number | null;
- focalY?: number | null;
- sizes?: {
- thumbnail?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- square?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- small?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- medium?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- large?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- xlarge?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- og?: {
- url?: string | null;
- width?: number | null;
- height?: number | null;
- mimeType?: string | null;
- filesize?: number | null;
- filename?: string | null;
- };
- };
+  id: string;
+  /**
+   * Texto alternativo (accesibilidad / SEO).
+   */
+  alt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    square?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    small?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    medium?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    large?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    xlarge?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "avisos".
  */
 export interface Aviso {
- id: string;
- title: string;
- content: {
- root: {
- type: string;
- children: {
- type: any;
- version: number;
- [k: string]: unknown;
- }[];
- direction: ('ltr' | 'rtl') | null;
- format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
- indent: number;
- version: number;
- };
- [k: string]: unknown;
- };
- /**
- * Si está activado, este aviso se mostrará en un modal en la landing mientras no haya expirado.
- */
- important?: boolean | null;
- /**
- * Obligatoria cuando 'Es importante' está activado. Debe ser entre mañana y 365 días a partir de hoy.
- */
- expiresAt?: string | null;
- /**
- * No puede ser una fecha futura.
- */
- publishedAt: string;
- /**
- * When enabled, the slug will auto-generate from the title field on save and autosave.
- */
- generateSlug?: boolean | null;
- slug: string;
- updatedAt: string;
- createdAt: string;
- _status?: ('draft' | 'published') | null;
+  id: string;
+  title: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Si está activado, este aviso se mostrará en un modal en la landing mientras no haya expirado.
+   */
+  important?: boolean | null;
+  /**
+   * Obligatoria cuando 'Es importante' está activado. Debe ser entre mañana y 365 días a partir de hoy.
+   */
+  expiresAt?: string | null;
+  /**
+   * No puede ser una fecha futura.
+   */
+  publishedAt: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
- id: string;
- key: string;
- data:
- | {
- [k: string]: unknown;
- }
- | unknown[]
- | string
- | number
- | boolean
- | null;
+  id: string;
+  key: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
- id: string;
- document?:
- | ({
- relationTo: 'cms-admins';
- value: string | CmsAdmin;
- } | null)
- | ({
- relationTo: 'posts';
- value: string | Post;
- } | null)
- | ({
- relationTo: 'media';
- value: string | Media;
- } | null)
- | ({
- relationTo: 'avisos';
- value: string | Aviso;
- } | null);
- globalSlug?: string | null;
- user: {
- relationTo: 'cms-admins';
- value: string | CmsAdmin;
- };
- updatedAt: string;
- createdAt: string;
+  id: string;
+  document?:
+    | ({
+        relationTo: 'cms-admins';
+        value: string | CmsAdmin;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: string | Post;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'avisos';
+        value: string | Aviso;
+      } | null);
+  globalSlug?: string | null;
+  user: {
+    relationTo: 'cms-admins';
+    value: string | CmsAdmin;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
- id: string;
- user: {
- relationTo: 'cms-admins';
- value: string | CmsAdmin;
- };
- key?: string | null;
- value?:
- | {
- [k: string]: unknown;
- }
- | unknown[]
- | string
- | number
- | boolean
- | null;
- updatedAt: string;
- createdAt: string;
+  id: string;
+  user: {
+    relationTo: 'cms-admins';
+    value: string | CmsAdmin;
+  };
+  key?: string | null;
+  value?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
- id: string;
- name?: string | null;
- batch?: number | null;
- updatedAt: string;
- createdAt: string;
+  id: string;
+  name?: string | null;
+  batch?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "cms-admins_select".
  */
 export interface CmsAdminsSelect<T extends boolean = true> {
- user_id?: T;
- email?: T;
- name?: T;
- updatedAt?: T;
- createdAt?: T;
+  user_id?: T;
+  email?: T;
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
- title?: T;
- heroImage?: T;
- content?: T;
- publishedAt?: T;
- generateSlug?: T;
- slug?: T;
- updatedAt?: T;
- createdAt?: T;
- _status?: T;
+  title?: T;
+  heroImage?: T;
+  content?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
- alt?: T;
- updatedAt?: T;
- createdAt?: T;
- url?: T;
- thumbnailURL?: T;
- filename?: T;
- mimeType?: T;
- filesize?: T;
- width?: T;
- height?: T;
- focalX?: T;
- focalY?: T;
- sizes?:
- | T
- | {
- thumbnail?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- square?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- small?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- medium?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- large?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- xlarge?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- og?:
- | T
- | {
- url?: T;
- width?: T;
- height?: T;
- mimeType?: T;
- filesize?: T;
- filename?: T;
- };
- };
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        square?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        small?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        medium?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        xlarge?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "avisos_select".
  */
 export interface AvisosSelect<T extends boolean = true> {
- title?: T;
- content?: T;
- important?: T;
- expiresAt?: T;
- publishedAt?: T;
- generateSlug?: T;
- slug?: T;
- updatedAt?: T;
- createdAt?: T;
- _status?: T;
+  title?: T;
+  content?: T;
+  important?: T;
+  expiresAt?: T;
+  publishedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
- key?: T;
- data?: T;
+  key?: T;
+  data?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
- document?: T;
- globalSlug?: T;
- user?: T;
- updatedAt?: T;
- createdAt?: T;
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences_select".
  */
 export interface PayloadPreferencesSelect<T extends boolean = true> {
- user?: T;
- key?: T;
- value?: T;
- updatedAt?: T;
- createdAt?: T;
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-migrations_select".
  */
 export interface PayloadMigrationsSelect<T extends boolean = true> {
- name?: T;
- batch?: T;
- updatedAt?: T;
- createdAt?: T;
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home".
  */
 export interface Home {
- id: string;
- hero?: {
- slides?:
- | {
- activo?: boolean | null;
- etiqueta: string;
- titulo: string;
- texto: string;
- imagen?: (string | null) | Media;
- duracion: number;
- ctaPrincipal: {
- label: string;
- href: string;
- };
- ctaSecundario?: {
- label?: string | null;
- href?: string | null;
- };
- id?: string | null;
- }[]
- | null;
- };
- nosotros: {
- titulo: string;
- texto: string;
- imagen1?: (string | null) | Media;
- imagen2?: (string | null) | Media;
- };
- mision: {
- titulo: string;
- texto: string;
- };
- vision: {
- titulo: string;
- texto: string;
- };
- afiliacion: {
- titulo: string;
- descripcion: string;
- secciones?:
- | {
- titulo: string;
- items?:
- | {
- texto: string;
- id?: string | null;
- }[]
- | null;
- id?: string | null;
- }[]
- | null;
- cta: {
- label: string;
- href: string;
- };
- };
- queHacemos: {
- titulo: string;
- texto: string;
- };
- testimonios?:
- | {
- activo?: boolean | null;
- nombre: string;
- texto: string;
- puntaje: number;
- foto?: (string | null) | Media;
- id?: string | null;
- }[]
- | null;
- contacto: {
- titulo: string;
- texto: string;
- redes?: {
- facebook?: string | null;
- instagram?: string | null;
- linkedin?: string | null;
- youtube?: string | null;
- tiktok?: string | null;
- };
- };
- _status?: ('draft' | 'published') | null;
- updatedAt?: string | null;
- createdAt?: string | null;
+  id: string;
+  hero?: {
+    slides?:
+      | {
+          activo?: boolean | null;
+          etiqueta: string;
+          titulo: string;
+          texto: string;
+          imagen?: (string | null) | Media;
+          duracion: number;
+          ctaPrincipal: {
+            label: string;
+            href: string;
+          };
+          ctaSecundario?: {
+            label?: string | null;
+            href?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  nosotros: {
+    titulo: string;
+    texto: string;
+    imagen1?: (string | null) | Media;
+    imagen2?: (string | null) | Media;
+  };
+  mision: {
+    titulo: string;
+    texto: string;
+  };
+  vision: {
+    titulo: string;
+    texto: string;
+  };
+  afiliacion: {
+    titulo: string;
+    descripcion: string;
+    secciones?:
+      | {
+          titulo: string;
+          items?:
+            | {
+                texto: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    cta: {
+      label: string;
+      href: string;
+    };
+  };
+  queHacemos: {
+    titulo: string;
+    texto: string;
+  };
+  testimonios?:
+    | {
+        activo?: boolean | null;
+        nombre: string;
+        texto: string;
+        puntaje: number;
+        foto?: (string | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  contacto: {
+    titulo: string;
+    texto: string;
+    redes?: {
+      facebook?: string | null;
+      instagram?: string | null;
+      linkedin?: string | null;
+      youtube?: string | null;
+      tiktok?: string | null;
+    };
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * Gestión simple de la imagen de fondo para la página de inicio de sesión.
@@ -655,165 +655,165 @@ export interface Home {
  * via the `definition` "login-config".
  */
 export interface LoginConfig {
- id: string;
- /**
- * Sube la imagen que aparecerá en el panel lateral del login. Deja este campo vacío para usar el fondo azul institucional por defecto.
- */
- imagenFondo?: (string | null) | Media;
- updatedAt?: string | null;
- createdAt?: string | null;
+  id: string;
+  /**
+   * Sube la imagen que aparecerá en el panel lateral del login. Deja este campo vacío para usar el fondo azul institucional por defecto.
+   */
+  imagenFondo?: (string | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home_select".
  */
 export interface HomeSelect<T extends boolean = true> {
- hero?:
- | T
- | {
- slides?:
- | T
- | {
- activo?: T;
- etiqueta?: T;
- titulo?: T;
- texto?: T;
- imagen?: T;
- duracion?: T;
- ctaPrincipal?:
- | T
- | {
- label?: T;
- href?: T;
- };
- ctaSecundario?:
- | T
- | {
- label?: T;
- href?: T;
- };
- id?: T;
- };
- };
- nosotros?:
- | T
- | {
- titulo?: T;
- texto?: T;
- imagen1?: T;
- imagen2?: T;
- };
- mision?:
- | T
- | {
- titulo?: T;
- texto?: T;
- };
- vision?:
- | T
- | {
- titulo?: T;
- texto?: T;
- };
- afiliacion?:
- | T
- | {
- titulo?: T;
- descripcion?: T;
- secciones?:
- | T
- | {
- titulo?: T;
- items?:
- | T
- | {
- texto?: T;
- id?: T;
- };
- id?: T;
- };
- cta?:
- | T
- | {
- label?: T;
- href?: T;
- };
- };
- queHacemos?:
- | T
- | {
- titulo?: T;
- texto?: T;
- };
- testimonios?:
- | T
- | {
- activo?: T;
- nombre?: T;
- texto?: T;
- puntaje?: T;
- foto?: T;
- id?: T;
- };
- contacto?:
- | T
- | {
- titulo?: T;
- texto?: T;
- redes?:
- | T
- | {
- facebook?: T;
- instagram?: T;
- linkedin?: T;
- youtube?: T;
- tiktok?: T;
- };
- };
- _status?: T;
- updatedAt?: T;
- createdAt?: T;
- globalType?: T;
+  hero?:
+    | T
+    | {
+        slides?:
+          | T
+          | {
+              activo?: T;
+              etiqueta?: T;
+              titulo?: T;
+              texto?: T;
+              imagen?: T;
+              duracion?: T;
+              ctaPrincipal?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              ctaSecundario?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+            };
+      };
+  nosotros?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        imagen1?: T;
+        imagen2?: T;
+      };
+  mision?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+      };
+  vision?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+      };
+  afiliacion?:
+    | T
+    | {
+        titulo?: T;
+        descripcion?: T;
+        secciones?:
+          | T
+          | {
+              titulo?: T;
+              items?:
+                | T
+                | {
+                    texto?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  queHacemos?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+      };
+  testimonios?:
+    | T
+    | {
+        activo?: T;
+        nombre?: T;
+        texto?: T;
+        puntaje?: T;
+        foto?: T;
+        id?: T;
+      };
+  contacto?:
+    | T
+    | {
+        titulo?: T;
+        texto?: T;
+        redes?:
+          | T
+          | {
+              facebook?: T;
+              instagram?: T;
+              linkedin?: T;
+              youtube?: T;
+              tiktok?: T;
+            };
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "login-config_select".
  */
 export interface LoginConfigSelect<T extends boolean = true> {
- imagenFondo?: T;
- updatedAt?: T;
- createdAt?: T;
- globalType?: T;
+  imagenFondo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
- data?: {
- [k: string]: unknown;
- };
- width: 'full';
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
- media: string | Media;
- id?: string | null;
- blockName?: string | null;
- blockType: 'mediaBlock';
+  media: string | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {
- [k: string]: unknown;
+  [k: string]: unknown;
 }
 
 
 declare module 'payload' {
- export interface GeneratedTypes extends Config {}
+  export interface GeneratedTypes extends Config {}
 }

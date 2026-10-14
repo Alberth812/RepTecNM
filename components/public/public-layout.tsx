@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -8,14 +9,20 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl">
         <div className="flex h-16 w-full items-center justify-between px-4 lg:px-8">
           <Link href="/" className="flex items-center gap-2 text-primary">
-            <img
-              src="/logo.png"
-              alt="REP-TecNM"
-              className="h-9 w-9 rounded-lg object-cover object-[center_15%] ring-1 ring-border"
-            />
-            <span className="text-xl font-bold tracking-tight">
-              REP-<span className="font-light">TecNM</span>
-            </span>
+            {/* CAMBIO: Logo profesional completo sin marcos ni texto duplicado.
+        * La imagen /logo.png ya contiene el texto "REP-TecNM" integrado.
+        * Se eliminaron las clases 'rounded', 'ring' y 'border' para que la imagen 
+        * sin fondo se muestre de forma limpia y profesional, respetando su diseño original.
+        * Se usa el componente Image de Next.js para optimización automática.
+        */}
+        <Image 
+          src="/logo.png" 
+          alt="REP-TecNM - Red de Egresados de Posgrado del Tecnológico Nacional de México" 
+          width={180} 
+          height={50} 
+          className="h-auto w-auto object-contain" 
+          priority 
+        />
           </Link>
 
           <nav className="hidden items-center gap-5 text-sm font-medium text-zinc-700 lg:flex">

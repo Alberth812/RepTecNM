@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import { Download, GraduationCap, HeartPulse, Lock, Save } from "lucide-react";
 import { toast } from "sonner";
