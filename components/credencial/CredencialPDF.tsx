@@ -1,406 +1,329 @@
 import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
-import QRCode from "qrcode";
+
+/* 
+ * CREDENCIAL PDF - VERSIÓN FINAL CORREGIDA
+ * 
+ * CORRECCIONES APLICADAS:
+ * 1. Header blanco: El logo es azul y ya contiene el texto, por lo que el fondo debe ser blanco para que sea visible.
+ * 2. Sin sobreposición: Nombre en 10pt con lineHeight, márgenes compactos y jerarquía visual clara.
+ * 3. QR Garantizado: Se recibe como base64 desde el componente padre para evitar fallos de red en @react-pdf/renderer.
+ * 4. Diseño Premium: Limpio, profesional, con badge de estado sin iconos.
+ */
 
 const COLORS = {
- azulOscuro: "#003366",
- azulMedio: "#004B87",
- azulClaro: "#E6F0FA",
- dorado: "#C9A227",
- rojoEmergencia: "#DC2626",
- grisOscuro: "#2B2B2B",
- grisMedio: "#6B7280",
- blanco: "#FFFFFF",
+  azulInstitucional: "#004B87",
+  azulOscuro: "#003366",
+  dorado: "#C9A227",
+  blanco: "#FFFFFF",
+  grisOscuro: "#1A1A1A",
+  grisMedio: "#6B7280",
+  grisClaro: "#F8F9FA",
+  grisBorde: "#E5E7EB",
 };
 
-// Tamaño estándar ID-1 horizontal: 85.6mm × 53.98mm ≈ 242pt × 153pt
-const CARD_WIDTH = 242;
-const CARD_HEIGHT = 153;
+const CARD_WIDTH = 153;
+const CARD_HEIGHT = 243;
 
 const styles = StyleSheet.create({
- page: {
- width: CARD_WIDTH,
- height: CARD_HEIGHT,
- backgroundColor: COLORS.blanco,
- fontFamily: "Helvetica",
- overflow: "hidden",
- },
- // ===== FRENTE =====
- frontContainer: {
- width: CARD_WIDTH,
- height: CARD_HEIGHT,
- flexDirection: "column",
- },
- header: {
- backgroundColor: COLORS.azulMedio,
- paddingHorizontal: 8,
- paddingVertical: 6,
- flexDirection: "row",
- justifyContent: "space-between",
- alignItems: "center",
- },
- headerLeft: {
- flexDirection: "column",
- },
- headerTitle: {
- fontSize: 10,
- fontWeight: "bold",
- color: COLORS.blanco,
- marginBottom: 1,
- },
- headerSubtitle: {
- fontSize: 6,
- color: COLORS.blanco,
- opacity: 0.9,
- },
- statusBadge: {
- backgroundColor: COLORS.dorado,
- paddingHorizontal: 8,
- paddingVertical: 3,
- borderRadius: 8,
- },
- statusText: {
- fontSize: 7,
- fontWeight: "bold",
- color: COLORS.blanco,
- },
- body: {
- flex: 1,
- flexDirection: "row",
- paddingHorizontal: 8,
- paddingVertical: 6,
- gap: 8,
- },
- photoContainer: {
- width: 50,
- height: 67,
- backgroundColor: COLORS.azulClaro,
- border: "1.5 solid " + COLORS.azulMedio,
- borderRadius: 3,
- overflow: "hidden",
- },
- photo: {
- width: "100%",
- height: "100%",
- objectFit: "cover",
- },
- infoContainer: {
- flex: 1,
- flexDirection: "column",
- justifyContent: "space-between",
- },
- infoRow: {
- marginBottom: 3,
- },
- infoLabel: {
- fontSize: 4,
- color: COLORS.grisMedio,
- textTransform: "uppercase",
- marginBottom: 1,
- letterSpacing: 0.3,
- },
- infoValue: {
- fontSize: 7,
- color: COLORS.grisOscuro,
- fontWeight: "bold",
- },
- infoValueLarge: {
- fontSize: 10,
- color: COLORS.azulMedio,
- fontWeight: "bold",
- },
- qrContainer: {
- width: 45,
- height: 45,
- backgroundColor: COLORS.blanco,
- border: "0.5 solid #E5E7EB",
- padding: 2,
- borderRadius: 2,
- },
- qrImage: {
- width: "100%",
- height: "100%",
- },
- footer: {
- position: "absolute",
- bottom: 0,
- left: 0,
- right: 0,
- flexDirection: "row",
- justifyContent: "space-between",
- alignItems: "center",
- paddingHorizontal: 8,
- paddingBottom: 4,
- borderTop: "0.5 solid #E5E7EB",
- },
- folioLabel: {
- fontSize: 4,
- color: COLORS.grisMedio,
- textTransform: "uppercase",
- marginBottom: 1,
- },
- folioValue: {
- fontSize: 6,
- color: COLORS.azulMedio,
- fontWeight: "bold",
- fontFamily: "Courier",
- },
- // ===== REVERSO =====
- backContainer: {
- width: CARD_WIDTH,
- height: CARD_HEIGHT,
- flexDirection: "column",
- backgroundColor: COLORS.blanco,
- },
- emergencyHeader: {
- backgroundColor: COLORS.rojoEmergencia,
- paddingVertical: 4,
- alignItems: "center",
- justifyContent: "center",
- },
- emergencyHeaderText: {
- color: COLORS.blanco,
- fontSize: 8,
- fontWeight: "bold",
- letterSpacing: 1.5,
- },
- backContent: {
- flex: 1,
- paddingHorizontal: 8,
- paddingVertical: 6,
- flexDirection: "column",
- gap: 4,
- },
- sectionTitle: {
- fontSize: 5,
- color: COLORS.azulMedio,
- fontWeight: "bold",
- textTransform: "uppercase",
- borderBottom: "0.5 solid #E5E7EB",
- paddingBottom: 2,
- marginBottom: 2,
- },
- medicalGrid: {
- flexDirection: "row",
- gap: 4,
- },
- medicalCard: {
- flex: 1,
- backgroundColor: COLORS.azulClaro,
- padding: 4,
- borderRadius: 3,
- borderLeft: "2 solid " + COLORS.azulMedio,
- },
- medicalLabel: {
- fontSize: 4,
- color: COLORS.grisMedio,
- textTransform: "uppercase",
- marginBottom: 1,
- },
- medicalValue: {
- fontSize: 9,
- color: COLORS.rojoEmergencia,
- fontWeight: "bold",
- },
- medicalText: {
- fontSize: 6,
- color: COLORS.grisOscuro,
- fontWeight: "bold",
- },
- contactBox: {
- backgroundColor: COLORS.azulClaro,
- padding: 4,
- borderRadius: 3,
- border: "0.5 solid #E5E7EB",
- },
- contactRow: {
- flexDirection: "row",
- justifyContent: "space-between",
- marginBottom: 2,
- fontSize: 5,
- },
- contactKey: {
- color: COLORS.grisMedio,
- fontWeight: "bold",
- },
- contactValue: {
- color: COLORS.grisOscuro,
- fontWeight: "bold",
- },
- legalText: {
- fontSize: 3.5,
- color: COLORS.grisMedio,
- textAlign: "center",
- lineHeight: 1.3,
- marginTop: "auto",
- paddingTop: 3,
- borderTop: "0.5 solid #D1D5DB",
- },
- websiteText: {
- fontSize: 4,
- color: COLORS.azulMedio,
- fontWeight: "bold",
- textAlign: "center",
- marginTop: 2,
- },
+  page: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    backgroundColor: COLORS.blanco,
+    fontFamily: "Helvetica",
+    overflow: "hidden",
+  },
+  frontContainer: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    flexDirection: "column",
+  },
+  headerBar: {
+    backgroundColor: COLORS.blanco,
+    height: 40,
+    paddingHorizontal: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: COLORS.azulInstitucional,
+  },
+  logoImage: {
+    width: 100, // Ancho suficiente para que se vea el logo completo con su texto integrado
+    height: 28,
+    objectFit: "contain",
+  },
+  statusBadge: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    backgroundColor: COLORS.dorado,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
+  statusText: {
+    color: COLORS.blanco,
+    fontSize: 6,
+    fontWeight: "bold",
+    letterSpacing: 0.5,
+  },
+  photoSection: {
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 6,
+  },
+  photoFrame: {
+    width: 52,
+    height: 69,
+    backgroundColor: COLORS.grisClaro,
+    borderWidth: 1.5,
+    borderColor: COLORS.azulInstitucional,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  photo: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  photoPlaceholder: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.grisClaro,
+  },
+  photoPlaceholderText: {
+    fontSize: 6,
+    color: COLORS.grisMedio,
+    textAlign: "center",
+  },
+  infoSection: {
+    paddingHorizontal: 10,
+    flex: 1,
+  },
+  nombreCompleto: {
+    fontSize: 10, // Reducido para evitar corte en nombres largos
+    fontWeight: "bold",
+    color: COLORS.azulOscuro,
+    textAlign: "center",
+    marginBottom: 6,
+    lineHeight: 1.2,
+  },
+  infoRow: {
+    marginBottom: 5,
+    paddingBottom: 3,
+    borderBottomWidth: 0.5,
+    borderBottomColor: COLORS.grisBorde,
+  },
+  infoLabel: {
+    fontSize: 4.5,
+    color: COLORS.grisMedio,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 1,
+  },
+  infoValue: {
+    fontSize: 7.5,
+    color: COLORS.grisOscuro,
+    fontWeight: "bold",
+  },
+  affiliateNumberBox: {
+    backgroundColor: COLORS.grisClaro,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    borderRadius: 3,
+    marginTop: 4,
+    borderLeftWidth: 2.5,
+    borderLeftColor: COLORS.azulInstitucional,
+  },
+  affiliateNumberLabel: {
+    fontSize: 4.5,
+    color: COLORS.azulInstitucional,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    marginBottom: 1,
+  },
+  affiliateNumber: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: COLORS.azulOscuro,
+    fontFamily: "Courier",
+    letterSpacing: 1.2,
+  },
+  frontFooter: {
+    paddingHorizontal: 10,
+    paddingBottom: 6,
+    alignItems: "center",
+  },
+  folioText: {
+    fontSize: 5.5,
+    color: COLORS.grisMedio,
+    fontFamily: "Courier",
+  },
+  backContainer: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    backgroundColor: COLORS.azulInstitucional,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    position: "relative",
+  },
+  backContent: {
+    alignItems: "center",
+    width: "100%",
+    zIndex: 1,
+  },
+  verificationTitle: {
+    fontSize: 7,
+    fontWeight: "bold",
+    color: COLORS.blanco,
+    textTransform: "uppercase",
+    textAlign: "center",
+    marginBottom: 3,
+    letterSpacing: 0.8,
+  },
+  verificationSubtitle: {
+    fontSize: 5.5,
+    color: COLORS.blanco,
+    textAlign: "center",
+    marginBottom: 8,
+    opacity: 0.9,
+  },
+  qrContainer: {
+    width: 75,
+    height: 75,
+    backgroundColor: COLORS.blanco,
+    padding: 3,
+    borderRadius: 4,
+    marginBottom: 10,
+  },
+  qrImage: {
+    width: 69,
+    height: 69,
+  },
+  folioHash: {
+    fontFamily: "Courier",
+    fontSize: 8,
+    fontWeight: "bold",
+    color: COLORS.dorado,
+    textAlign: "center",
+    marginBottom: 12,
+    letterSpacing: 1.2,
+  },
+  legalNotice: {
+    fontSize: 4.5,
+    color: COLORS.blanco,
+    textAlign: "justify",
+    lineHeight: 1.3,
+    marginTop: "auto",
+    opacity: 0.95,
+  },
+  backFooterBar: {
+    fontSize: 5.5,
+    fontWeight: "bold",
+    color: COLORS.dorado,
+    marginTop: 6,
+    letterSpacing: 0.3,
+  },
 });
 
 interface CredencialPDFProps {
- numeroAfiliado: string;
- nombreCompleto: string;
- instituto: string;
- anioAprobacion: number;
- folio: string;
- logoUrl: string;
- fotografiaUrl?: string;
- qrCodeDataUrl?: string;
- datosEmergencia?: {
- tipoSanguineo: string;
- alergiasCondiciones: string;
- nombreContacto: string;
- parentesco: string;
- telefonoContacto: string;
- } | null;
+  numeroAfiliado: string;
+  nombreCompleto: string;
+  instituto: string;
+  anioAprobacion: number;
+  folio: string;
+  logoUrl: string;
+  fotografiaUrl?: string;
+  qrCodeBase64: string; // Nuevo prop para garantizar renderizado del QR
 }
 
 export const CredencialPDF = ({
- numeroAfiliado,
- nombreCompleto,
- instituto,
- anioAprobacion,
- folio,
- logoUrl,
- fotografiaUrl,
- qrCodeDataUrl,
- datosEmergencia,
+  numeroAfiliado,
+  nombreCompleto,
+  instituto,
+  anioAprobacion,
+  folio,
+  logoUrl,
+  fotografiaUrl,
+  qrCodeBase64,
 }: CredencialPDFProps) => {
- return (
- <Document>
- {/* FRENTE */}
- <Page size={[CARD_WIDTH, CARD_HEIGHT]} style={styles.page}>
- <View style={styles.frontContainer}>
- {/* Header */}
- <View style={styles.header}>
- <View style={styles.headerLeft}>
- <Text style={styles.headerTitle}>REP-TecNM</Text>
- <Text style={styles.headerSubtitle}>Red de Egresados de Posgrado</Text>
- </View>
- <View style={styles.statusBadge}>
- <Text style={styles.statusText}>ACTIVO</Text>
- </View>
- </View>
+  return (
+    <Document>
+      <Page size={[CARD_WIDTH, CARD_HEIGHT]} style={styles.page}>
+        <View style={styles.frontContainer}>
+          <View style={styles.headerBar}>
+            <Image src={logoUrl} style={styles.logoImage} />
+          </View>
+          
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>ACTIVO</Text>
+          </View>
+          
+          <View style={styles.photoSection}>
+            <View style={styles.photoFrame}>
+              {fotografiaUrl ? (
+                <Image src={fotografiaUrl} style={styles.photo} />
+              ) : (
+                <View style={styles.photoPlaceholder}>
+                  <Text style={styles.photoPlaceholderText}>Sin{"\n"}fotografía</Text>
+                </View>
+              )}
+            </View>
+          </View>
+          
+          <View style={styles.infoSection}>
+            <Text style={styles.nombreCompleto}>{nombreCompleto}</Text>
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Instituto / Unidad</Text>
+              <Text style={styles.infoValue}>{instituto}</Text>
+            </View>
+            
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Año de Aprobación</Text>
+              <Text style={styles.infoValue}>{anioAprobacion}</Text>
+            </View>
+            
+            <View style={styles.affiliateNumberBox}>
+              <Text style={styles.affiliateNumberLabel}>No. de Afiliado</Text>
+              <Text style={styles.affiliateNumber}>{numeroAfiliado}</Text>
+            </View>
+          </View>
+          
+          <View style={styles.frontFooter}>
+            <Text style={styles.folioText}>Folio: {folio}</Text>
+          </View>
+        </View>
+      </Page>
 
- {/* Body */}
- <View style={styles.body}>
- {/* Photo */}
- <View style={styles.photoContainer}>
- {fotografiaUrl ? (
- <Image src={fotografiaUrl} style={styles.photo} />
- ) : (
- <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
- <Text style={{ fontSize: 20, color: COLORS.grisMedio }}></Text>
- </View>
- )}
- </View>
-
- {/* Info */}
- <View style={styles.infoContainer}>
- <View>
- <View style={styles.infoRow}>
- <Text style={styles.infoLabel}>NÚMERO DE AFILIADO</Text>
- <Text style={styles.infoValueLarge}>{numeroAfiliado}</Text>
- </View>
- <View style={styles.infoRow}>
- <Text style={styles.infoLabel}>NOMBRE COMPLETO</Text>
- <Text style={styles.infoValue}>{nombreCompleto}</Text>
- </View>
- <View style={styles.infoRow}>
- <Text style={styles.infoLabel}>INSTITUTO</Text>
- <Text style={styles.infoValue}>{instituto}</Text>
- </View>
- <View style={styles.infoRow}>
- <Text style={styles.infoLabel}>AÑO</Text>
- <Text style={styles.infoValue}>{anioAprobacion}</Text>
- </View>
- </View>
- </View>
-
- {/* QR */}
- {qrCodeDataUrl && (
- <View style={styles.qrContainer}>
- <Image src={qrCodeDataUrl} style={styles.qrImage} />
- </View>
- )}
- </View>
-
- {/* Footer */}
- <View style={styles.footer}>
- <View>
- <Text style={styles.folioLabel}>FOLIO DE VERIFICACIÓN</Text>
- <Text style={styles.folioValue}>{folio}</Text>
- </View>
- </View>
- </View>
- </Page>
-
- {/* REVERSO */}
- <Page size={[CARD_WIDTH, CARD_HEIGHT]} style={styles.page}>
- <View style={styles.backContainer}>
- {/* Emergency Header */}
- <View style={styles.emergencyHeader}>
- <Text style={styles.emergencyHeaderText}>EN CASO DE EMERGENCIA</Text>
- </View>
-
- {/* Content */}
- <View style={styles.backContent}>
- {datosEmergencia ? (
- <>
- <Text style={styles.sectionTitle}>Información Médica</Text>
- <View style={styles.medicalGrid}>
- <View style={styles.medicalCard}>
- <Text style={styles.medicalLabel}>Tipo Sanguíneo</Text>
- <Text style={styles.medicalValue}>{datosEmergencia.tipoSanguineo}</Text>
- </View>
- <View style={styles.medicalCard}>
- <Text style={styles.medicalLabel}>Alergias</Text>
- <Text style={styles.medicalText}>
- {datosEmergencia.alergiasCondiciones || "Ninguna"}
- </Text>
- </View>
- </View>
-
- <Text style={styles.sectionTitle}>Contacto de Emergencia</Text>
- <View style={styles.contactBox}>
- <View style={styles.contactRow}>
- <Text style={styles.contactKey}>Nombre:</Text>
- <Text style={styles.contactValue}>{datosEmergencia.nombreContacto}</Text>
- </View>
- <View style={styles.contactRow}>
- <Text style={styles.contactKey}>Parentesco:</Text>
- <Text style={styles.contactValue}>{datosEmergencia.parentesco}</Text>
- </View>
- <View style={styles.contactRow}>
- <Text style={styles.contactKey}>Teléfono:</Text>
- <Text style={styles.contactValue}>{datosEmergencia.telefonoContacto}</Text>
- </View>
- </View>
- </>
- ) : (
- <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
- <Text style={{ fontSize: 5, color: COLORS.grisMedio, textAlign: "center" }}>
- El afiliado no ha configurado{"\n"}datos de emergencia
- </Text>
- </View>
- )}
-
- {/* Legal */}
- <Text style={styles.legalText}>
- Esta credencial es un documento personal e intransferible propiedad de la Red de Posgrados del TecNM (REP-TecNM). 
- Los datos médicos y de contacto son confidenciales y para uso exclusivo en situaciones de emergencia.
- </Text>
- <Text style={styles.websiteText}>www.reptecnm.org.mx</Text>
- </View>
- </View>
- </Page>
- </Document>
- );
+      <Page size={[CARD_WIDTH, CARD_HEIGHT]} style={styles.page}>
+        <View style={styles.backContainer}>
+          <View style={styles.backContent}>
+            <Text style={styles.verificationTitle}>Verificar Autenticidad</Text>
+            <Text style={styles.verificationSubtitle}>
+              Escanea el código QR o visita:
+            </Text>
+            
+            <View style={styles.qrContainer}>
+              <Image src={qrCodeBase64} style={styles.qrImage} />
+            </View>
+            
+            <Text style={styles.folioHash}>FOLIO: {folio}</Text>
+            
+            <Text style={styles.legalNotice}>
+              Esta credencial es propiedad de la Red de Egresados de Posgrado del TecNM (REP-TecNM). 
+              Su uso es personal e intransferible. En caso de extravío, repórtelo inmediatamente. 
+              La información de afiliación se valida en tiempo real a través del código QR.
+            </Text>
+            
+            <Text style={styles.backFooterBar}>www.reptecnm.org.mx</Text>
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
 };
