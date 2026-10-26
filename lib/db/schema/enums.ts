@@ -1,48 +1,48 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const accountRoleEnum = pgEnum("account_role", [
- "AFILIADO",
- "ADMINISTRADOR",
+  "AFILIADO",
+  "ADMINISTRADOR",
 ]);
 
 export const adminSubtypeEnum = pgEnum("admin_subtype", [
- "GENERAL",
- "CONTENIDO",
+  "GENERAL",
+  "CONTENIDO",
 ]);
 
 export const tipoSanguineoEnum = pgEnum("tipo_sanguineo", [
- "A+",
- "A-",
- "B+",
- "B-",
- "AB+",
- "AB-",
- "O+",
- "O-",
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
 ]);
 
 export const membershipStatusEnum = pgEnum("membership_status", [
- "NO_INICIADA",
- "PENDIENTE_APROBACION",
- "REQUIERE_CORRECCION",
- "RECHAZADO",
- "ACTIVO",
- "INACTIVO",
- "SUSPENDIDO",
- "BAJA",
+  "NO_INICIADA",
+  "PENDIENTE_APROBACION",
+  "REQUIERE_CORRECCION",
+  "RECHAZADO",
+  "ACTIVO",
+  "INACTIVO",
+  "SUSPENDIDO",
+  "BAJA",
 ]);
 
 // db/schema/enums.ts (agregar)
 export const revisionDecisionEnum = pgEnum("revision_decision", [
- "APROBADO",
- "REQUIERE_CORRECCION",
- "RECHAZADO",
+  "APROBADO",
+  "REQUIERE_CORRECCION",
+  "RECHAZADO",
 ]);
 
 export const authEventTypeEnum = pgEnum("auth_event_type", [
- "EMAIL_VERIFICATION_OTP_SENT", // RF-AUTH-002/003/018/019 (signup y cambio de correo)
- "PASSWORD_RESET_REQUESTED", // RF-AUTH-011/023
- "PASSWORD_RESET_COMPLETED", // RF-AUTH-024
- "SIGNUP_ATTEMPTED", // RF-AUTH-017
- "LOGIN_FAILED", // RF-AUTH-025/026
+  "EMAIL_VERIFICATION_OTP_SENT", // RF-AUTH-002/003/018/019 (signup y cambio de correo)
+  "PASSWORD_RESET_REQUESTED", // RF-AUTH-011/023
+  "PASSWORD_RESET_COMPLETED", // RF-AUTH-024
+  "SIGNUP_ATTEMPTED", // RF-AUTH-017
+  "LOGIN_FAILED", // RF-AUTH-025/026
 ]);

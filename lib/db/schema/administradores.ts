@@ -8,24 +8,24 @@ import { adminSubtypeEnum } from "./enums";
  * (RF-AUTH-013): siempre vía seed inicial o vía otro administrador GENERAL.
  */
 export const administradores = pgTable("administradores", {
- userId: text("user_id")
- .primaryKey()
- .references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
 
- nombreCompleto: text("nombre_completo").notNull(),
+  nombreCompleto: text("nombre_completo").notNull(),
 
- subtype: adminSubtypeEnum("subtype").notNull(),
- isActive: boolean("is_active").notNull().default(true),
+  subtype: adminSubtypeEnum("subtype").notNull(),
+  isActive: boolean("is_active").notNull().default(true),
 
- // RF-AUTH-013: solo puede ser true para el administrador raíz creado por
- // el seed inicial. Nunca se expone como campo asignable en la API.
- isRoot: boolean("is_root").notNull().default(false),
+  // RF-AUTH-013: solo puede ser true para el administrador raíz creado por
+  // el seed inicial. Nunca se expone como campo asignable en la API.
+  isRoot: boolean("is_root").notNull().default(false),
 
- createdAt: timestamp("created_at", { withTimezone: true })
- .notNull()
- .defaultNow(),
- updatedAt: timestamp("updated_at", { withTimezone: true })
- .notNull()
- .defaultNow()
- .$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });

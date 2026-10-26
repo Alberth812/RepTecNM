@@ -1,6 +1,10 @@
 // Ubicación sugerida: @/lib/validation/instituciones.ts
 
 import { z } from "zod";
+import { es } from "zod/locales"; // O también desde "zod/v4/locales/es.js"
+
+// Configura el idioma español globalmente
+z.config(es());
 
 import { institucionEstadoEnum } from "@/lib/db/schema/instituciones";
 
@@ -11,23 +15,23 @@ const estadoValues = institucionEstadoEnum.enumValues;
 export const institucionEstadoSchema = z.enum(estadoValues);
 
 const nombreSchema = z
- .string()
- .trim()
- .min(10, "El nombre debe tener al menos 10 caracteres.")
- .max(50, "El nombre no puede superar los 50 caracteres.");
+  .string()
+  .trim()
+  .min(10, "El nombre debe tener al menos 10 caracteres.")
+  .max(50, "El nombre no puede superar los 50 caracteres.");
 
 /**
  * Query params del listado (?page=&pageSize=&nombre=&estado=)
  */
 export const listInstitucionesQuerySchema = z.object({
- page: z.coerce.number().int().min(1).default(1),
- pageSize: z.coerce.number().int().min(1).max(100).default(10),
- nombre: z.string().trim().min(1).max(50).optional(),
- estado: institucionEstadoSchema.optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  nombre: z.string().trim().min(1).max(50).optional(),
+  estado: institucionEstadoSchema.optional(),
 });
 
 export type ListInstitucionesQuery = z.infer<
- typeof listInstitucionesQuerySchema
+  typeof listInstitucionesQuerySchema
 >;
 
 /**
@@ -35,7 +39,7 @@ export type ListInstitucionesQuery = z.infer<
  * `estado` y `lastChangedToInactivoAt` los decide el servidor.
  */
 export const createInstitucionSchema = z.object({
- nombre: nombreSchema,
+  nombre: nombreSchema,
 });
 
 export type CreateInstitucionInput = z.infer<typeof createInstitucionSchema>;
@@ -45,8 +49,8 @@ export type CreateInstitucionInput = z.infer<typeof createInstitucionSchema>;
  * pero el cálculo de `lastChangedToInactivoAt` ocurre siempre en el servidor.
  */
 export const updateInstitucionSchema = z.object({
- nombre: nombreSchema,
- estado: institucionEstadoSchema,
+  nombre: nombreSchema,
+  estado: institucionEstadoSchema,
 });
 
 export type UpdateInstitucionInput = z.infer<typeof updateInstitucionSchema>;
@@ -55,5 +59,5 @@ export type UpdateInstitucionInput = z.infer<typeof updateInstitucionSchema>;
  * Validación del parámetro dinámico `id` en las rutas /api/instituciones/[id]
  */
 export const institucionIdParamSchema = z.object({
- id: z.string().uuid("El identificador de la institución no es válido."),
+  id: z.string().uuid("El identificador de la institución no es válido."),
 });

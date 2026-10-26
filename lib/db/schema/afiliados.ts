@@ -1,11 +1,11 @@
 import {
- boolean,
- integer,
- pgTable,
- text,
- timestamp,
- uuid,
- varchar,
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./auth-schema";
 import { membershipStatusEnum, tipoSanguineoEnum } from "./enums";
@@ -16,93 +16,93 @@ import { archivos } from "./archivo";
  * egresados (sujeto a `autoriza_publicacion` / `datos_publicos`).
  */
 export const afiliados = pgTable("afiliados", {
- userId: text("user_id")
- .primaryKey()
- .references(() => users.id, { onDelete: "cascade" }),
- // Datos generales
- apellidoPaterno: text("apellido_paterno") /* .notNull() */,
- apellidoMaterno: text("apellido_materno") /* .notNull() */,
- nombres: text("nombres") /* .notNull() */,
- fotografiaArchivoId: uuid("fotografia_archivo_id").references(
- () => archivos.id,
- ),
- comprobanteMembresiaArchivoId: uuid(
- "comprobante_membresia_archivo_id",
- ).references(() => archivos.id),
- genero: text("genero") /* .notNull() */,
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  // Datos generales
+  apellidoPaterno: text("apellido_paterno") /* .notNull() */,
+  apellidoMaterno: text("apellido_materno") /* .notNull() */,
+  nombres: text("nombres") /* .notNull() */,
+  fotografiaArchivoId: uuid("fotografia_archivo_id").references(
+    () => archivos.id,
+  ),
+  comprobanteMembresiaArchivoId: uuid(
+    "comprobante_membresia_archivo_id",
+  ).references(() => archivos.id),
+  genero: text("genero") /* .notNull() */,
 
- //Estado de membresía
- membershipStatus: membershipStatusEnum("membership_status")
- .notNull()
- .default("NO_INICIADA"),
+  //Estado de membresía
+  membershipStatus: membershipStatusEnum("membership_status")
+    .notNull()
+    .default("NO_INICIADA"),
 
- // RF-AUTH-012: fecha del último cambio de correo exitoso, para aplicar el
- // cooldown de 15 días. NULL si nunca ha cambiado su correo.
- lastEmailChangeAt: timestamp("last_email_change_at", { withTimezone: true }),
+  // RF-AUTH-012: fecha del último cambio de correo exitoso, para aplicar el
+  // cooldown de 15 días. NULL si nunca ha cambiado su correo.
+  lastEmailChangeAt: timestamp("last_email_change_at", { withTimezone: true }),
 
- // Folio
- // REP-{año actual}-{6 digitos}
- folio: varchar("folio", { length: 15 }).unique(),
- mostrarEnQr: boolean("mostrar_en_qr").notNull().default(false),
+  // Folio
+  // REP-{año actual}-{6 digitos}
+  folio: varchar("folio", { length: 15 }).unique(),
+  mostrarEnQr: boolean("mostrar_en_qr").notNull().default(false),
 
- // Contacto
- telefonoCelular: varchar("telefono_celular", { length: 10 }) /* .notNull() */,
- telefonoCasa: varchar("telefono_casa", { length: 10 }),
- //Este correo electrónico es solo informativo dentro de la plataforma, no es el email de login/register y no requiere ser unique
- correoElectronico: text("correo_electronico") /* .notNull() */
- .unique(),
- linkedin: text("linkedin"),
- orcid: text("orcid"),
- sitioWeb: text("sitio_web"),
+  // Contacto
+  telefonoCelular: varchar("telefono_celular", { length: 10 }) /* .notNull() */,
+  telefonoCasa: varchar("telefono_casa", { length: 10 }),
+  //Este correo electrónico es solo informativo dentro de la plataforma, no es el email de login/register y no requiere ser unique
+  correoElectronico: text("correo_electronico") /* .notNull() */
+    .unique(),
+  linkedin: text("linkedin"),
+  orcid: text("orcid"),
+  sitioWeb: text("sitio_web"),
 
- // Ubicación para el catálogo
- estadoResidencia: text("estado_residencia") /* .notNull() */,
- ciudadResidencia: text("ciudad_residencia") /* .notNull() */,
- disponibilidadGeografica: text(
- "disponibilidad_geografica",
- ).array() /* .notNull() */,
+  // Ubicación para el catálogo
+  estadoResidencia: text("estado_residencia") /* .notNull() */,
+  ciudadResidencia: text("ciudad_residencia") /* .notNull() */,
+  disponibilidadGeografica: text(
+    "disponibilidad_geografica",
+  ).array() /* .notNull() */,
 
- // Perfil profesional público
- areaConocimiento: text("area_conocimiento").array() /* .notNull() */,
- areaConocimientoOtro: text("area_conocimiento_otro"),
- perfilProfesional: text("perfil_profesional") /* .notNull() */,
- palabrasClave: text("palabras_clave").array() /* .notNull() */,
- habilidadesTecnologicas: text("habilidades_tecnologicas") /* .notNull() */,
+  // Perfil profesional público
+  areaConocimiento: text("area_conocimiento").array() /* .notNull() */,
+  areaConocimientoOtro: text("area_conocimiento_otro"),
+  perfilProfesional: text("perfil_profesional") /* .notNull() */,
+  palabrasClave: text("palabras_clave").array() /* .notNull() */,
+  habilidadesTecnologicas: text("habilidades_tecnologicas") /* .notNull() */,
 
- // Servicios profesionales
- tipoServicios: text("tipo_servicios").array() /* .notNull() */,
- tipoServiciosOtro: text("tipo_servicios_otro"),
- descripcionServicios: text("descripcion_servicios") /* .notNull() */,
- sectores: text("sectores").array() /* .notNull() */,
- sectoresOtro: text("sectores_otro"),
- modalidadServicios: text("modalidad_servicios").array() /* .notNull() */,
- interesadoEn: text("interesado_en").array() /* .notNull() */,
- interesadoEnOtro: text("interesado_en_otro"),
+  // Servicios profesionales
+  tipoServicios: text("tipo_servicios").array() /* .notNull() */,
+  tipoServiciosOtro: text("tipo_servicios_otro"),
+  descripcionServicios: text("descripcion_servicios") /* .notNull() */,
+  sectores: text("sectores").array() /* .notNull() */,
+  sectoresOtro: text("sectores_otro"),
+  modalidadServicios: text("modalidad_servicios").array() /* .notNull() */,
+  interesadoEn: text("interesado_en").array() /* .notNull() */,
+  interesadoEnOtro: text("interesado_en_otro"),
 
- // Visibilidad
- autorizaPublicacion: boolean("autoriza_publicacion") /* .notNull() */
- .default(false),
- datosPublicos: text("datos_publicos").array() /* .notNull() */,
+  // Visibilidad
+  autorizaPublicacion: boolean("autoriza_publicacion") /* .notNull() */
+    .default(false),
+  datosPublicos: text("datos_publicos").array() /* .notNull() */,
 
- createdAt: timestamp("created_at", { withTimezone: true })
- .notNull()
- .defaultNow(),
- updatedAt: timestamp("updated_at", { withTimezone: true })
- .notNull()
- .defaultNow()
- .$onUpdate(() => new Date()),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 /** Proyectos relevantes del afiliado (0 a 5, capturados en el paso 4). */
 export const proyectosRelevantes = pgTable("proyectos_relevantes", {
- id: uuid("id").primaryKey().defaultRandom(),
- afiliadoId: text("afiliado_id")
- .notNull()
- .references(() => afiliados.userId, { onDelete: "cascade" }),
- nombre: text("nombre").notNull(),
- descripcion: text("descripcion").notNull(),
- rol: text("rol").notNull(),
- anio: integer("anio").notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  afiliadoId: text("afiliado_id")
+    .notNull()
+    .references(() => afiliados.userId, { onDelete: "cascade" }),
+  nombre: text("nombre").notNull(),
+  descripcion: text("descripcion").notNull(),
+  rol: text("rol").notNull(),
+  anio: integer("anio").notNull(),
 });
 
 /**
@@ -113,29 +113,29 @@ export const proyectosRelevantes = pgTable("proyectos_relevantes", {
  * permisos/políticas de acceso (p. ej. Row Level Security) independientes.
  */
 export const datosEmergencia = pgTable("datos_emergencia", {
- id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom(),
 
- afiliadoId: text("afiliado_id")
- .notNull()
- .unique()
- .references(() => afiliados.userId, { onDelete: "cascade" }),
+  afiliadoId: text("afiliado_id")
+    .notNull()
+    .unique()
+    .references(() => afiliados.userId, { onDelete: "cascade" }),
 
- nombreContacto: text("nombre_contacto").notNull(),
- parentesco: text("parentesco").notNull(),
- parentescoOtro: text("parentesco_otro"),
- telefono: varchar("telefono", { length: 10 }).notNull(),
- tipoSanguineo: tipoSanguineoEnum("tipo_sanguineo").notNull(),
- alergiasCondicionesMedicas: text("alergias_condiciones_medicas"),
- mostrarEnQr: boolean("mostrar_en_qr").notNull().default(false),
+  nombreContacto: text("nombre_contacto").notNull(),
+  parentesco: text("parentesco").notNull(),
+  parentescoOtro: text("parentesco_otro"),
+  telefono: varchar("telefono", { length: 10 }).notNull(),
+  tipoSanguineo: tipoSanguineoEnum("tipo_sanguineo").notNull(),
+  alergiasCondicionesMedicas: text("alergias_condiciones_medicas"),
+  mostrarEnQr: boolean("mostrar_en_qr").notNull().default(false),
 
- createdAt: timestamp("created_at", { withTimezone: true })
- .notNull()
- .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 
- updatedAt: timestamp("updated_at", { withTimezone: true })
- .notNull()
- .defaultNow()
- .$onUpdate(() => new Date()),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export type Afiliado = typeof afiliados.$inferSelect;
