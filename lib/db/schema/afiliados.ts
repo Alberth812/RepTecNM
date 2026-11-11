@@ -40,6 +40,11 @@ export const afiliados = pgTable("afiliados", {
   // cooldown de 15 días. NULL si nunca ha cambiado su correo.
   lastEmailChangeAt: timestamp("last_email_change_at", { withTimezone: true }),
 
+  // Motivo de la suspensión más reciente. Se conserva incluso después de
+  // reactivar al afiliado (no se borra al quitar la suspensión); solo se
+  // reemplaza cuando el afiliado es suspendido de nuevo.
+  motivoSuspension: text("motivo_suspension"),
+
   // Folio
   // REP-{año actual}-{6 digitos}
   folio: varchar("folio", { length: 15 }).unique(),
