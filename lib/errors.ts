@@ -4,21 +4,32 @@
  * lib/http/responses.ts), incluyendo el header `Retry-After` que pide
  * RF-AUTH-027 cuando se supera un rate limit.
  */
+
+//
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
   readonly retryAfterSeconds?: number;
 
-  constructor(status: number, code: string, message: string, retryAfterSeconds?: number) {
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    retryAfterSeconds?: number,
+  ) {
     super(message);
+
     this.name = "ApiError";
     this.status = status;
     this.code = code;
     this.retryAfterSeconds = retryAfterSeconds;
   }
 
-  static rateLimited(message: string, retryAfterSeconds: number, code = "RATE_LIMITED") {
-    // RF-AUTH-027: 429 + Retry-After.
+  static rateLimited(
+    message: string,
+    retryAfterSeconds: number,
+    code = "RATE_LIMITED",
+  ) {
     return new ApiError(429, code, message, retryAfterSeconds);
   }
 

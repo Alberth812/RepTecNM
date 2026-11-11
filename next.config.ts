@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     "http://localhost:3000",
     "http://10.168.0.109:3000",
     "http://10.168.0.109.nip.io:3000",
+    "10.168.0.109.nip.io:3000",
   ],
   devIndicators: {
     position: "bottom-right",

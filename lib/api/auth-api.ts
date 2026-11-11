@@ -7,6 +7,7 @@ import type {
   forgotPasswordSchema,
   resetPasswordSchema,
 } from "@/lib/validation/schemas";
+import type { AdminSubtype, MembershipStatus } from "@/lib/auth/auth-types";
 
 // Los tipos de input se infieren directamente de los esquemas de zod que ya
 // existen en el proyecto (@/lib/validation/schemas), para no duplicar reglas
@@ -36,13 +37,24 @@ export function resendVerificationRequest(input: ResendVerificationInput) {
   return postJson<MessageResponse>("/api/verify-email/resend", input);
 }
 
+export type LoginAffiliateUser = {
+  id: string;
+  email: string;
+  role: "AFILIADO";
+  membershipStatus: MembershipStatus;
+};
+
+export type LoginAdminUser = {
+  id: string;
+  email: string;
+  role: "ADMINISTRADOR";
+  subtype: AdminSubtype;
+};
+
+export type LoginUser = LoginAffiliateUser | LoginAdminUser;
+
 export interface LoginResponse {
-  user: {
-    id: string;
-    email: string;
-    role: "ADMINISTRADOR" | "AFILIADO";
-    [key: string]: unknown;
-  };
+  user: LoginUser;
 }
 
 /** Único punto de entrada soportado para iniciar sesión: POST /api/login */

@@ -1,53 +1,44 @@
 // app/(frontend)/afiliado/layout.tsx
-import { NoAutorizado } from "@/components/auth/no-autorizado";
-import { BarraAfiliado } from "@/components/barra-afiliado/BarraAfiliado";
-import { requireAfiliado, requireSession } from "@/lib/auth/session";
-import { ApiError } from "@/lib/errors";
+
+import type { ReactNode } from "react";
+
 import { redirect } from "next/navigation";
 
+import { NoAutorizado } from "@/components/auth/no-autorizado";
+import { BarraAfiliado } from "@/components/barra-afiliado/BarraAfiliado";
+
+import { getAfiliadoPageAccess } from "@/lib/auth/session";
+
+import { REGISTRATION_STATUSES } from "@/lib/auth/auth-types";
+
 type Args = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-const Layout = async ({ children }: Args) => {
-  try {
-    // Usamos requireSession
+export default async function AfiliadoLayout({ children }: Args) {
+  const access = await getAfiliadoPageAccess(["ACTIVO"]);
 
-    const session = await requireSession();
-
-    if (session.user.role === "ADMIN") {
-      <NoAutorizado
-        redirectHref="/admin/afiliado"
-        redirectLabel="Regresar al dashboard"
-      />;
-    } else {
-      // Entonces es afiliado
-      const { afiliado } = await requireAfiliado();
-      if (afiliado.membershipStatus === "ACTIVO") {
-        return <BarraAfiliado>{children}</BarraAfiliado>;
-      } else if(afiliado.membershipStatus === "NO_INICIADA"
-        || afiliado.membershipStatus === "PENDIENTE_APROBACION"
-        || afiliado.membershipStatus === "REQUIERE_CORRECCION"
-      ) {
-        redirect("/registro");
-      } 
-      else {
-        return (
-          <NoAutorizado
-            redirectHref="/"
-            redirectLabel="Regresar a inicio"
-            description="No tienes permisos para acceder a esta página ya que no estás activo"
-          />
-        );
-      }
+  if (!access.allowed) {
+    /*
+     * Si es afiliado, pero todavía no ha terminado
+     * el proceso de registro, enviarlo a /registro.
+     */
+    if (
+      access.reason === "MEMBERSHIP_STATUS" &&
+      access.membershipStatus &&
+      REGISTRATION_STATUSES.some((status) => status === access.membershipStatus)
+    ) {
+      redirect("/registro");
     }
-  } catch (err) {
-    if (err instanceof ApiError) {
-      if (err.status === 403) {
-        return <NoAutorizado redirectHref="/" />;
-      } else throw err;
-    } else throw err;
-  }
-};
 
-export default Layout;
+    return (
+      <NoAutorizado
+        redirectHref={access.redirectHref}
+        redirectLabel={access.redirectLabel}
+        description={access.description}
+      />
+    );
+  }
+
+  return <BarraAfiliado>{children}</BarraAfiliado>;
+}
