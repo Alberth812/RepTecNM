@@ -156,134 +156,159 @@ export default function VerificarCredencialPage() {
  );
  }
 
- const esActivo = data.membershipStatus === "ACTIVO";
+   const esActivo = data.membershipStatus === "ACTIVO";
 
- return (
- <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
- {/* Header Institucional */}
- <header className="bg-white border-b border-slate-200">
- <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
- <div className="flex items-center justify-between h-16">
- <Link href="/" className="flex items-center gap-2">
- <img src="/logo.png" alt="REP-TecNM" className="h-10 w-auto" />
- </Link>
- <div className="flex items-center gap-3">
- <Link href="/login">
- <Button variant="outline" size="sm">
- Iniciar sesión
- </Button>
- </Link>
- </div>
- </div>
- </div>
- </header>
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] flex flex-col">
+      {/* Header Limpio */}
+      <header className="bg-white border-b border-slate-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/logo.png" alt="REP-TecNM" className="h-8 w-auto" />
+            </Link>
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="text-slate-600">
+                Iniciar sesión
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </header>
 
- {/* Contenido Principal */}
- <main className="py-12 px-4">
- <div className="max-w-2xl mx-auto">
- {/* Header simplificado - solo el check y título */}
- <div className="text-center mb-8">
- <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#004B87] mb-4">
- <CheckCircle2 className="h-12 w-12 text-white" />
- </div>
- <h1 className="text-3xl font-bold text-[#004B87] mb-1">Verificación de Credencial Digital</h1>
- </div>
+      {/* Contenido Principal */}
+      <main className="flex-1 py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          
+          {/* Título de la página */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Verificación de Credencial Digital
+            </h1>
+            <p className="text-slate-500 mt-1 text-sm">
+              Sistema de validación de la Red de Egresados de Posgrado del TecNM
+            </p>
+          </div>
 
- {/* Tarjeta de Verificación */}
- <Card className="border-2 border-slate-200 shadow-2xl overflow-hidden">
- {/* Header con estado */}
- <div className={`px-8 py-6 ${esActivo ? "bg-gradient-to-r from-emerald-500 to-emerald-600" : "bg-gradient-to-r from-amber-500 to-amber-600"}`}>
- <div className="flex items-center justify-between">
- <div>
- <h2 className="text-2xl font-bold text-white mb-1">
- {esActivo ? "AFILIACIÓN VIGENTE" : "AFILIACIÓN NO VIGENTE"}
- </h2>
- <p className="text-white/90 text-sm">Credencial verificada correctamente</p>
- </div>
- <Badge className={`text-lg px-4 py-2 ${esActivo ? "bg-white text-emerald-600" : "bg-white text-amber-600"}`}>
- {data.membershipStatus}
- </Badge>
- </div>
- </div>
+          {/* Tarjeta de Verificación (Estilo Suizo: Sin sombras pesadas, bordes sutiles) */}
+          <Card className="border border-slate-200 bg-white overflow-hidden">
+            
+            {/* Banner de Estado (Plano, sin degradados) */}
+            <div className={`px-6 py-4 border-b ${esActivo ? "bg-[#F0F4F8] border-[#E5EAF0]" : "bg-red-50 border-red-100"}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {esActivo ? (
+                    <CheckCircle2 className="h-6 w-6 text-[#004B87]" />
+                  ) : (
+                    <XCircle className="h-6 w-6 text-red-600" />
+                  )}
+                  <div>
+                    <h2 className={`text-lg font-bold ${esActivo ? "text-[#004B87]" : "text-red-700"}`}>
+                      {esActivo ? "AFILIACIÓN VIGENTE" : "AFILIACIÓN NO VIGENTE"}
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Folio verificado el {new Date().toLocaleDateString('es-MX')}
+                    </p>
+                  </div>
+                </div>
+                <Badge className={`text-xs px-3 py-1 font-mono ${esActivo ? "bg-[#004B87] text-white" : "bg-red-600 text-white"}`}>
+                  {data.membershipStatus}
+                </Badge>
+              </div>
+            </div>
 
- <CardContent className="p-8">
- {/* Foto y Datos Principales */}
- <div className="flex flex-col md:flex-row gap-6 mb-8">
- <div className="flex-shrink-0">
- <div className="w-28 h-36 rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-100 shadow-lg">
- {fotoUrl ? (
- <img src={fotoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
- ) : (
- <div className="w-full h-full flex items-center justify-center">
- <User className="h-12 w-12 text-slate-400" />
- </div>
- )}
- </div>
- </div>
+            <CardContent className="p-6">
+              {/* Foto y Datos Principales */}
+              <div className="flex flex-col sm:flex-row gap-6">
+                {/* Foto */}
+                <div className="flex-shrink-0 mx-auto sm:mx-0">
+                  <div className="w-24 h-32 rounded overflow-hidden bg-slate-100 border border-slate-200">
+                    {fotoUrl ? (
+                      <img src={fotoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <User className="h-10 w-10 text-slate-300" />
+                      </div>
+                    )}
+                  </div>
+                </div>
 
- <div className="flex-1">
- <h3 className="text-2xl font-bold text-slate-900 mb-3">{data.nombreCompleto}</h3>
- <div className="space-y-2">
- <div className="flex items-center gap-2 text-slate-600">
- <FileText className="h-4 w-4" />
- <span className="text-sm">Folio: <span className="font-mono font-semibold text-[#004B87]">{data.folio}</span></span>
- </div>
- {data.instituto && (
- <div className="flex items-center gap-2 text-slate-600">
- <GraduationCap className="h-4 w-4" />
- <span className="text-sm">{data.instituto}</span>
- </div>
- )}
- {data.anioAprobacion && (
- <div className="flex items-center gap-2 text-slate-600">
- <GraduationCap className="h-4 w-4" />
- <span className="text-sm">Año de graduación: {data.anioAprobacion}</span>
- </div>
- )}
- </div>
- </div>
- </div>
+                {/* Información */}
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4 uppercase tracking-wide">
+                    {data.nombreCompleto}
+                  </h3>
+                  
+                  <div className="space-y-3 text-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                      <span className="text-slate-500 font-medium w-24">Folio:</span>
+                      <span className="font-mono font-semibold text-slate-900">{data.folio}</span>
+                    </div>
+                    {data.instituto && (
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <span className="text-slate-500 font-medium w-24">Instituto:</span>
+                        <span className="text-slate-900">{data.instituto}</span>
+                      </div>
+                    )}
+                    {data.anioAprobacion && (
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                        <span className="text-slate-500 font-medium w-24">Año:</span>
+                        <span className="text-slate-900">{data.anioAprobacion}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
 
- {/* Áreas de Conocimiento */}
- {data.areaConocimiento && data.areaConocimiento.length > 0 && (
- <div className="mb-6">
- <h4 className="text-sm font-semibold text-slate-700 mb-3">Áreas de Conocimiento</h4>
- <div className="flex flex-wrap gap-2">
- {data.areaConocimiento.map((area, idx) => (
- <Badge key={idx} variant="secondary" className="bg-blue-50 text-[#004B87] border-blue-200">
- {area}
- </Badge>
- ))}
- </div>
- </div>
- )}
+              {/* Áreas de Conocimiento */}
+              {data.areaConocimiento && data.areaConocimiento.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-slate-100">
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                    Áreas de Conocimiento
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {data.areaConocimiento.map((area, idx) => (
+                      <span 
+                        key={idx} 
+                        className="px-2.5 py-1 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                      >
+                        {area}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
- {/* Botón de acción - solo Ir al inicio */}
- <div className="border-t border-slate-200 pt-6 mt-6">
- <div className="flex justify-center">
- <Link href="/">
- <Button variant="outline">
- <Home className="mr-2 h-4 w-4" />
- Ir al inicio
- </Button>
- </Link>
- </div>
- </div>
- </CardContent>
- </Card>
- </div>
- </main>
+              {/* Aviso de Privacidad Simplificado */}
+              <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Esta verificación es de carácter informativo. La Red de Egresados de Posgrado del TecNM 
+                  se reserva el derecho de actualizar o modificar el estado de las afiliaciones en cualquier momento.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
- {/* Footer */}
- <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
- <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
- <div className="text-center text-slate-600">
- <p className="text-sm">
- Red de Egresados de Posgrado del TecNM © {new Date().getFullYear()}
- </p>
- </div>
- </div>
- </footer>
- </div>
- );
+          {/* Botón de acción */}
+          <div className="mt-8 text-center">
+            <Link href="/">
+              <Button variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-50">
+                <Home className="mr-2 h-4 w-4" />
+                Volver al inicio
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 py-6">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <p className="text-xs text-slate-500">
+            Red de Egresados de Posgrado del TecNM © {new Date().getFullYear()}
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
 }

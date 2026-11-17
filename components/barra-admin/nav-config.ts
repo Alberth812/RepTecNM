@@ -1,63 +1,46 @@
 import type { LucideIcon } from "lucide-react";
 import {
- Home,
- FileText,
- Users,
- Ticket,
- CreditCard,
- Megaphone,
- BookOpen,
- User,
+  Home,
+  Users,
+  FileText,
+  Settings,
+  MessageSquare,
+  LayoutDashboard,
+  User,
 } from "lucide-react";
 
 export type NavItem = {
- label: string;
- href: string;
- icon: LucideIcon;
- badge?: boolean;
+  label: string;
+  href: string;
+  icon: LucideIcon;
 };
 
 export type NavGroup = {
- title?: string;
- items: NavItem[];
+  title?: string;
+  items: NavItem[];
 };
 
 export const NAV_GROUPS: NavGroup[] = [
- {
- items: [
- { label: "Inicio", href: "/admin/inicio", icon: Home },
- { label: "Repositorio", href: "/publicaciones", icon: FileText },
- ],
- },
- {
- title: "Gestión",
- items: [
- { 
- label: "Solicitudes de Afiliación", 
- href: "/admin/solicitudes", 
- icon: Users,
- badge: true 
- },
- { label: "Tickets de Soporte", href: "/admin/soporte", icon: Ticket },
- { label: "Credenciales", href: "/admin/credenciales", icon: CreditCard },
- ],
- },
- {
- title: "Comunicación",
- items: [
- { label: "Avisos", href: "/admin/avisos", icon: Megaphone },
- ],
- },
- {
- title: "Catálogo",
- items: [
- { label: "Catálogo Profesional", href: "/admin/catalogo", icon: BookOpen },
- ],
- },
+  {
+    items: [
+      { label: "Inicio", href: "/admin/inicio", icon: Home },
+      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: "Gestión",
+    items: [
+      { label: "Afiliados", href: "/admin/afiliados", icon: Users },
+      { label: "Aprobaciones", href: "/admin/aprobaciones", icon: FileText },
+      { label: "Publicaciones", href: "/admin/moderacion", icon: FileText },
+      { label: "Avisos", href: "/admin/avisos", icon: MessageSquare },
+      { label: "Configuración", href: "/admin/configuracion", icon: Settings },
+    ],
+  },
 ];
 
 export const ACCOUNT_ITEM: NavItem = {
- label: "Cuenta",
- href: "/admin/cuenta",
- icon: User,
+  label: "Cuenta",
+  href: "/admin/cuenta",
+  icon: User,
 };
