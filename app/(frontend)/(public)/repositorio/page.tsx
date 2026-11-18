@@ -6,8 +6,18 @@ import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  Download, Eye, FilePlus2, FileText, Flag, MessageSquareText, PencilLine,
-  Plus, Search, Send, Trash2, X,
+  Download,
+  Eye,
+  FilePlus2,
+  FileText,
+  Flag,
+  MessageSquareText,
+  PencilLine,
+  Plus,
+  Search,
+  Send,
+  Trash2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,19 +27,47 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { documentosIniciales, type Documento } from "@/lib/mock/repositorio";
 import { COMENTARIOS_INICIALES, type Comentario } from "@/lib/mock/comentarios";
 
 const ANIO_ACTUAL = new Date().getFullYear();
-const TIPOS = ["Artículo", "Tesis", "Libro", "Memoria de congreso", "Presentación", "Ensayo", "Reporte técnico", "Otro"];
+const TIPOS = [
+  "Artículo",
+  "Tesis",
+  "Libro",
+  "Memoria de congreso",
+  "Presentación",
+  "Ensayo",
+  "Reporte técnico",
+  "Otro",
+];
+
+const tiposItems = TIPOS.map((t) => ({
+  label: t,
+  value: t,
+}));
+
 const MOTIVOS_RETIRO = [
   "Autoría no verificada",
   "Incongruencias en los datos",
@@ -39,24 +77,56 @@ const MOTIVOS_RETIRO = [
   "Otro",
 ];
 
-const MOTIVOS_REPORTE = ["Derechos de autor", "Contenido inapropiado", "Información confidencial", "Plagio", "Spam", "Otro"];
+const MOTIVOS_REPORTE = [
+  "Derechos de autor",
+  "Contenido inapropiado",
+  "Información confidencial",
+  "Plagio",
+  "Spam",
+  "Otro",
+];
 
 interface FormDoc {
-  titulo: string; resumen: string; tipo: string; otroTipo: string; anio: string;
-  autores: string[]; tags: string[];
-  doi: string; revista: string; editorial: string; isbn: string; issn: string; url: string;
-  archivo: string; acepta: boolean;
+  titulo: string;
+  resumen: string;
+  tipo: string;
+  otroTipo: string;
+  anio: string;
+  autores: string[];
+  tags: string[];
+  doi: string;
+  revista: string;
+  editorial: string;
+  isbn: string;
+  issn: string;
+  url: string;
+  archivo: string;
+  acepta: boolean;
 }
 
 const FORM_VACIO: FormDoc = {
-  titulo: "", resumen: "", tipo: "", otroTipo: "", anio: "",
-  autores: [""], tags: [],
-  doi: "", revista: "", editorial: "", isbn: "", issn: "", url: "",
-  archivo: "", acepta: false,
+  titulo: "",
+  resumen: "",
+  tipo: "",
+  otroTipo: "",
+  anio: "",
+  autores: [""],
+  tags: [],
+  doi: "",
+  revista: "",
+  editorial: "",
+  isbn: "",
+  issn: "",
+  url: "",
+  archivo: "",
+  acepta: false,
 };
 
 function normalizar(t: string) {
-  return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return t
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function puntuacion(d: Documento, terminos: string[]) {
@@ -75,7 +145,13 @@ function puntuacion(d: Documento, terminos: string[]) {
   return total;
 }
 
-function SeccionForm({ titulo, children }: { titulo: string; children: ReactNode }) {
+function SeccionForm({
+  titulo,
+  children,
+}: {
+  titulo: string;
+  children: ReactNode;
+}) {
   return (
     <section className="rounded-xl border bg-muted/30 p-4">
       <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -88,7 +164,13 @@ function SeccionForm({ titulo, children }: { titulo: string; children: ReactNode
 
 export default function RepositorioPage() {
   return (
-    <Suspense fallback={<div className="flex h-64 items-center justify-center text-muted-foreground">Cargando...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-64 items-center justify-center text-muted-foreground">
+          Cargando...
+        </div>
+      }
+    >
       <RepositorioPageInner />
     </Suspense>
   );
@@ -112,7 +194,9 @@ function RepositorioPageInner() {
   const { rol } = useRol();
   const [viendo, setViendo] = useState<Documento | null>(null);
   const [foroAbierto, setForoAbierto] = useState<string | null>(null);
-  const [comentarios, setComentarios] = useState<Record<string, Comentario[]>>(COMENTARIOS_INICIALES);
+  const [comentarios, setComentarios] = useState<Record<string, Comentario[]>>(
+    COMENTARIOS_INICIALES,
+  );
   const [textoComentario, setTextoComentario] = useState("");
   const paramsUrl = useSearchParams();
   const qUrl = paramsUrl.get("q");
@@ -139,12 +223,21 @@ function RepositorioPageInner() {
 
   const abrirEdicion = (d: Documento) => {
     setForm({
-      titulo: d.titulo, resumen: d.resumen,
+      titulo: d.titulo,
+      resumen: d.resumen,
       tipo: TIPOS.includes(d.tipo) ? d.tipo : "Otro",
       otroTipo: TIPOS.includes(d.tipo) ? "" : d.tipo,
-      anio: String(d.anio), autores: [...d.autores], tags: [...d.palabrasClave],
-      doi: d.doi ?? "", revista: d.revista ?? "", editorial: "", isbn: "", issn: "", url: "",
-      archivo: "", acepta: true,
+      anio: String(d.anio),
+      autores: [...d.autores],
+      tags: [...d.palabrasClave],
+      doi: d.doi ?? "",
+      revista: d.revista ?? "",
+      editorial: "",
+      isbn: "",
+      issn: "",
+      url: "",
+      archivo: "",
+      acepta: true,
     });
     setEditandoId(d.id);
     setSheetAbierto(true);
@@ -152,56 +245,110 @@ function RepositorioPageInner() {
 
   const guardarDocumento = () => {
     const errores: string[] = [];
-    if (!form.titulo.trim() || form.titulo.length > 300) errores.push("El título es obligatorio (máx. 300 caracteres).");
-    if (!form.resumen.trim() || form.resumen.length > 1800) errores.push("El resumen es obligatorio (máx. 1800 caracteres).");
+    if (!form.titulo.trim() || form.titulo.length > 300)
+      errores.push("El título es obligatorio (máx. 300 caracteres).");
+    if (!form.resumen.trim() || form.resumen.length > 1800)
+      errores.push("El resumen es obligatorio (máx. 1800 caracteres).");
     if (!form.tipo) errores.push("Selecciona el tipo de documento.");
-    if (form.tipo === "Otro" && (!form.otroTipo.trim() || form.otroTipo.length > 50)) errores.push("Describe el tipo (máx. 50 caracteres).");
+    if (
+      form.tipo === "Otro" &&
+      (!form.otroTipo.trim() || form.otroTipo.length > 50)
+    )
+      errores.push("Describe el tipo (máx. 50 caracteres).");
     const anio = Number(form.anio);
-    if (!form.anio || anio < 1950 || anio > ANIO_ACTUAL) errores.push(`El año debe estar entre 1950 y ${ANIO_ACTUAL}.`);
-    if (form.autores.length < 1 || form.autores.some((a) => !a.trim())) errores.push("Registra entre 1 y 50 autores.");
-    if (form.autores.some((a) => /\d/.test(a))) errores.push("Los autores no pueden contener dígitos.");
-    if (form.autores.some((a) => a.length > 150)) errores.push("Cada autor admite máx. 150 caracteres.");
-    if (form.tags.length < 1 || form.tags.length > 15) errores.push("Registra entre 1 y 15 palabras clave.");
-    if (form.doi && docs.some((d) => d.doi === form.doi.trim() && d.id !== editandoId)) errores.push("Ya existe un documento con ese DOI.");
-    if (form.url && !/^https?:\/\/\S+$/.test(form.url)) errores.push("La URL oficial no es válida.");
-    if (!editandoId && !form.archivo) errores.push("Carga el documento en PDF (máx. 5 MB).");
-    if (!editandoId && !form.acepta) errores.push("Debes aceptar el descargo de derechos de autor (RF-DOC-002).");
+    if (!form.anio || anio < 1950 || anio > ANIO_ACTUAL)
+      errores.push(`El año debe estar entre 1950 y ${ANIO_ACTUAL}.`);
+    if (form.autores.length < 1 || form.autores.some((a) => !a.trim()))
+      errores.push("Registra entre 1 y 50 autores.");
+    if (form.autores.some((a) => /\d/.test(a)))
+      errores.push("Los autores no pueden contener dígitos.");
+    if (form.autores.some((a) => a.length > 150))
+      errores.push("Cada autor admite máx. 150 caracteres.");
+    if (form.tags.length < 1 || form.tags.length > 15)
+      errores.push("Registra entre 1 y 15 palabras clave.");
+    if (
+      form.doi &&
+      docs.some((d) => d.doi === form.doi.trim() && d.id !== editandoId)
+    )
+      errores.push("Ya existe un documento con ese DOI.");
+    if (form.url && !/^https?:\/\/\S+$/.test(form.url))
+      errores.push("La URL oficial no es válida.");
+    if (!editandoId && !form.archivo)
+      errores.push("Carga el documento en PDF (máx. 5 MB).");
+    if (!editandoId && !form.acepta)
+      errores.push(
+        "Debes aceptar el descargo de derechos de autor (RF-DOC-002).",
+      );
 
-    if (errores.length > 0) { toast.error(errores[0]); return; }
+    if (errores.length > 0) {
+      toast.error(errores[0]);
+      return;
+    }
 
     const tipoFinal = form.tipo === "Otro" ? form.otroTipo.trim() : form.tipo;
 
     if (editandoId) {
-      setDocs((prev) => prev.map((d) => d.id === editandoId ? {
-        ...d,
-        titulo: form.titulo.trim(), resumen: form.resumen.trim(), tipo: tipoFinal,
-        anio, autores: form.autores.map((a) => a.trim()), palabrasClave: form.tags,
-        doi: form.doi.trim() || undefined, revista: form.revista.trim() || undefined,
-      } : d));
-      toast.success("Metadatos actualizados. El PDF no puede modificarse (RF-DOC-009).");
+      setDocs((prev) =>
+        prev.map((d) =>
+          d.id === editandoId
+            ? {
+                ...d,
+                titulo: form.titulo.trim(),
+                resumen: form.resumen.trim(),
+                tipo: tipoFinal,
+                anio,
+                autores: form.autores.map((a) => a.trim()),
+                palabrasClave: form.tags,
+                doi: form.doi.trim() || undefined,
+                revista: form.revista.trim() || undefined,
+              }
+            : d,
+        ),
+      );
+      toast.success(
+        "Metadatos actualizados. El PDF no puede modificarse (RF-DOC-009).",
+      );
     } else {
-      setDocs((prev) => [{
-        id: `DOC-2026-${String(prev.length + 1).padStart(4, "0")}`,
-        titulo: form.titulo.trim(), resumen: form.resumen.trim(), tipo: tipoFinal,
-        anio, autores: form.autores.map((a) => a.trim()), palabrasClave: form.tags,
-        doi: form.doi.trim() || undefined, revista: form.revista.trim() || undefined,
-        tamano: form.archivo, afiliado: "María Fernanda López Herrera", propio: true,
-      }, ...prev]);
+      setDocs((prev) => [
+        {
+          id: `DOC-2026-${String(prev.length + 1).padStart(4, "0")}`,
+          titulo: form.titulo.trim(),
+          resumen: form.resumen.trim(),
+          tipo: tipoFinal,
+          anio,
+          autores: form.autores.map((a) => a.trim()),
+          palabrasClave: form.tags,
+          doi: form.doi.trim() || undefined,
+          revista: form.revista.trim() || undefined,
+          tamano: form.archivo,
+          afiliado: "María Fernanda López Herrera",
+          propio: true,
+        },
+        ...prev,
+      ]);
       toast.success("Documento publicado en el repositorio.");
     }
     setSheetAbierto(false);
   };
 
-
   const confirmarRetiro = () => {
-    if (!retirando || !motivoRetiro) { toast.error("Selecciona un motivo."); return; }
+    if (!retirando || !motivoRetiro) {
+      toast.error("Selecciona un motivo.");
+      return;
+    }
     if (motivoRetiro === "Otro") {
       const len = detalleRetiro.trim().length;
-      if (len < 10 || len > 300) { toast.error("Describe el motivo (10 a 300 caracteres)."); return; }
+      if (len < 10 || len > 300) {
+        toast.error("Describe el motivo (10 a 300 caracteres).");
+        return;
+      }
     }
-    const motivoFinal = motivoRetiro === "Otro" ? detalleRetiro.trim() : motivoRetiro;
+    const motivoFinal =
+      motivoRetiro === "Otro" ? detalleRetiro.trim() : motivoRetiro;
     setDocs((prev) => prev.filter((d) => d.id !== retirando.id));
-    const reportes = JSON.parse(localStorage.getItem("rep-reportes-admin") ?? "[]");
+    const reportes = JSON.parse(
+      localStorage.getItem("rep-reportes-admin") ?? "[]",
+    );
     reportes.unshift({
       id: `RET-${Date.now()}`,
       tipo: "Retiro de publicación",
@@ -211,7 +358,9 @@ function RepositorioPageInner() {
       fecha: new Date().toISOString().slice(0, 10),
     });
     localStorage.setItem("rep-reportes-admin", JSON.stringify(reportes));
-    const notis = JSON.parse(localStorage.getItem("rep-notificaciones") ?? "[]");
+    const notis = JSON.parse(
+      localStorage.getItem("rep-notificaciones") ?? "[]",
+    );
     notis.unshift({
       id: `NOT-${Date.now()}`,
       destinatario: retirando.afiliado,
@@ -220,17 +369,25 @@ function RepositorioPageInner() {
       fecha: new Date().toISOString().slice(0, 10),
     });
     localStorage.setItem("rep-notificaciones", JSON.stringify(notis));
-    toast.success(`Publicación retirada y ${retirando.afiliado} notificado del motivo.`);
+    toast.success(
+      `Publicación retirada y ${retirando.afiliado} notificado del motivo.`,
+    );
     setRetirando(null);
     setMotivoRetiro("");
     setDetalleRetiro("");
   };
 
   const confirmarReporte = () => {
-    if (!reportando || !motivoReporte) { toast.error("Selecciona un motivo."); return; }
+    if (!reportando || !motivoReporte) {
+      toast.error("Selecciona un motivo.");
+      return;
+    }
     if (motivoReporte === "Otro") {
       const len = detalleReporte.trim().length;
-      if (len < 10 || len > 300) { toast.error("La descripción debe tener entre 10 y 300 caracteres."); return; }
+      if (len < 10 || len > 300) {
+        toast.error("La descripción debe tener entre 10 y 300 caracteres.");
+        return;
+      }
     }
     setReportados((prev) => [...prev, reportando.id]);
     toast.success("Reporte enviado al Administrador General (RF-DOC-005).");
@@ -263,8 +420,12 @@ function RepositorioPageInner() {
 
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Repositorio Académico</h1>
-          <p className="mt-2 text-muted-foreground">Publicaciones de la comunidad de egresados.</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Repositorio Académico
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Publicaciones de la comunidad de egresados.
+          </p>
         </div>
         <Button onClick={abrirNuevo}>
           <Plus className="mr-2 h-4 w-4" /> Publicar documento
@@ -283,7 +444,10 @@ function RepositorioPageInner() {
 
       <div className="grid gap-4">
         {resultados.map((d) => (
-          <div key={d.id} className="rounded-2xl border bg-card p-5 transition-shadow hover:shadow-lg">
+          <div
+            key={d.id}
+            className="rounded-2xl border bg-card p-5 transition-shadow hover:shadow-lg"
+          >
             <div className="flex gap-4">
               <button
                 type="button"
@@ -294,8 +458,12 @@ function RepositorioPageInner() {
                 <div className="relative h-36 w-28 overflow-hidden rounded-md border border-slate-300 bg-white shadow-sm">
                   <div className="h-2 bg-[#004B87]" />
                   <div className="p-2">
-                    <p className="line-clamp-3 text-[7px] font-bold leading-snug text-slate-800">{d.titulo}</p>
-                    <p className="mt-1 truncate text-[6px] text-slate-500">{d.autores[0]}</p>
+                    <p className="line-clamp-3 text-[7px] font-bold leading-snug text-slate-800">
+                      {d.titulo}
+                    </p>
+                    <p className="mt-1 truncate text-[6px] text-slate-500">
+                      {d.autores[0]}
+                    </p>
                     <div className="mt-2 space-y-1">
                       <div className="h-1 w-11/12 rounded bg-slate-200" />
                       <div className="h-1 w-full rounded bg-slate-200" />
@@ -317,15 +485,23 @@ function RepositorioPageInner() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary">{d.tipo}</Badge>
-                  <span className="text-xs text-muted-foreground">{d.anio}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {d.anio}
+                  </span>
                   {d.propio && <Badge variant="outline">Tuyo</Badge>}
                 </div>
                 <h2 className="mt-2 font-semibold leading-snug">{d.titulo}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{d.autores.join(", ")}</p>
-                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{d.resumen}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {d.autores.join(", ")}
+                </p>
+                <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                  {d.resumen}
+                </p>
                 <div className="mt-3 flex flex-wrap gap-1">
                   {d.palabrasClave.map((c) => (
-                    <Badge key={c} variant="outline" className="text-[11px]">{c}</Badge>
+                    <Badge key={c} variant="outline" className="text-[11px]">
+                      {c}
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -335,20 +511,31 @@ function RepositorioPageInner() {
               <Button variant="outline" size="sm" onClick={() => setViendo(d)}>
                 <Eye className="mr-2 h-4 w-4" /> Ver en línea
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => toast.info(`Descarga simulada: ${d.titulo} (${d.tamano}).`)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() =>
+                  toast.info(`Descarga simulada: ${d.titulo} (${d.tamano}).`)
+                }
+              >
                 <Download className="mr-2 h-4 w-4" /> Descargar
               </Button>
               {!d.propio && (
-                <Link href={`/mensajeria?con=${encodeURIComponent(d.afiliado)}`}>
+                <Link
+                  href={`/mensajeria?con=${encodeURIComponent(d.afiliado)}`}
+                >
                   <Button variant="ghost" size="sm">
-                    <MessageSquareText className="mr-2 h-4 w-4" /> Contactar al autor
+                    <MessageSquareText className="mr-2 h-4 w-4" /> Contactar al
+                    autor
                   </Button>
                 </Link>
               )}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setForoAbierto(foroAbierto === d.id ? null : d.id)}
+                onClick={() =>
+                  setForoAbierto(foroAbierto === d.id ? null : d.id)
+                }
               >
                 <MessageSquareText className="mr-2 h-4 w-4" />
                 Foro ({(comentarios[d.id] ?? []).length})
@@ -375,7 +562,11 @@ function RepositorioPageInner() {
 
               {d.propio && (
                 <>
-                  <Button variant="ghost" size="sm" onClick={() => abrirEdicion(d)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => abrirEdicion(d)}
+                  >
                     <PencilLine className="mr-2 h-4 w-4" /> Editar metadatos
                   </Button>
                   <Button
@@ -388,7 +579,9 @@ function RepositorioPageInner() {
                   </Button>
                 </>
               )}
-              <span className="ml-auto text-xs text-muted-foreground">PDF · {d.tamano}</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                PDF · {d.tamano}
+              </span>
             </div>
 
             {foroAbierto === d.id && (
@@ -396,13 +589,20 @@ function RepositorioPageInner() {
                 <p className="text-sm font-semibold">Foro de la comunidad</p>
                 <div className="mt-3 space-y-3">
                   {(comentarios[d.id] ?? []).length === 0 && (
-                    <p className="text-xs text-muted-foreground">Sé la primera persona en comentar esta publicación.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Sé la primera persona en comentar esta publicación.
+                    </p>
                   )}
                   {(comentarios[d.id] ?? []).map((c, i) => (
-                    <div key={i} className="rounded-lg border bg-background p-3">
+                    <div
+                      key={i}
+                      className="rounded-lg border bg-background p-3"
+                    >
                       <div className="flex items-center justify-between">
                         <p className="text-xs font-semibold">{c.autor}</p>
-                        <span className="text-[11px] text-muted-foreground">{c.fecha}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {c.fecha}
+                        </span>
                       </div>
                       <p className="mt-1 text-sm">{c.texto}</p>
                     </div>
@@ -413,10 +613,19 @@ function RepositorioPageInner() {
                     className="bg-background"
                     value={textoComentario}
                     onChange={(e) => setTextoComentario(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); agregarComentario(d.id); } }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        agregarComentario(d.id);
+                      }
+                    }}
                     placeholder="Escribe un comentario para la comunidad..."
                   />
-                  <Button size="sm" disabled={!textoComentario.trim()} onClick={() => agregarComentario(d.id)}>
+                  <Button
+                    size="sm"
+                    disabled={!textoComentario.trim()}
+                    onClick={() => agregarComentario(d.id)}
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
@@ -434,19 +643,32 @@ function RepositorioPageInner() {
       {viendo && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-          onClick={(e) => { if (e.target === e.currentTarget) setViendo(null); }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setViendo(null);
+          }}
         >
           <div className="flex h-[90vh] w-[92vw] max-w-6xl flex-col overflow-hidden rounded-2xl border bg-background shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b p-4">
               <div className="min-w-0">
                 <h2 className="font-semibold leading-snug">{viendo.titulo}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">Vista previa dentro de la plataforma, sin descarga (RF-DOC-008).</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Vista previa dentro de la plataforma, sin descarga
+                  (RF-DOC-008).
+                </p>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setViendo(null)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setViendo(null)}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <iframe src="/docs/muestra.pdf" title="Vista previa del documento" className="w-full flex-1 bg-muted" />
+            <iframe
+              src="/docs/muestra.pdf"
+              title="Vista previa del documento"
+              className="w-full flex-1 bg-muted"
+            />
           </div>
         </div>
       )}
@@ -460,7 +682,9 @@ function RepositorioPageInner() {
                 <FilePlus2 className="h-5 w-5 text-[#004B87]" />
               </div>
               <div className="text-left">
-                <SheetTitle>{editandoId ? "Editar metadatos" : "Publicar documento"}</SheetTitle>
+                <SheetTitle>
+                  {editandoId ? "Editar metadatos" : "Publicar documento"}
+                </SheetTitle>
                 <SheetDescription>
                   {editandoId
                     ? "Solo los metadatos pueden modificarse; el PDF permanece intacto (RF-DOC-009)."
@@ -474,7 +698,9 @@ function RepositorioPageInner() {
             {!editandoId && (
               <SeccionForm titulo="Archivo">
                 <div className="rounded-lg border bg-background p-4">
-                  <p className="text-sm font-medium">Documento PDF (máx. 5 MB)</p>
+                  <p className="text-sm font-medium">
+                    Documento PDF (máx. 5 MB)
+                  </p>
                   <Input
                     type="file"
                     accept=".pdf"
@@ -482,14 +708,25 @@ function RepositorioPageInner() {
                     onChange={(e) => {
                       const f = e.target.files?.[0];
                       if (!f) return;
-                      if (f.type !== "application/pdf") { toast.error("Solo se acepta PDF (RF-DOC-001)."); return; }
-                      if (f.size > 5 * 1024 * 1024) { toast.error("El PDF excede 5 MB."); return; }
-                      setForm({ ...form, archivo: `${(f.size / 1024 / 1024).toFixed(1)} MB` });
+                      if (f.type !== "application/pdf") {
+                        toast.error("Solo se acepta PDF (RF-DOC-001).");
+                        return;
+                      }
+                      if (f.size > 5 * 1024 * 1024) {
+                        toast.error("El PDF excede 5 MB.");
+                        return;
+                      }
+                      setForm({
+                        ...form,
+                        archivo: `${(f.size / 1024 / 1024).toFixed(1)} MB`,
+                      });
                       toast.success("PDF cargado correctamente.");
                     }}
                   />
                   {form.archivo && (
-                    <p className="mt-2 text-xs font-medium text-green-700">PDF cargado · {form.archivo}</p>
+                    <p className="mt-2 text-xs font-medium text-green-700">
+                      PDF cargado · {form.archivo}
+                    </p>
                   )}
                 </div>
               </SeccionForm>
@@ -499,70 +736,169 @@ function RepositorioPageInner() {
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Título</span>
-                  <span className="text-xs text-muted-foreground">{form.titulo.length} / 300</span>
+                  <span className="text-xs text-muted-foreground">
+                    {form.titulo.length} / 300
+                  </span>
                 </div>
-                <Input maxLength={300} className="bg-background" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
+                <Input
+                  maxLength={300}
+                  className="bg-background"
+                  value={form.titulo}
+                  onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+                />
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Resumen</span>
-                  <span className="text-xs text-muted-foreground">{form.resumen.length} / 1800</span>
+                  <span className="text-xs text-muted-foreground">
+                    {form.resumen.length} / 1800
+                  </span>
                 </div>
-                <Textarea rows={4} maxLength={1800} className="bg-background" value={form.resumen} onChange={(e) => setForm({ ...form, resumen: e.target.value })} />
+                <Textarea
+                  rows={4}
+                  maxLength={1800}
+                  className="bg-background"
+                  value={form.resumen}
+                  onChange={(e) =>
+                    setForm({ ...form, resumen: e.target.value })
+                  }
+                />
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="grid gap-2">
                   <span className="text-sm font-medium">Tipo de documento</span>
-                  <Select value={form.tipo || undefined} onValueChange={(v) => { if (v) setForm({ ...form, tipo: v }); }}>
-                    <SelectTrigger className="bg-background"><SelectValue placeholder="Selecciona" /></SelectTrigger>
+                  <Select
+                    items={tiposItems}
+                    value={form.tipo || ""}
+                    onValueChange={(v) => {
+                      if (v) setForm({ ...form, tipo: v });
+                    }}
+                  >
+                    <SelectTrigger className="bg-background">
+                      <SelectValue placeholder="Selecciona" />
+                    </SelectTrigger>
                     <SelectContent>
-                      {TIPOS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      {tiposItems.map((t) => (
+                        <SelectItem key={t.value} value={t.value}>
+                          {t.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <span className="text-sm font-medium">Año de publicación</span>
+                  <span className="text-sm font-medium">
+                    Año de publicación
+                  </span>
                   <Input
                     inputMode="numeric"
                     className="bg-background"
                     value={form.anio}
-                    onChange={(e) => setForm({ ...form, anio: e.target.value.replace(/\D/g, "").slice(0, 4) })}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        anio: e.target.value.replace(/\D/g, "").slice(0, 4),
+                      })
+                    }
                   />
                 </div>
               </div>
               {form.tipo === "Otro" && (
-                <Input maxLength={50} className="bg-background" placeholder="Describe el tipo (máx. 50)" value={form.otroTipo} onChange={(e) => setForm({ ...form, otroTipo: e.target.value })} />
+                <Input
+                  maxLength={50}
+                  className="bg-background"
+                  placeholder="Describe el tipo (máx. 50)"
+                  value={form.otroTipo}
+                  onChange={(e) =>
+                    setForm({ ...form, otroTipo: e.target.value })
+                  }
+                />
               )}
             </SeccionForm>
 
             <SeccionForm titulo="Autores y palabras clave">
               <div className="grid gap-2">
-                <span className="text-sm font-medium">Autores (1 a 50, sin dígitos)</span>
+                <span className="text-sm font-medium">
+                  Autores (1 a 50, sin dígitos)
+                </span>
                 {form.autores.map((a, i) => (
                   <div key={i} className="flex gap-2">
-                    <Input maxLength={150} className="bg-background" value={a} onChange={(e) => {
-                      const copia = [...form.autores]; copia[i] = e.target.value; setForm({ ...form, autores: copia });
-                    }} placeholder={`Autor ${i + 1}`} />
-                    <Button variant="ghost" size="icon" disabled={form.autores.length === 1} onClick={() => setForm({ ...form, autores: form.autores.filter((_, x) => x !== i) })}>
+                    <Input
+                      maxLength={150}
+                      className="bg-background"
+                      value={a}
+                      onChange={(e) => {
+                        const copia = [...form.autores];
+                        copia[i] = e.target.value;
+                        setForm({ ...form, autores: copia });
+                      }}
+                      placeholder={`Autor ${i + 1}`}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={form.autores.length === 1}
+                      onClick={() =>
+                        setForm({
+                          ...form,
+                          autores: form.autores.filter((_, x) => x !== i),
+                        })
+                      }
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                <Button variant="outline" className="w-fit bg-background" disabled={form.autores.length >= 50} onClick={() => setForm({ ...form, autores: [...form.autores, ""] })}>
+                <Button
+                  variant="outline"
+                  className="w-fit bg-background"
+                  disabled={form.autores.length >= 50}
+                  onClick={() =>
+                    setForm({ ...form, autores: [...form.autores, ""] })
+                  }
+                >
                   <Plus className="mr-2 h-4 w-4" /> Agregar autor
                 </Button>
               </div>
               <div className="grid gap-2">
-                <span className="text-sm font-medium">Palabras clave (1 a 15)</span>
+                <span className="text-sm font-medium">
+                  Palabras clave (1 a 15)
+                </span>
                 <div className="flex gap-2">
-                  <Input className="bg-background" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); agregarTag(); } }} placeholder="ej. biotecnología" />
-                  <Button variant="outline" className="bg-background" onClick={agregarTag}><Plus className="h-4 w-4" /></Button>
+                  <Input
+                    className="bg-background"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        agregarTag();
+                      }
+                    }}
+                    placeholder="ej. biotecnología"
+                  />
+                  <Button
+                    variant="outline"
+                    className="bg-background"
+                    onClick={agregarTag}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {form.tags.map((t) => (
                     <Badge key={t} variant="secondary" className="gap-1">
                       {t}
-                      <button onClick={() => setForm({ ...form, tags: form.tags.filter((x) => x !== t) })}>×</button>
+                      <button
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            tags: form.tags.filter((x) => x !== t),
+                          })
+                        }
+                      >
+                        ×
+                      </button>
                     </Badge>
                   ))}
                 </div>
@@ -571,26 +907,84 @@ function RepositorioPageInner() {
 
             <SeccionForm titulo="Identificadores opcionales">
               <div className="grid gap-3 md:grid-cols-2">
-                <Input className="bg-background" placeholder="DOI (opcional, único)" value={form.doi} onChange={(e) => setForm({ ...form, doi: e.target.value })} />
-                <Input className="bg-background" placeholder="Revista o congreso" maxLength={250} value={form.revista} onChange={(e) => setForm({ ...form, revista: e.target.value })} />
-                <Input className="bg-background" placeholder="Editorial" maxLength={250} value={form.editorial} onChange={(e) => setForm({ ...form, editorial: e.target.value })} />
-                <Input className="bg-background" placeholder="ISBN" maxLength={25} value={form.isbn} onChange={(e) => setForm({ ...form, isbn: e.target.value })} />
-                <Input className="bg-background" placeholder="ISSN" maxLength={13} value={form.issn} onChange={(e) => setForm({ ...form, issn: e.target.value })} />
-                <Input className="bg-background" placeholder="URL oficial (https://...)" maxLength={500} value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
+                <Input
+                  className="bg-background"
+                  placeholder="DOI (opcional, único)"
+                  value={form.doi}
+                  onChange={(e) => setForm({ ...form, doi: e.target.value })}
+                />
+                <Input
+                  className="bg-background"
+                  placeholder="Revista o congreso"
+                  maxLength={250}
+                  value={form.revista}
+                  onChange={(e) =>
+                    setForm({ ...form, revista: e.target.value })
+                  }
+                />
+                <Input
+                  className="bg-background"
+                  placeholder="Editorial"
+                  maxLength={250}
+                  value={form.editorial}
+                  onChange={(e) =>
+                    setForm({ ...form, editorial: e.target.value })
+                  }
+                />
+                <Input
+                  className="bg-background"
+                  placeholder="ISBN"
+                  maxLength={25}
+                  value={form.isbn}
+                  onChange={(e) => setForm({ ...form, isbn: e.target.value })}
+                />
+                <Input
+                  className="bg-background"
+                  placeholder="ISSN"
+                  maxLength={13}
+                  value={form.issn}
+                  onChange={(e) => setForm({ ...form, issn: e.target.value })}
+                />
+                <Input
+                  className="bg-background"
+                  placeholder="URL oficial (https://...)"
+                  maxLength={500}
+                  value={form.url}
+                  onChange={(e) => setForm({ ...form, url: e.target.value })}
+                />
               </div>
             </SeccionForm>
 
             {!editandoId && (
               <SeccionForm titulo="Declaración de autoría">
                 <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
-                  <li>Es de mi autoría o cuento con la autorización necesaria para su publicación.</li>
-                  <li>No infringe derechos de autor ni otros derechos de terceros.</li>
-                  <li>Su publicación es compatible con licencias, contratos editoriales o políticas institucionales.</li>
-                  <li>Asumo la responsabilidad por cualquier reclamación derivada de su publicación.</li>
-                  <li>Corresponde a una producción académica legítima y pertinente.</li>
+                  <li>
+                    Es de mi autoría o cuento con la autorización necesaria para
+                    su publicación.
+                  </li>
+                  <li>
+                    No infringe derechos de autor ni otros derechos de terceros.
+                  </li>
+                  <li>
+                    Su publicación es compatible con licencias, contratos
+                    editoriales o políticas institucionales.
+                  </li>
+                  <li>
+                    Asumo la responsabilidad por cualquier reclamación derivada
+                    de su publicación.
+                  </li>
+                  <li>
+                    Corresponde a una producción académica legítima y
+                    pertinente.
+                  </li>
                 </ul>
                 <label className="flex items-center gap-2 text-sm">
-                  <Checkbox checked={form.acepta} onCheckedChange={(v) => setForm({ ...form, acepta: v === true })} />
+                  <Checkbox
+                    checked={form.acepta}
+                    onCheckedChange={(v) =>
+                      setForm({ ...form, acepta: v === true })
+                    }
+                  />
                   Declaro que este documento cumple lo anterior.
                 </label>
               </SeccionForm>
@@ -599,15 +993,22 @@ function RepositorioPageInner() {
 
           <div className="sticky bottom-0 -mx-6 mt-8 border-t bg-background/95 p-6 backdrop-blur">
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => setSheetAbierto(false)}>Cancelar</Button>
-              <Button onClick={guardarDocumento}>{editandoId ? "Guardar cambios" : "Publicar"}</Button>
+              <Button variant="outline" onClick={() => setSheetAbierto(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={guardarDocumento}>
+                {editandoId ? "Guardar cambios" : "Publicar"}
+              </Button>
             </div>
           </div>
         </SheetContent>
       </Sheet>
 
       {/* Reporte */}
-      <Dialog open={!!reportando} onOpenChange={(open) => !open && setReportando(null)}>
+      <Dialog
+        open={!!reportando}
+        onOpenChange={(open) => !open && setReportando(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reportar documento</DialogTitle>
@@ -616,37 +1017,69 @@ function RepositorioPageInner() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
-            <Select value={motivoReporte || undefined} onValueChange={(v) => { if (v) setMotivoReporte(v); }}>
-              <SelectTrigger><SelectValue placeholder="Motivo del reporte" /></SelectTrigger>
+            <Select
+              value={motivoReporte || undefined}
+              onValueChange={(v) => {
+                if (v) setMotivoReporte(v);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Motivo del reporte" />
+              </SelectTrigger>
               <SelectContent>
-                {MOTIVOS_REPORTE.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                {MOTIVOS_REPORTE.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             {motivoReporte === "Otro" && (
-              <Textarea rows={3} value={detalleReporte} onChange={(e) => setDetalleReporte(e.target.value)} placeholder="Describe el motivo (10 a 300 caracteres)" />
+              <Textarea
+                rows={3}
+                value={detalleReporte}
+                onChange={(e) => setDetalleReporte(e.target.value)}
+                placeholder="Describe el motivo (10 a 300 caracteres)"
+              />
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setReportando(null)}>Cancelar</Button>
-            <Button variant="destructive" onClick={confirmarReporte}>Enviar reporte</Button>
+            <Button variant="outline" onClick={() => setReportando(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmarReporte}>
+              Enviar reporte
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-
       {/* Retiro por administracion */}
-      <Dialog open={!!retirando} onOpenChange={(open) => { if (!open) { setRetirando(null); setMotivoRetiro(""); setDetalleRetiro(""); } }}>
+      <Dialog
+        open={!!retirando}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRetirando(null);
+            setMotivoRetiro("");
+            setDetalleRetiro("");
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Retirar publicación</DialogTitle>
             <DialogDescription>
-              La publicación se elimina del repositorio y el afiliado autor recibe una notificación con el motivo. Esta acción queda registrada en el historial de administración (RF-DOC-010).
+              La publicación se elimina del repositorio y el afiliado autor
+              recibe una notificación con el motivo. Esta acción queda
+              registrada en el historial de administración (RF-DOC-010).
             </DialogDescription>
           </DialogHeader>
           {retirando && (
             <div className="rounded-lg border bg-muted/30 p-3 text-sm">
               <p className="font-medium">{retirando.titulo}</p>
-              <p className="text-xs text-muted-foreground">{retirando.afiliado} · {retirando.tipo} · {retirando.anio}</p>
+              <p className="text-xs text-muted-foreground">
+                {retirando.afiliado} · {retirando.tipo} · {retirando.anio}
+              </p>
             </div>
           )}
           <div className="grid gap-3">
@@ -658,7 +1091,11 @@ function RepositorioPageInner() {
                 onChange={(e) => setMotivoRetiro(e.target.value)}
               >
                 <option value="">Selecciona un motivo</option>
-                {MOTIVOS_RETIRO.map((m) => <option key={m} value={m}>{m}</option>)}
+                {MOTIVOS_RETIRO.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
               </select>
             </label>
             {motivoRetiro === "Otro" && (
@@ -671,28 +1108,48 @@ function RepositorioPageInner() {
                   onChange={(e) => setDetalleRetiro(e.target.value)}
                   placeholder="Mínimo 10 caracteres"
                 />
-                <span className="text-xs text-muted-foreground">{detalleRetiro.length} / 300</span>
+                <span className="text-xs text-muted-foreground">
+                  {detalleRetiro.length} / 300
+                </span>
               </label>
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setRetirando(null); setMotivoRetiro(""); setDetalleRetiro(""); }}>Cancelar</Button>
-            <Button variant="destructive" onClick={confirmarRetiro}>Retirar y notificar</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRetirando(null);
+                setMotivoRetiro("");
+                setDetalleRetiro("");
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmarRetiro}>
+              Retirar y notificar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Eliminación */}
-      <Dialog open={!!eliminando} onOpenChange={(open) => !open && setEliminando(null)}>
+      <Dialog
+        open={!!eliminando}
+        onOpenChange={(open) => !open && setEliminando(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Eliminar publicación</DialogTitle>
             <DialogDescription>
-              {eliminando ? "Esta acción es irreversible y retirará el documento del repositorio." : ""}
+              {eliminando
+                ? "Esta acción es irreversible y retirará el documento del repositorio."
+                : ""}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEliminando(null)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setEliminando(null)}>
+              Cancelar
+            </Button>
             <Button
               variant="destructive"
               onClick={() => {

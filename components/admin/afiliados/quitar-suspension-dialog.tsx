@@ -47,8 +47,8 @@ export function QuitarSuspensionDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger /*asChild*/>
-        <Button>Quitar suspensión</Button>
+      <DialogTrigger render={<Button variant="destructive" size="sm" />}>
+        Quitar suspensión
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

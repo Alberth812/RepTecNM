@@ -1,10 +1,8 @@
 // @/components/admin/afiliados/afiliados-table.tsx
 "use client";
 
-import Link from "next/link";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -13,8 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import Link from "next/link";
+
 import type { AfiliadoListItem } from "@/lib/api/client/afiliados";
+import { cn } from "@/lib/utils";
 import type {
   SortByAfiliados,
   SortOrderAfiliados,
@@ -120,11 +121,15 @@ export function AfiliadosTable({
                 <TableCell>{item.ciudadResidencia ?? "—"}</TableCell>
                 <TableCell>{item.correoElectronico ?? "—"}</TableCell>
                 <TableCell className="text-right">
-                  <Button /*asChild*/ variant="outline" size="sm">
-                    <Link href={`/admin/afiliados/${item.userId}`}>
-                      Ver detalles
-                    </Link>
-                  </Button>
+                  <Link
+                    href={`/admin/afiliados/${item.userId}`}
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "sm",
+                    })}
+                  >
+                    Ver detalles
+                  </Link>
                 </TableCell>
               </TableRow>
             ))

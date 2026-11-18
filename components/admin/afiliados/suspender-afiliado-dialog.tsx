@@ -68,8 +68,8 @@ export function SuspenderAfiliadoDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger /*asChild*/>
-        <Button variant="destructive">Suspender</Button>
+      <DialogTrigger render={<Button variant="destructive" size="sm" />}>
+        Suspender
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>

@@ -6,7 +6,7 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export default defineConfig({
+export default defineConfig({ //
   out: "./drizzle",
   schema: "./lib/db/schema/**/*.ts",
   dialect: "postgresql",

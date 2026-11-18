@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { AfiliadoFoto } from "@/components/admin/afiliados/afiliado-foto";
@@ -13,6 +13,8 @@ import { SuspenderAfiliadoDialog } from "@/components/admin/afiliados/suspender-
 import { QuitarSuspensionDialog } from "@/components/admin/afiliados/quitar-suspension-dialog";
 import { useAfiliadoDetalleQuery } from "@/lib/hooks/use-afiliados";
 import type { ApiClientError } from "@/lib/api/client/afiliados";
+
+//
 
 const STATUS_VARIANT: Record<
   string,
@@ -48,11 +50,14 @@ export function AfiliadoDetailView({ userId }: AfiliadoDetailViewProps) {
           {(error as ApiClientError)?.message ??
             "No se pudo cargar la información del afiliado."}
         </p>
-        <Button /*asChild*/ variant="outline" size="sm">
-          <Link href="/admin/afiliados">
-            <ArrowLeft className="size-4" />
-            Volver al listado
-          </Link>
+        <Button
+          variant="outline"
+          size="sm"
+          render={<Link href="/admin/afiliados" />}
+          nativeButton={false}
+        >
+          <ArrowLeft className="size-4" />
+          Volver al listado
         </Button>
       </div>
     );
@@ -69,12 +74,16 @@ export function AfiliadoDetailView({ userId }: AfiliadoDetailViewProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <Button /*asChild*/ variant="ghost" size="sm">
-          <Link href="/admin/afiliados">
-            <ArrowLeft className="size-4" />
-            Volver al listado
-          </Link>
-        </Button>
+        <Link
+          href="/admin/afiliados"
+          className={buttonVariants({
+            variant: "ghost",
+            size: "sm",
+          })}
+        >
+          <ArrowLeft className="size-4" />
+          Volver al listado
+        </Link>
 
         {data.membershipStatus === "ACTIVO" && (
           <SuspenderAfiliadoDialog

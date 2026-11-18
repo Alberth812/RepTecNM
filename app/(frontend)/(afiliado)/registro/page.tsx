@@ -1,4 +1,4 @@
-// app/(afiliado)/registro/page.tsx
+// app/(afiliado)/registro/page.tsx 
 import { requireAfiliado } from "@/lib/auth/session";
 import { obtenerSolicitudActualParaAfiliado } from "@/lib/db/solicitudes/queries";
 import { getFileUrl } from "@/lib/storage";

@@ -189,21 +189,12 @@ export default function ModificarDatosForm({ initialData }: RegistroFormProps) {
           )}
 
           <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={currentStep === 0 || submitStatus === "submitting"}
-              className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Anterior
-            </button>
-
             <div className="flex items-center justify-between gap-3">
+              {/* Anterior */}
               <button
                 type="button"
                 onClick={handleBack}
-                disabled={currentStep === 0 || submitStatus === "submitting"}
+                disabled={submitStatus === "submitting"}
                 className="flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -225,18 +216,17 @@ export default function ModificarDatosForm({ initialData }: RegistroFormProps) {
                     ? "Guardando..."
                     : "Guardar datos"}
                 </button>
-                {/* Siguiente solamente si no estamos en el último paso */}
-                {currentStep < LAST_STEP && (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    disabled={submitStatus === "submitting"}
-                    className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Siguiente
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
+
+                {/* Siguiente */}
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={submitStatus === "submitting"}
+                  className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Siguiente
+                  <ArrowRight className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>

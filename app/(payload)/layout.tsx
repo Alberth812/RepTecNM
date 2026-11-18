@@ -1,4 +1,4 @@
-// app/(payload)/layout.tsx
+
 import type { ServerFunctionClient } from "payload";
 import "@payloadcms/next/css";
 import config from "@payload-config";
@@ -10,9 +10,9 @@ import "./custom.scss";
 
 import { BarraAdmin } from "@/components/barra-admin/BarraAdmin";
 import { BarraAdminContenido } from "@/components/barra-admin/BarraAdminContenido";
-import { requireAdministrador, requireSession } from "@/lib/auth/session";
 import { NoAutorizado } from "@/components/auth/no-autorizado";
-import { ApiError } from "@/lib/errors";
+
+import { getAdministradorPageAccess } from "@/lib/auth/session";
 
 type Args = {
   children: React.ReactNode;
@@ -29,36 +29,25 @@ const serverFunction: ServerFunctionClient = async function (args) {
 };
 
 const Layout = async ({ children }: Args) => {
+  const access = await getAdministradorPageAccess();
+
   let componente: React.ReactNode;
 
-  try {
-    const session = await requireSession();
+  if (!access.allowed) {
+    componente = (
+      <NoAutorizado
+        redirectHref={access.redirectHref}
+        redirectLabel={access.redirectLabel}
+        description={access.description}
+      />
+    );
+  } else {
+    const { profile } = access.data;
 
-    if (session.user.role === "AFILIADO") {
-      componente = (
-        <NoAutorizado
-          redirectHref="/afiliado/inicio"
-          redirectLabel="Regresar al dashboard"
-        />
-      );
+    if (profile.subtype === "GENERAL") {
+      componente = <BarraAdmin>{children}</BarraAdmin>;
     } else {
-      const { profile } = await requireAdministrador();
-
-      if (profile.subtype === "GENERAL") {
-        componente = <BarraAdmin>{children}</BarraAdmin>;
-      } else {
-        componente = <BarraAdminContenido>{children}</BarraAdminContenido>;
-      }
-    }
-  } catch (err) {
-    if (err instanceof ApiError) {
-      if (err.status === 403) {
-        componente = <NoAutorizado redirectHref="/" />;
-      } else {
-        throw err;
-      }
-    } else {
-      throw err;
+      componente = <BarraAdminContenido>{children}</BarraAdminContenido>;
     }
   }
 

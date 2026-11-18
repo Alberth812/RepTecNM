@@ -141,12 +141,13 @@ export function AfiliadosFilters({ value, onChange }: AfiliadosFiltersProps) {
 
         {availableFilters.length > 0 && (
           <DropdownMenu>
-            <DropdownMenuTrigger /*asChild*/>
-              <Button variant="outline" size="sm">
-                <Plus className="size-4" />
-                Agregar filtro
-              </Button>
+            <DropdownMenuTrigger
+              render={<Button variant="outline" size="sm" />}
+            >
+              <Plus className="size-4" />
+              Agregar filtro
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="start">
               {availableFilters.map((key) => (
                 <DropdownMenuItem key={key} onSelect={() => addFilter(key)}>
