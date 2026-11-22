@@ -36,6 +36,11 @@ export const afiliados = pgTable("afiliados", {
     .notNull()
     .default("NO_INICIADA"),
 
+  // fecha de inicio de la membresía actual
+  fechaInicioMembresia: timestamp("fecha_inicio_membresia", {
+    withTimezone: true,
+  }).defaultNow(),
+
   // RF-AUTH-012: fecha del último cambio de correo exitoso, para aplicar el
   // cooldown de 15 días. NULL si nunca ha cambiado su correo.
   lastEmailChangeAt: timestamp("last_email_change_at", { withTimezone: true }),

@@ -438,6 +438,7 @@ async function finalizarAfiliado(
         params.solicitud.comprobanteMembresiaArchivoId,
 
       folio,
+      fechaInicioMembresia: new Date(),
 
       telefonoCelular: datos.telefono_celular,
       telefonoCasa: emptyToNull(datos.telefono_casa),
