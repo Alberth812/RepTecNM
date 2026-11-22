@@ -60,11 +60,11 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "Gestión",
     items: [
-      { 
-        label: "Solicitudes de Afiliación", 
-        href: "/admin/solicitudes", 
+      {
+        label: "Solicitudes de Afiliación",
+        href: "/admin/solicitudes",
         icon: Users,
-        badge: true 
+        badge: true,
       },
       { label: "Tickets de Soporte", href: "/admin/soporte", icon: Ticket },
       { label: "Credenciales", href: "/admin/credenciales", icon: CreditCard },
@@ -72,14 +72,21 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     title: "Comunicación",
-    items: [
-      { label: "Avisos", href: "/admin/avisos", icon: Megaphone },
-    ],
+    items: [{ label: "Avisos", href: "/admin/avisos", icon: Megaphone }],
   },
   {
     title: "Catálogo",
     items: [
-      { label: "Catálogo Profesional", href: "/admin/catalogo", icon: BookOpen },
+      {
+        label: "Catálogo Profesional",
+        href: "/admin/catalogo",
+        icon: BookOpen,
+      },
+    ],
+  },
+  {
+    items: [
+      { label: "Dashboard", href: "/admin/estadisticas", icon: FileText },
     ],
   },
 ];
