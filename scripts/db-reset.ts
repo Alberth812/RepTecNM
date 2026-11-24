@@ -4,7 +4,7 @@ import { Client } from "pg";
 const client = new Client({
  connectionString: process.env.DATABASE_URL,
 });
-
+//
 async function reset() {
  console.log("Reseteando base de datos...");
 

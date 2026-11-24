@@ -43,6 +43,7 @@ import type { PublicacionMetadataFormValues } from "@/lib/publicaciones/schemas/
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+//
 interface PublicacionMetadataFieldsProps<
  TFieldValues extends FieldValues &
  PublicacionMetadataFormValues & { autores: AutorFormValue[] },

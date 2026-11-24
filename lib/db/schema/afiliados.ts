@@ -36,9 +36,19 @@ export const afiliados = pgTable("afiliados", {
     .notNull()
     .default("NO_INICIADA"),
 
+  // fecha de inicio de la membresía actual
+  fechaInicioMembresia: timestamp("fecha_inicio_membresia", {
+    withTimezone: true,
+  }).defaultNow(),
+
   // RF-AUTH-012: fecha del último cambio de correo exitoso, para aplicar el
   // cooldown de 15 días. NULL si nunca ha cambiado su correo.
   lastEmailChangeAt: timestamp("last_email_change_at", { withTimezone: true }),
+
+  // Motivo de la suspensión más reciente. Se conserva incluso después de
+  // reactivar al afiliado (no se borra al quitar la suspensión); solo se
+  // reemplaza cuando el afiliado es suspendido de nuevo.
+  motivoSuspension: text("motivo_suspension"),
 
   // Folio
   // REP-{año actual}-{6 digitos}

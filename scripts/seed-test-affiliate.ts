@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth/auth";
 import { db } from "@/lib/db/client";
 import { users } from "@/lib/db/schema/auth-schema";
 import { afiliados } from "@/lib/db/schema/afiliados";
-
+//
 async function main() {
  const email = "afiliado@reptecnm.test";
  const password = process.env.TEST_AFFILIATE_PASSWORD || `Test${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}!`;

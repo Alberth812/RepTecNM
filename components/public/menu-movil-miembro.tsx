@@ -6,10 +6,20 @@ import { usePathname } from "next/navigation";
 import { LogOut, Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MENU_ADMIN, MENU_AFILIADO, contarMensajesNoLeidos } from "@/components/public/sidebar-miembro";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  MENU_ADMIN,
+  MENU_AFILIADO,
+  contarMensajesNoLeidos,
+} from "@/components/public/sidebar-miembro";
 import { useRol } from "@/lib/use-rol";
 
+//
 export function MenuMovilMiembro() {
   const { rol, nombre } = useRol();
   const pathname = usePathname();
@@ -17,13 +27,36 @@ export function MenuMovilMiembro() {
   const [msgNoLeidas, setMsgNoLeidas] = useState(0);
 
   useEffect(() => {
-    if (rol !== "visitante") setMsgNoLeidas(contarMensajesNoLeidos());
+    if (rol === "visitante") {
+      setMsgNoLeidas(0);
+      return;
+    }
+
+    let cancelado = false;
+
+    async function cargarContador() {
+      const cantidad = await contarMensajesNoLeidos();
+
+      if (!cancelado) {
+        setMsgNoLeidas(cantidad);
+      }
+    }
+
+    void cargarContador();
+
+    return () => {
+      cancelado = true;
+    };
   }, [rol, abierto, pathname]);
 
   if (rol === "visitante") return null;
 
   const items = rol === "admin" ? MENU_ADMIN : MENU_AFILIADO;
-  const nombreReal = nombre || (rol === "admin" ? "Administración RepTecNM" : "María Fernanda López Herrera");
+  const nombreReal =
+    nombre ||
+    (rol === "admin"
+      ? "Administración RepTecNM"
+      : "María Fernanda López Herrera");
 
   const salir = () => {
     localStorage.removeItem("rep-rol");

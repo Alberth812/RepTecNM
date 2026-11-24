@@ -1,42 +1,41 @@
+// app/(frontend)/afiliado/layout.tsx
+
+import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { requireAfiliado } from "@/lib/auth/session";
+
+import { NoAutorizado } from "@/components/auth/no-autorizado";
 import { BarraAfiliado } from "@/components/barra-afiliado/BarraAfiliado";
 
-// Rutas que un afiliado NO-activo puede visitar
-const ALLOWED_FOR_NON_ACTIVE = [
-  "/afiliado/registro",
-  "/afiliado/inicio",
-  "/afiliado/cuenta",
-];
+import { getAfiliadoPageAccess } from "@/lib/auth/session";
+import { REGISTRATION_STATUSES } from "@/lib/auth/auth-types";
 
-export default async function AfiliadoLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  // requireAfiliado lanza error si no hay sesión o si el rol no es AFILIADO
-  const { afiliado } = await requireAfiliado();
+type Args = {
+  children: ReactNode;
+};
 
-  const status = afiliado.membershipStatus;
+export default async function AfiliadoLayout({ children }: Args) {
+  const access = await getAfiliadoPageAccess(["ACTIVO"]);
 
-  // Estados que NO deben acceder a NADA (redirigir a login con mensaje)
-  if (status === "SUSPENDIDO" || status === "BAJA") {
-    redirect("/login?reason=suspended");
-  }
+  if (!access.allowed) {
+    /*
+     * Si es afiliado, pero todavía no ha terminado
+     * el proceso de registro, enviarlo a completar sus datos.
+     */
+    if (
+      access.reason === "MEMBERSHIP_STATUS" &&
+      access.membershipStatus &&
+      REGISTRATION_STATUSES.some((status) => status === access.membershipStatus)
+    ) {
+      redirect("/afiliado/registro");
+    }
 
-  // Estados que solo pueden ver el registro/inicio/cuenta
-  if (
-    status === "NO_INICIADA" ||
-    status === "PENDIENTE_APROBACION" ||
-    status === "REQUIERE_CORRECCION" ||
-    status === "RECHAZADO" ||
-    status === "INACTIVO"
-  ) {
-    // Aquí no podemos leer pathname directamente en un layout server,
-    // así que usamos una trampa: solo permitimos children si estamos
-    // en una subruta permitida. La validación real de pathname la
-    // hacemos en cada page.tsx con requireAfiliado([...]).
-    // Para blindar, enviamos a registro si el usuario intenta algo más.
+    return (
+      <NoAutorizado
+        redirectHref={access.redirectHref}
+        redirectLabel={access.redirectLabel}
+        description={access.description}
+      />
+    );
   }
 
   return <BarraAfiliado>{children}</BarraAfiliado>;

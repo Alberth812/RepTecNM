@@ -13,9 +13,9 @@ import { ApiError } from "@/lib/errors";
 import { buildRegistroSchema } from "@/lib/actualizar-datos/schema";
 import z from "zod";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Helpers de parseo de FormData
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 /** Convierte "" / undefined / null en null (para columnas opcionales). */
 function emptyToNull(value: unknown): string | null {
@@ -65,9 +65,9 @@ function formDataToObject(formData: FormData): Record<string, unknown> {
   return out;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 // Handler
-// ─────────────────────────────────────────────────────────────────────────────
+// 
 
 export async function POST(request: NextRequest) {
   try {
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     const data = parsed.data;
 
-    // ── Persistencia atómica ──────────────────────────────────────────────
+    //  Persistencia atómica 
     await db.transaction(async (tx) => {
       // 1) Tabla afiliados
       await tx
