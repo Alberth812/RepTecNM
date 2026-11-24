@@ -1,27 +1,10 @@
-// app/afiliado/publicaciones/page.tsx
-import type { Metadata } from "next";
+import { requireAfiliadoActivo } from "@/lib/auth/guards";
+import PageClient from "./page-client";
 
-import { PublicacionesAfiliadoList } from "@/components/afiliado/publicaciones/publicaciones-afiliado-list";
-
-export const metadata: Metadata = {
- title: "Mis publicaciones",
-};
-
-//
-//
-export default function MisPublicacionesPage() {
- return (
- <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
- <div className="space-y-1">
- <h1 className="text-2xl font-semibold tracking-tight">
- Mis publicaciones
- </h1>
- <p className="text-sm text-muted-foreground">
- Consulta, busca y administra tus publicaciones académicas.
- </p>
- </div>
-
- <PublicacionesAfiliadoList />
- </div>
- );
+export default async function Page() {
+  // Si no está ACTIVO, esto redirige automáticamente a /afiliado/registro
+  await requireAfiliadoActivo();
+  
+  // Si llega aquí, es ACTIVO, renderizamos el componente cliente
+  return <PageClient />;
 }

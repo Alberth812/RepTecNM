@@ -17,6 +17,7 @@ import {
  MAX_PDF_SIZE_BYTES,
 } from "@/lib/validation/publicaciones";
 import {
+import { requireAfiliadoActivo } from "@/lib/auth/guards";
  buscarPublicacionesQuerySchema,
  type BuscarPublicacionesQuery,
 } from "@/lib/validation/publicaciones-busqueda";
@@ -37,6 +38,7 @@ const MAX_MULTIPART_BODY_BYTES = MAX_PDF_SIZE_BYTES + 512 * 1024;
  * El propietario se obtiene exclusivamente de la sesión.
  */
 export async function POST(request: NextRequest) {
+  await requireAfiliadoActivo();
  try {
  // 1. Autorización: solo afiliados. El propietario sale de la sesión.
  const { afiliado } = await requireAfiliado();
@@ -173,6 +175,7 @@ function parseQuery(searchParams: URLSearchParams): BuscarPublicacionesQuery {
  * devuelve URLs firmadas ni `documentoArchivoId`.
  */
 export async function GET(request: NextRequest) {
+  await requireAfiliadoActivo();
  try {
  await requireSession();
  const query = parseQuery(request.nextUrl.searchParams);

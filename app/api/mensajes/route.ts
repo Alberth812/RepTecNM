@@ -5,6 +5,7 @@ import { users } from "@/lib/db/schema/auth-schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { getCurrentSession } from "@/lib/auth/session";
 import { z } from "zod";
+import { requireAfiliadoActivo } from "@/lib/auth/guards";
 
 // Esquema para enviar mensajes (se mantiene igual)
 const enviarMensajeSchema = z.object({
@@ -20,6 +21,7 @@ const enviarMensajeSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  await requireAfiliadoActivo();
  try {
  const session = await getCurrentSession();
  if (!session || !session.user) {
@@ -66,6 +68,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  await requireAfiliadoActivo();
  try {
  const session = await getCurrentSession();
  if (!session || !session.user) {
