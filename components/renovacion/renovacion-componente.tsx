@@ -148,8 +148,13 @@ export function RenovacionComponente({
               ? "Tu último comprobante fue rechazado. Sube uno nuevo para renovar tu membresía."
               : "Ya puedes subir tu comprobante de pago para renovarla."}
           </span>
-          <Button size="sm" className="w-fit" /*asChild*/>
-            <Link href={hrefRenovacion}>Renovar membresía</Link>
+          <Button
+            size="sm"
+            className="w-fit"
+            render={<Link href={hrefRenovacion} />}
+            nativeButton={false}
+          >
+            Renovar membresía
           </Button>
         </AlertDescription>
       </Alert>

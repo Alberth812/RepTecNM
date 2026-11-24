@@ -278,11 +278,13 @@ function RenovacionFila({
           Aprobar
         </Button>
         <Dialog open={dialogAbierto} onOpenChange={setDialogAbierto}>
-          <DialogTrigger /*asChild*/>
-            <Button size="sm" variant="destructive">
-              Rechazar
-            </Button>
-          </DialogTrigger>
+          <DialogTrigger
+            render={
+              <Button size="sm" variant="destructive">
+                Rechazar
+              </Button>
+            }
+          />
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Rechazar comprobante</DialogTitle>

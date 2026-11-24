@@ -15,7 +15,7 @@ const URL_EXPIRACION_SEGUNDOS = 900;
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ afiliadoId: string }> },
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     await requireAdminGeneral();
@@ -29,15 +29,15 @@ export async function GET(
     throw error;
   }
 
-  const { afiliadoId } = await params;
+  const { userId } = await params;
 
   const [afiliado, versiones] = await Promise.all([
     db
       .select({ membershipStatus: afiliados.membershipStatus })
       .from(afiliados)
-      .where(eq(afiliados.userId, afiliadoId))
+      .where(eq(afiliados.userId, userId))
       .then((rows) => rows[0]),
-    obtenerVersionesSolicitud(afiliadoId),
+    obtenerVersionesSolicitud(userId),
   ]);
 
   if (!afiliado || versiones.length === 0) {
