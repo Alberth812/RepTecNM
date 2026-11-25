@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, User, BookOpen, Mail, CreditCard } from "lucide-react";
+import { FileText, Home, User, BookOpen, Mail, CreditCard, Award } from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -44,6 +44,11 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Credencial Digital",
         href: "/afiliado/credencial",
         icon: CreditCard,
+      },
+      {
+        label: "Certificado de Afiliación",
+        href: "/afiliado/certificado",
+        icon: Award,
       },
     ],
   },

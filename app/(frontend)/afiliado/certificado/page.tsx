@@ -131,20 +131,24 @@ export default function CertificadoPage() {
       </div>
 
       <Card className="overflow-hidden border-2 border-[#004B87]/20 shadow-xl">
-        <CardContent className="p-0 bg-gray-100 flex justify-center overflow-auto max-h-[80vh]">
-          <div className="scale-[0.45] origin-top my-[-30%]">
-            <CertificadoHTML 
-              data={{ ...data, fechaEmision }}
-            />
+        <CardContent className="p-4 bg-gray-100 flex justify-center overflow-auto max-h-[80vh]">
+          <div 
+            className="bg-white shadow-lg"
+            style={{ 
+              width: '210mm', 
+              height: '297mm', 
+              transform: 'scale(0.6)', 
+              transformOrigin: 'top center' 
+            }}
+          >
+            <CertificadoHTML data={{ ...data, fechaEmision }} />
           </div>
         </CardContent>
       </Card>
 
-      <div className="absolute -left-[9999px] top-0" aria-hidden="true">
+      <div className="absolute -left-[9999px] top-0" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', top: 0 }}>
         <div ref={certificadoRef}>
-          <CertificadoHTML 
-            data={{ ...data, fechaEmision }}
-          />
+          <CertificadoHTML data={{ ...data, fechaEmision }} />
         </div>
       </div>
     </div>

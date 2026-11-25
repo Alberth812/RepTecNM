@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { solicitudes, afiliados } from "@/lib/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { solicitudes } from "@/lib/db/schema/solicitudes";
+import { afiliados } from "@/lib/db/schema/afiliados";
+import { eq, desc, isNull, sql } from "drizzle-orm";
 import { requireAdminGeneral } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
@@ -16,32 +17,65 @@ export async function GET(request: NextRequest) {
     const limit = 20;
     const offset = (page - 1) * limit;
 
-    const conditions = estado ? [eq(solicitudes.estado, estado as any)] : [];
-    const where = conditions.length > 0 ? and(...conditions) : undefined;
+    let condition;
+    if (estado === "PENDIENTE") {
+      condition = isNull(solicitudes.revisionDecision);
+    } else if (estado) {
+      condition = eq(solicitudes.revisionDecision, estado as any);
+    }
 
     const [rows, totalRows] = await Promise.all([
       db.select({
         id: solicitudes.id,
-        estado: solicitudes.estado,
-        fechaSolicitud: solicitudes.fechaSolicitud,
+        afiliadoId: solicitudes.afiliadoId,
+        revisionDecision: solicitudes.revisionDecision,
+        revisionObservaciones: solicitudes.revisionObservaciones,
+        createdAt: solicitudes.createdAt,
+        datos: solicitudes.datos,
+        fotografiaArchivoId: solicitudes.fotografiaArchivoId,
+        comprobanteArchivoId: solicitudes.comprobanteMembresiaArchivoId,
+        membershipStatus: afiliados.membershipStatus,
         folio: afiliados.folio,
-        nombres: afiliados.nombres,
-        apellidoPaterno: afiliados.apellidoPaterno,
-        apellidoMaterno: afiliados.apellidoMaterno,
-        correo: afiliados.correo,
       })
       .from(solicitudes)
       .leftJoin(afiliados, eq(solicitudes.afiliadoId, afiliados.userId))
-      .where(where)
-      .orderBy(desc(solicitudes.fechaSolicitud))
+      .where(condition ? condition : undefined)
+      .orderBy(desc(solicitudes.createdAt))
       .limit(limit)
       .offset(offset),
-      db.select({ count: solicitudes.id }).from(solicitudes).where(where),
+      db.select({ count: solicitudes.id })
+        .from(solicitudes)
+        .where(condition ? condition : undefined),
     ]);
 
+    const data = rows.map((row) => {
+      const d = (row.datos ?? {}) as Record<string, unknown>;
+      return {
+        id: row.id,
+        afiliadoId: row.afiliadoId,
+        estado: row.revisionDecision || "PENDIENTE",
+        observaciones: row.revisionObservaciones,
+        fechaSolicitud: row.createdAt,
+        folio: row.folio,
+        membershipStatus: row.membershipStatus,
+        nombres: (d.nombres as string) ?? null,
+        apellidoPaterno: (d.apellido_paterno as string) ?? null,
+        apellidoMaterno: (d.apellido_materno as string) ?? null,
+        correo: (d.correo_electronico as string) ?? null,
+        fotografiaArchivoId: row.fotografiaArchivoId,
+        comprobanteArchivoId: row.comprobanteArchivoId,
+        datos: d,
+      };
+    });
+
     return NextResponse.json({
-      data: rows,
-      pagination: { page, limit, total: totalRows.length, totalPages: Math.ceil(totalRows.length / limit) },
+      data,
+      pagination: {
+        page,
+        limit,
+        total: totalRows[0]?.count ?? 0,
+        totalPages: Math.ceil((totalRows[0]?.count ?? 0) / limit),
+      },
     });
   } catch (error) {
     console.error("[GET /api/admin/solicitudes]", error);

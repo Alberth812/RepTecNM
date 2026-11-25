@@ -120,15 +120,21 @@ export function SessionDashboard() {
  const folio = me.folio;
 
  return (
- <div className="mx-auto w-full max-w-2xl p-4 sm:p-6">
+ <div className="mx-auto flex min-h-[60vh] w-full max-w-2xl items-center justify-center p-4 sm:p-6">
  <Card className="overflow-hidden shadow-sm">
  {/* Header */}
  <CardHeader className="border-b bg-muted/20">
  <div className="flex items-start justify-between gap-4">
  <div className="flex items-center gap-3">
- <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#004B87]/10">
+ <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#004B87]/10">
  {isAdmin ? (
  <ShieldCheck className="h-5 w-5 text-[#004B87]" />
+ ) : me.fotografiaArchivoId ? (
+ <img
+ src={`/api/archivo/${me.fotografiaArchivoId}`}
+ alt="Foto de perfil"
+ className="h-full w-full object-cover"
+ />
  ) : (
  <User className="h-5 w-5 text-[#004B87]" />
  )}

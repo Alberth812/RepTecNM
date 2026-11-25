@@ -6,12 +6,6 @@ import { afiliados } from "@/lib/db/schema/afiliados";
 import { ok, toErrorResponse } from "@/lib/http/responses";
 import { ROLES } from "@/lib/constants";
 
-/**
- * No es parte explícita de RF-AUTH, pero es un endpoint natural para que
- * cualquier cliente obtenga, junto con la sesión, los datos de dominio que
- * NO viven en la tabla `users` de better-auth (subtipo/is_root para
- * administradores, membership_status para afiliados).
- */
 export async function GET() {
  try {
  const session = await requireSession();
@@ -36,7 +30,11 @@ export async function GET() {
  }
 
  const [profile] = await db
- .select({ membershipStatus: afiliados.membershipStatus, folio: afiliados.folio })
+ .select({
+ membershipStatus: afiliados.membershipStatus,
+ folio: afiliados.folio,
+ fotografiaArchivoId: afiliados.fotografiaArchivoId,
+ })
  .from(afiliados)
  .where(eq(afiliados.userId, session.user.id))
  .limit(1);
@@ -45,8 +43,9 @@ export async function GET() {
  id: session.user.id,
  email: session.user.email,
  role: session.user.role,
- folio: profile.folio,
+ folio: profile?.folio ?? null,
  membershipStatus: profile?.membershipStatus ?? null,
+ fotografiaArchivoId: profile?.fotografiaArchivoId ?? null,
  });
  } catch (error) {
  return toErrorResponse(error);

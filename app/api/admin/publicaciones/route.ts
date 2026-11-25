@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { publicaciones, users } from "@/lib/db/schema";
+import { publicaciones } from "@/lib/db/schema/publicaciones";
+import { users } from "@/lib/db/schema/auth-schema";
 import { eq, desc, and } from "drizzle-orm";
 import { requireAdminGeneral } from "@/lib/auth/session";
 

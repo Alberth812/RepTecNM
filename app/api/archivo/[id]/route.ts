@@ -1,65 +1,83 @@
 import { NextRequest, NextResponse } from "next/server";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { db } from "@/lib/db/client";
 import { archivos } from "@/lib/db/schema/archivo";
 import { eq } from "drizzle-orm";
 import { getCurrentSession } from "@/lib/auth/session";
-import { getInternalFileUrl, type StorageTarget } from "@/lib/storage";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+// Cliente S3 directo usando las variables que sabemos que existen en .env
+const s3 = new S3Client({
+  region: process.env.S3_REGION || "garage",
+  endpoint: process.env.S3_ENDPOINT || "http://dev-garage:3900",
+  forcePathStyle: true,
+  credentials: {
+    accessKeyId: process.env.GARAGE_AFFILIATES_ACCESS_KEY || "",
+    secretAccessKey: process.env.GARAGE_AFFILIATES_SECRET_KEY || "",
+  },
+});
+
+async function streamToBuffer(stream: any): Promise<Buffer> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
 
 export async function GET(
- request: NextRequest,
- { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
- try {
- const { id } = await params;
- 
- if (!id || id === "undefined" || id === "null") {
- return NextResponse.json({ error: "ID de archivo inválido" }, { status: 400 });
- }
+  try {
+    // 1. Verificar autenticación (cualquier usuario logueado, no solo admin)
+    const session = await getCurrentSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
- const [archivo] = await db.select().from(archivos).where(eq(archivos.id, id)).limit(1);
+    const { id } = await params;
+    const [file] = await db.select().from(archivos).where(eq(archivos.id, id));
 
- if (!archivo) {
- console.error("Archivo no encontrado en BD:", id);
- return NextResponse.json({ error: "Archivo no encontrado" }, { status: 404 });
- }
+    if (!file) {
+      return NextResponse.json({ error: "Archivo no encontrado" }, { status: 404 });
+    }
 
- // Mapeo de bucket
- let targetKey: StorageTarget = "afiliados";
- if (archivo.bucket === "cms") {
- targetKey = "cms";
- } else if (archivo.bucket === "affiliates") {
- targetKey = "afiliados";
- }
+    // 2. Verificar permisos: Admin GENERAL o dueño del archivo
+    // El objectKey tiene el formato: ownerId/folder/uuid.extension
+    const ownerId = file.objectKey.split("/")[0];
+    const esAdmin = session.user.role === "ADMINISTRADOR";
+    const esDueno = session.user.id === ownerId;
 
- // Verificar autenticación
- const session = await getCurrentSession();
- if (!session || !session.user) {
- return NextResponse.json({ error: "No autorizado" }, { status: 401 });
- }
+    if (!esAdmin && !esDueno) {
+      return NextResponse.json({ error: "No tienes permiso para ver este archivo" }, { status: 403 });
+    }
 
- // SOLUCIÓN: Usar el endpoint INTERNO (http://garage:3900) en lugar del público (s3.localhost)
- // Esto permite que el contenedor de Next.js resuelva y descargue la imagen sin problemas de DNS.
- const internalFileUrl = await getInternalFileUrl(targetKey, archivo.objectKey);
+    // 3. Obtener el archivo de Garage usando el SDK (firma automática SigV4)
+    const res = await s3.send(
+      new GetObjectCommand({
+        Bucket: file.bucket,
+        Key: file.objectKey,
+      })
+    );
 
- console.log("Descargando imagen desde endpoint interno:", internalFileUrl);
+    if (!res.Body) {
+      return NextResponse.json({ error: "El archivo está vacío" }, { status: 500 });
+    }
 
- const imageRes = await fetch(internalFileUrl);
- if (!imageRes.ok) {
- throw new Error(`Fallo al descargar imagen: ${imageRes.status}`);
- }
+    const buffer = await streamToBuffer(res.Body);
 
- const arrayBuffer = await imageRes.arrayBuffer();
-
- // Servir la imagen directamente al navegador con headers CORS
- return new NextResponse(arrayBuffer, {
- headers: {
- "Content-Type": archivo.contentType || "image/jpeg",
- "Cache-Control": "public, max-age=31536000, immutable",
- "Access-Control-Allow-Origin": "*", // Crucial para que el frontend pueda convertir a Blob/Base64
- },
- });
- } catch (error) {
- console.error(" Error en /api/archivo/[id]:", error);
- return NextResponse.json({ error: "Error interno del servidor", details: String(error) }, { status: 500 });
- }
+    return new NextResponse(buffer, {
+      headers: {
+        "Content-Type": file.contentType || "application/octet-stream",
+        "Content-Disposition": `inline; filename="${encodeURIComponent(file.originalName)}"`,
+        "Cache-Control": "private, max-age=3600",
+      },
+    });
+  } catch (error) {
+    console.error("[GET /api/archivo/[id]]", error);
+    return NextResponse.json({ error: "Error al obtener el archivo" }, { status: 500 });
+  }
 }
