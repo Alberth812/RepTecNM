@@ -1,97 +1,109 @@
 "use client";
-
 import { useState } from "react";
-import { MessageSquareText, Trash2 } from "lucide-react";
-import { toast } from "sonner";
-
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
- Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import { COMENTARIOS_INICIALES, type Comentario } from "@/lib/mock/comentarios";
-import { documentosIniciales } from "@/lib/mock/repositorio";
-
-interface Fila extends Comentario {
- key: string;
- docId: string;
- docTitulo: string;
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Trash2, Eye, AlertTriangle } from "lucide-react";
 
 export default function ModeracionPage() {
- const [filas, setFilas] = useState<Fila[]>(() =>
- Object.entries(COMENTARIOS_INICIALES).flatMap(([docId, lista]) =>
- lista.map((c, i) => ({
- ...c,
- docId,
- key: `${docId}-${i}`,
- docTitulo: documentosIniciales.find((d) => d.id === docId)?.titulo ?? docId,
- }))
- )
- );
+  const [page, setPage] = useState(1);
+  const [estado, setEstado] = useState("");
 
- const eliminar = (f: Fila) => {
- setFilas((prev) => prev.filter((x) => x.key !== f.key));
- toast.success("Comentario retirado del foro público.");
- };
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["publicaciones", page, estado],
+    queryFn: async () => {
+      const params = new URLSearchParams({ page: page.toString(), limit: "20" });
+      if (estado) params.set("estado", estado);
+      const res = await fetch(`/api/admin/publicaciones?${params}`);
+      if (!res.ok) throw new Error("Error");
+      return res.json();
+    },
+  });
 
- return (
- <div className="flex flex-col gap-4">
- <div>
- <h1 className="text-2xl font-semibold tracking-tight">Moderación del foro</h1>
- <p className="text-sm text-muted-foreground">
- Comentarios publicados en el repositorio, sujetos a revisión del Administrador General.
- </p>
- </div>
+  const handleEliminar = async (id: string, titulo: string) => {
+    if (!confirm(`¿Eliminar la publicación "${titulo}"? Esta acción no se puede deshacer.`)) return;
+    const res = await fetch("/api/admin/publicaciones", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) refetch();
+    else alert("Error al eliminar");
+  };
 
- <div className="overflow-x-auto rounded-lg border bg-card">
- <Table>
- <TableHeader>
- <TableRow>
- <TableHead>Documento</TableHead>
- <TableHead>Autor</TableHead>
- <TableHead>Comentario</TableHead>
- <TableHead>Fecha</TableHead>
- <TableHead className="text-right">Acción</TableHead>
- </TableRow>
- </TableHeader>
- <TableBody>
- {filas.length === 0 && (
- <TableRow>
- <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
- No hay comentarios publicados.
- </TableCell>
- </TableRow>
- )}
- {filas.map((f) => (
- <TableRow key={f.key}>
- <TableCell className="max-w-xs">
- <p className="truncate font-medium">{f.docTitulo}</p>
- </TableCell>
- <TableCell>{f.autor}</TableCell>
- <TableCell className="max-w-md">
- <p className="truncate text-sm">{f.texto}</p>
- </TableCell>
- <TableCell className="text-xs">{f.fecha}</TableCell>
- <TableCell className="text-right">
- <Button
- size="sm"
- variant="ghost"
- className="text-destructive hover:bg-destructive/10 hover:text-destructive"
- onClick={() => eliminar(f)}
- >
- <Trash2 className="mr-2 h-4 w-4" /> Retirar
- </Button>
- </TableCell>
- </TableRow>
- ))}
- </TableBody>
- </Table>
- </div>
+  const getBadge = (e: string) => {
+    const c: Record<string, string> = { PUBLICADA: "bg-green-100 text-green-800", BORRADOR: "bg-gray-100 text-gray-800", PENDIENTE: "bg-yellow-100 text-yellow-800", RECHAZADA: "bg-red-100 text-red-800" };
+    return c[e] || "bg-gray-100 text-gray-800";
+  };
 
- <p className="flex items-center gap-2 text-xs text-muted-foreground">
- <MessageSquareText className="h-4 w-4" />
- Retirar un comentario lo elimina de la vista pública del repositorio de inmediato.
- </p>
- </div>
- );
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold">Moderación</h1>
+        <p className="text-sm text-muted-foreground">Revisa y gestiona las publicaciones de la comunidad</p>
+      </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Publicaciones</CardTitle>
+          <select value={estado} onChange={(e) => { setEstado(e.target.value); setPage(1); }} className="rounded-md border px-3 py-1 text-sm">
+            <option value="">Todos</option>
+            <option value="PUBLICADA">Publicadas</option>
+            <option value="BORRADOR">Borradores</option>
+            <option value="PENDIENTE">Pendientes</option>
+          </select>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? <p className="py-8 text-center">Cargando...</p> : data?.data?.length === 0 ? (
+            <p className="py-8 text-center text-muted-foreground">No hay publicaciones</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Autor</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.data?.map((p: any) => (
+                  <TableRow key={p.id}>
+                    <TableCell>
+                      <p className="font-medium">{p.titulo}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{p.resumen}</p>
+                    </TableCell>
+                    <TableCell>
+                      <p>{p.autorNombre || "Desconocido"}</p>
+                      <p className="text-xs text-muted-foreground">{p.autorEmail}</p>
+                    </TableCell>
+                    <TableCell><Badge className={getBadge(p.estado)}>{p.estado}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => window.open(`/publicaciones/${p.id}`, "_blank")}>
+                          <Eye className="mr-1 h-4 w-4" /> Ver
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleEliminar(p.id, p.titulo)}>
+                          <Trash2 className="mr-1 h-4 w-4" /> Eliminar
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-amber-600" /> Criterios de Moderación</CardTitle></CardHeader>
+        <CardContent className="space-y-2 text-sm text-muted-foreground">
+          <p>• Contenido que viole derechos de autor (plagio).</p>
+          <p>• Información falsa, engañosa o discriminatoria.</p>
+          <p>• Spam o datos personales sensibles sin consentimiento.</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
