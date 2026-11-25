@@ -50,12 +50,15 @@ export async function GET(request: NextRequest) {
  conditions.push(ids.length > 0 ? inArray(afiliados.userId, ids) : sql`1 = 0`);
  }
 
+ // FIX: Formatear arrays de JS a literales de array de PostgreSQL válidos
  if (areas.length > 0) {
- conditions.push(sql`${afiliados.areaConocimiento} && ${areas}::text[]`);
+ const areasPg = `{${areas.map(a => `"${a.replace(/"/g, '\\"')}"`).join(",")}}`;
+ conditions.push(sql`${afiliados.areaConocimiento} && ${areasPg}::text[]`);
  }
 
  if (servicios.length > 0) {
- conditions.push(sql`${afiliados.tipoServicios} && ${servicios}::text[]`);
+ const serviciosPg = `{${servicios.map(s => `"${s.replace(/"/g, '\\"')}"`).join(",")}}`;
+ conditions.push(sql`${afiliados.tipoServicios} && ${serviciosPg}::text[]`);
  }
 
  let searchCond = undefined;
@@ -118,7 +121,6 @@ export async function GET(request: NextRequest) {
  let fotografiaUrl: string | undefined = undefined;
  if (a.fotoObjectKey) {
  try {
- // Usamos "afiliados" como target del bucket, igual que en el registro
  fotografiaUrl = await getFileUrl("afiliados", a.fotoObjectKey);
  } catch (e) {
  console.error("Error generando URL de foto para", a.userId, e);

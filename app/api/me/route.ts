@@ -34,6 +34,11 @@ export async function GET() {
  membershipStatus: afiliados.membershipStatus,
  folio: afiliados.folio,
  fotografiaArchivoId: afiliados.fotografiaArchivoId,
+ nombres: afiliados.nombres,
+ apellidoPaterno: afiliados.apellidoPaterno,
+ apellidoMaterno: afiliados.apellidoMaterno,
+ correoElectronico: afiliados.correoElectronico,
+ telefonoCelular: afiliados.telefonoCelular,
  })
  .from(afiliados)
  .where(eq(afiliados.userId, session.user.id))
@@ -46,6 +51,11 @@ export async function GET() {
  folio: profile?.folio ?? null,
  membershipStatus: profile?.membershipStatus ?? null,
  fotografiaArchivoId: profile?.fotografiaArchivoId ?? null,
+ nombres: profile?.nombres ?? null,
+ apellidoPaterno: profile?.apellidoPaterno ?? null,
+ apellidoMaterno: profile?.apellidoMaterno ?? null,
+ correoElectronico: profile?.correoElectronico ?? null,
+ telefonoCelular: profile?.telefonoCelular ?? null,
  });
  } catch (error) {
  return toErrorResponse(error);

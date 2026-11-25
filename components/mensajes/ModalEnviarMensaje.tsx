@@ -25,6 +25,14 @@ interface ModalEnviarMensajeProps {
   onClose: () => void;
 }
 
+const estadoInicialForm = {
+  motivo: "",
+  contenido: "",
+  nombreParaRespuesta: "",
+  correoParaRespuesta: "",
+  telefonoParaRespuesta: "",
+};
+
 export function ModalEnviarMensaje({
   destinatarioId,
   destinatarioNombre,
@@ -34,84 +42,75 @@ export function ModalEnviarMensaje({
   const [enviando, setEnviando] = useState(false);
   const [cargandoDatos, setCargandoDatos] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
-  
-  const [formData, setFormData] = useState({
-    motivo: "",
-    contenido: "",
-    nombreParaRespuesta: "",
-    correoParaRespuesta: "",
-    telefonoParaRespuesta: "",
-  });
+  const [formData, setFormData] = useState(estadoInicialForm);
 
   useEffect(() => {
-    if (isOpen) {
-      console.log("[DEBUG] Modal abierto, intentando cargar datos del usuario...");
-      setCargandoDatos(true);
-      setErrores({});
-      
-      fetch("/api/usuarios/me")
-        .then(async (res) => {
-          console.log("[DEBUG] Estado de la respuesta HTTP:", res.status, res.statusText);
-          if (res.ok) {
-            const data = await res.json();
-            console.log("[DEBUG] Datos recibidos del servidor:", data);
-            return data;
-          }
-          console.warn("[DEBUG] La respuesta no fue OK (ej. 401 No autorizado o 404 No encontrado).");
-          return null;
-        })
-        .then((data) => {
-          if (data) {
-            setFormData({
-              motivo: "",
-              contenido: "",
-              // Intentamos múltiples nombres de campo comunes por si la API usa otros
-              nombreParaRespuesta: data.nombre || data.nombreCompleto || data.name || "",
-              correoParaRespuesta: data.correo || data.email || "",
-              telefonoParaRespuesta: data.telefono || data.phone || "",
-            });
-          } else {
-            console.warn("[DEBUG] No se pudieron obtener datos. Se dejan campos vacíos.");
-            setFormData({
-              motivo: "",
-              contenido: "",
-              nombreParaRespuesta: "",
-              correoParaRespuesta: "",
-              telefonoParaRespuesta: "",
-            });
-          }
-        })
-        .catch((err) => {
-          console.error("[DEBUG] Error de red o excepción:", err);
+    if (!isOpen) return;
+
+    let activo = true;
+    setCargandoDatos(true);
+    setErrores({});
+
+    fetch("/api/me")
+      .then(async (res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        if (!activo) return;
+
+        if (data) {
+          const nombreCompleto = data.nombres
+            ? `${data.nombres} ${data.apellidoPaterno || ""} ${data.apellidoMaterno || ""}`.trim()
+            : data.nombre || data.nombreCompleto || data.name || "";
+
           setFormData({
             motivo: "",
             contenido: "",
-            nombreParaRespuesta: "",
-            correoParaRespuesta: "",
-            telefonoParaRespuesta: "",
+            nombreParaRespuesta: nombreCompleto.slice(0, MAX_LONGITUD_CAMPOS.nombre),
+            correoParaRespuesta: (data.correoElectronico || data.correo || data.email || "").slice(
+              0,
+              MAX_LONGITUD_CAMPOS.correo
+            ),
+            telefonoParaRespuesta: String(data.telefonoCelular || data.telefono || data.phone || "")
+              .replace(/\D/g, "")
+              .slice(0, MAX_DIGITOS_TELEFONO),
           });
-        })
-        .finally(() => {
+        } else {
+          setFormData(estadoInicialForm);
+        }
+      })
+      .catch((err) => {
+        if (!activo) return;
+        console.error("Error al cargar datos del usuario:", err);
+        setFormData(estadoInicialForm);
+      })
+      .finally(() => {
+        if (activo) {
           setCargandoDatos(false);
-        });
-    }
+        }
+      });
+
+    return () => {
+      activo = false;
+    };
   }, [isOpen]);
 
   const conteoPalabras = useMemo(() => {
     if (!formData.contenido.trim()) return 0;
-    return formData.contenido.trim().split(/\s+/).filter((p) => p.length > 0).length;
+    return formData.contenido
+      .trim()
+      .split(/\s+/)
+      .filter((p) => p.length > 0).length;
   }, [formData.contenido]);
 
   const excedePalabras = conteoPalabras > MAX_PALABRAS;
 
   const handleTelefonoChange = (valor: string) => {
-    let limpio = valor.replace(/\D/g, "");
-    if (limpio.length > MAX_DIGITOS_TELEFONO) {
-      limpio = limpio.slice(0, MAX_DIGITOS_TELEFONO);
-    }
-    setFormData({ ...formData, telefonoParaRespuesta: limpio });
+    const limpio = valor.replace(/\D/g, "").slice(0, MAX_DIGITOS_TELEFONO);
+    setFormData((prev) => ({ ...prev, telefonoParaRespuesta: limpio }));
     if (errores.telefonoParaRespuesta) {
-      setErrores({ ...errores, telefonoParaRespuesta: "" });
+      setErrores((prev) => ({ ...prev, telefonoParaRespuesta: "" }));
     }
   };
 
@@ -121,7 +120,7 @@ export function ModalEnviarMensaje({
     if (formData.nombreParaRespuesta.trim().length < 2) {
       nuevosErrores.nombreParaRespuesta = "El nombre es obligatorio (mínimo 2 caracteres)";
     } else if (formData.nombreParaRespuesta.length > MAX_LONGITUD_CAMPOS.nombre) {
-      nuevosErrores.nombreParaRespuesta = `Nombre demasiado largo`;
+      nuevosErrores.nombreParaRespuesta = "Nombre demasiado largo";
     }
 
     if (!formData.correoParaRespuesta.trim()) {
@@ -133,10 +132,8 @@ export function ModalEnviarMensaje({
       }
     }
 
-    if (formData.telefonoParaRespuesta) {
-      if (formData.telefonoParaRespuesta.length < 10) {
-        nuevosErrores.telefonoParaRespuesta = "Teléfono debe tener 10-12 dígitos";
-      }
+    if (formData.telefonoParaRespuesta && formData.telefonoParaRespuesta.length < 10) {
+      nuevosErrores.telefonoParaRespuesta = "Teléfono debe tener 10-12 dígitos";
     }
 
     if (formData.motivo.trim().length < 5) {
@@ -170,24 +167,25 @@ export function ModalEnviarMensaje({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           destinatarioId,
-          nombreParaRespuesta: formData.nombreParaRespuesta,
-          correoParaRespuesta: formData.correoParaRespuesta,
+          nombreParaRespuesta: formData.nombreParaRespuesta.trim(),
+          correoParaRespuesta: formData.correoParaRespuesta.trim(),
           telefonoParaRespuesta: formData.telefonoParaRespuesta || null,
           motivo: formData.motivo,
-          contenido: formData.contenido,
+          contenido: formData.contenido.trim(),
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        const errorMsg = data.detalles 
-          ? data.detalles.map((d: any) => `${d.campo}: ${d.mensaje}`).join(" | ")
-          : (data.error || "Error al enviar");
+        const errorMsg = data.detalles
+          ? data.detalles.map((d: { campo: string; mensaje: string }) => `${d.campo}: ${d.mensaje}`).join(" | ")
+          : data.error || "Error al enviar";
         throw new Error(errorMsg);
       }
 
       toast.success("Mensaje enviado correctamente");
+      setFormData(estadoInicialForm);
       onClose();
     } catch (error: unknown) {
       console.error("Error al enviar mensaje:", error);
@@ -208,6 +206,7 @@ export function ModalEnviarMensaje({
             <p className="text-sm text-slate-600">Para: {destinatarioNombre}</p>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 transition-colors"
             disabled={enviando || cargandoDatos}
@@ -220,7 +219,7 @@ export function ModalEnviarMensaje({
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004B87]" />
-              Tus datos de contacto 
+              Tus datos de contacto
               {cargandoDatos && <Loader2 className="h-3 w-3 animate-spin text-[#004B87]" />}
             </h3>
 
@@ -230,11 +229,18 @@ export function ModalEnviarMensaje({
                 id="nombre"
                 placeholder="Ej: Juan Pérez"
                 value={formData.nombreParaRespuesta}
-                onChange={(e) => setFormData({ ...formData, nombreParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.nombre) })}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    nombreParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.nombre),
+                  }))
+                }
                 maxLength={MAX_LONGITUD_CAMPOS.nombre}
                 disabled={enviando || cargandoDatos}
               />
-              {errores.nombreParaRespuesta && <p className="text-sm text-red-500">{errores.nombreParaRespuesta}</p>}
+              {errores.nombreParaRespuesta && (
+                <p className="text-sm text-red-500">{errores.nombreParaRespuesta}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,11 +251,18 @@ export function ModalEnviarMensaje({
                   type="email"
                   placeholder="ejemplo@correo.com"
                   value={formData.correoParaRespuesta}
-                  onChange={(e) => setFormData({ ...formData, correoParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.correo) })}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      correoParaRespuesta: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.correo),
+                    }))
+                  }
                   maxLength={MAX_LONGITUD_CAMPOS.correo}
                   disabled={enviando || cargandoDatos}
                 />
-                {errores.correoParaRespuesta && <p className="text-sm text-red-500">{errores.correoParaRespuesta}</p>}
+                {errores.correoParaRespuesta && (
+                  <p className="text-sm text-red-500">{errores.correoParaRespuesta}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -265,7 +278,9 @@ export function ModalEnviarMensaje({
                   maxLength={MAX_DIGITOS_TELEFONO}
                   disabled={enviando || cargandoDatos}
                 />
-                {errores.telefonoParaRespuesta && <p className="text-sm text-red-500">{errores.telefonoParaRespuesta}</p>}
+                {errores.telefonoParaRespuesta && (
+                  <p className="text-sm text-red-500">{errores.telefonoParaRespuesta}</p>
+                )}
               </div>
             </div>
           </div>
@@ -275,7 +290,7 @@ export function ModalEnviarMensaje({
             <select
               id="motivo"
               value={formData.motivo}
-              onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
+              onChange={(e) => setFormData((prev) => ({ ...prev, motivo: e.target.value }))}
               disabled={enviando || cargandoDatos}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#004B87]"
             >
@@ -295,7 +310,12 @@ export function ModalEnviarMensaje({
               id="contenido"
               placeholder="Describe brevemente el motivo de tu contacto..."
               value={formData.contenido}
-              onChange={(e) => setFormData({ ...formData, contenido: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.mensaje) })}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  contenido: e.target.value.slice(0, MAX_LONGITUD_CAMPOS.mensaje),
+                }))
+              }
               rows={5}
               maxLength={MAX_LONGITUD_CAMPOS.mensaje}
               disabled={enviando || cargandoDatos}
@@ -311,10 +331,19 @@ export function ModalEnviarMensaje({
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <Button type="button" variant="outline" onClick={onClose} disabled={enviando || cargandoDatos}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={enviando || cargandoDatos}
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={enviando || cargandoDatos || excedePalabras} className="bg-[#004B87] hover:bg-[#003a68]">
+            <Button
+              type="submit"
+              disabled={enviando || cargandoDatos || excedePalabras}
+              className="bg-[#004B87] hover:bg-[#003a68]"
+            >
               {enviando ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
