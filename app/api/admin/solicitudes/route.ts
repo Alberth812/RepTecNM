@@ -1,52 +1,50 @@
-import {
- NoAutenticadoError,
- NoAutorizadoError,
- requireAdminGeneral,
-} from "@/lib/auth/session";
-import {
- contarSolicitudes,
- listarSolicitudes,
-} from "@/lib/db/solicitudes/queries";
-import { NextResponse } from "next/server";
-import { z } from "zod";
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db/client";
+import { solicitudes, afiliados } from "@/lib/db/schema";
+import { eq, desc, and } from "drizzle-orm";
+import { requireAdminGeneral } from "@/lib/auth/session";
 
-const querySchema = z.object({
- estado: z
- .enum(["REQUIERE_ATENCION", "EN_CORRECCION", "RECHAZADA", "APROBADA"])
- .optional(),
- limit: z.coerce.number().int().min(1).max(100).default(20),
- offset: z.coerce.number().int().min(0).default(0),
-});
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
- try {
- await requireAdminGeneral();
- } catch (error) {
- if (error instanceof NoAutenticadoError) {
- return NextResponse.json({ message: error.message }, { status: 401 });
- }
- if (error instanceof NoAutorizadoError) {
- return NextResponse.json({ message: error.message }, { status: 403 });
- }
- throw error;
- }
+export async function GET(request: NextRequest) {
+  try {
+    await requireAdminGeneral();
+    const searchParams = request.nextUrl.searchParams;
+    const estado = searchParams.get("estado");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = 20;
+    const offset = (page - 1) * limit;
 
- const { searchParams } = new URL(request.url);
- const result = querySchema.safeParse(Object.fromEntries(searchParams));
+    const conditions = estado ? [eq(solicitudes.estado, estado as any)] : [];
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
 
- if (!result.success) {
- return NextResponse.json(
- { message: "Parámetros de consulta inválidos." },
- { status: 400 },
- );
- }
+    const [rows, totalRows] = await Promise.all([
+      db.select({
+        id: solicitudes.id,
+        estado: solicitudes.estado,
+        fechaSolicitud: solicitudes.fechaSolicitud,
+        folio: afiliados.folio,
+        nombres: afiliados.nombres,
+        apellidoPaterno: afiliados.apellidoPaterno,
+        apellidoMaterno: afiliados.apellidoMaterno,
+        correo: afiliados.correo,
+      })
+      .from(solicitudes)
+      .leftJoin(afiliados, eq(solicitudes.afiliadoId, afiliados.userId))
+      .where(where)
+      .orderBy(desc(solicitudes.fechaSolicitud))
+      .limit(limit)
+      .offset(offset),
+      db.select({ count: solicitudes.id }).from(solicitudes).where(where),
+    ]);
 
- const { estado, limit, offset } = result.data;
-
- const [items, total] = await Promise.all([
- listarSolicitudes({ estado, limit, offset }),
- contarSolicitudes({ estado }),
- ]);
-
- return NextResponse.json({ items, total, limit, offset });
+    return NextResponse.json({
+      data: rows,
+      pagination: { page, limit, total: totalRows.length, totalPages: Math.ceil(totalRows.length / limit) },
+    });
+  } catch (error) {
+    console.error("[GET /api/admin/solicitudes]", error);
+    return NextResponse.json({ error: "Error al obtener solicitudes" }, { status: 500 });
+  }
 }
