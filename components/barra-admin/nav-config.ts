@@ -33,7 +33,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Afiliados", href: "/admin/afiliados", icon: Users },
       { label: "Aprobaciones", href: "/admin/aprobaciones", icon: FileText },
       { label: "Publicaciones", href: "/admin/moderacion", icon: FileText },
-      { label: "Avisos", href: "/admin/avisos", icon: MessageSquare },
+      { label: "Avisos", href: "/contenido/collections/avisos", icon: MessageSquare },
       { label: "Configuración", href: "/admin/configuracion", icon: Settings },
     ],
   },
