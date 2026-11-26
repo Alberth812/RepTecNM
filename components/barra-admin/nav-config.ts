@@ -89,6 +89,15 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Dashboard", href: "/admin/estadisticas", icon: FileText },
     ],
   },
+  {
+    items: [
+      {
+        label: "Renovar membresías",
+        href: "/admin/renovaciones-membresias",
+        icon: FileText,
+      },
+    ],
+  },
 ];
 
 export const ACCOUNT_ITEM: NavItem = {

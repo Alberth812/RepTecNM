@@ -1,5 +1,13 @@
 import type { LucideIcon } from "lucide-react";
-import { FileText, Home, User, BookOpen, Mail, LifeBuoy, CreditCard } from "lucide-react";
+import {
+  FileText,
+  Home,
+  User,
+  BookOpen,
+  Mail,
+  LifeBuoy,
+  CreditCard,
+} from "lucide-react";
 
 export type NavItem = {
   label: string;
@@ -14,9 +22,7 @@ export type NavGroup = {
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    items: [
-      { label: "Inicio", href: "/afiliado/inicio", icon: Home }
-    ],
+    items: [{ label: "Inicio", href: "/afiliado/inicio", icon: Home }],
   },
   {
     items: [

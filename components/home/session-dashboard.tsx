@@ -26,7 +26,9 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RenovacionComponente } from "../renovacion/renovacion-componente";
 
+//
 const MEMBERSHIP_LABELS: Record<string, string> = {
   NO_INICIADA: "NO_INICIADA",
   RECHAZADO: "RECHAZADO",
@@ -37,6 +39,9 @@ const MEMBERSHIP_LABELS: Record<string, string> = {
   BAJA: "BAJA",
 };
 
+//
+//
+//
 const BLOCKED_MEMBERSHIP_STATUSES = new Set([
   "RECHAZADO",
   "SUSPENDIDO",
@@ -247,6 +252,7 @@ export function SessionDashboard() {
                             "Tu membresía no está activa"}
                         </h2>
 
+                        {/**  */}
                         {membershipStatus === "ACTIVO" && (
                           <div className="rounded-lg border bg-background/60 p-3">
                             <p className="text-xs font-medium text-muted-foreground">
@@ -256,9 +262,9 @@ export function SessionDashboard() {
                             <p className="mt-1 font-mono text-sm font-semibold">
                               {folio || "Folio no disponible"}
                             </p>
+                            <RenovacionComponente variant="resumen" />
                           </div>
                         )}
-
                         <p className="mt-1 text-sm text-muted-foreground">
                           {membershipStatus === "NO_INICIADA" &&
                             "Por favor completa tu formulario de registro para comenzar."}
