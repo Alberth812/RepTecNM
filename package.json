@@ -14,6 +14,7 @@
     "db:seed-root": "tsx scripts/seed-root-admin.ts",
     "db:seed-instituciones": "tsx scripts/seed-instituciones.ts",
     "db:reset": "tsx scripts/db-reset.ts",
+    "db:seed-afiliados": "tsx scripts/seed-afiliados.ts",
     "payload": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts payload"
   },
   "dependencies": {
